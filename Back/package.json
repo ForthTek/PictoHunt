@@ -11,8 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.17.1",
-    "mssql": "^6.3.1",
-    "tedious": "^9.2.3"
+    "mysql": "^2.18.1"
   },
   "devDependencies": {}
 }
