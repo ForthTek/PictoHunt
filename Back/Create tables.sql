@@ -1,4 +1,8 @@
-#CREATE DATABASE PictoHunt;
+
+IF db_id('PictoHunt') IS NULL 
+    CREATE DATABASE PictoHunt;
+
+GO
 
 # Names 32
 # Email address 64
