@@ -16,39 +16,39 @@ const config =
 
 
 
-// Syntax for calling the query async function 
-(async () => {
-  let v = await query("SELECT * FROM User WHERE username = ?", 'sol');
-  console.log("Test query - username = sol");
-  console.log(v);
-})();
-
 
 
 
 /**
  * Async function that performs a prepared statement query on the database. Must be called 
  * from within an async function block and must include the await keyword before the call.
- * @code (async () => { let v = await query('query', ...'args'); })();
+ * @code (async () => { let x = await query('query', ...'args'); })();
  * 
  * @param {string} query A prepared statement SQl query. E.g. 'SELECT * FROM User WHERE username = ?'
- * @param {*[]} args The arguments to substitute into the prepared statement. E.g. 'sol'
+ * @param {*[]} args The arguments to substitute into the prepared statement. 
  * @returns {*} The rows affected by the query (could be NULL if the query failed).
  */
 async function query(query, ...args) {
   // Function taken from official documentation: 
   // https://github.com/mlaanderson/database-js-mysql
 
+  console.log(args);
+
   let connection, statement, rows;
   connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
 
   try {
     statement = connection.prepareStatement(query);
+
+    console.log(statement);
+
     rows = await statement.query(args);
     //console.log(rows);
-  } catch (error) {
+  }
+  catch (error) {
     console.log(error);
-  } finally {
+  }
+  finally {
     await connection.close();
   }
 
@@ -70,27 +70,36 @@ async function query(query, ...args) {
  * @param {string} username The username of the account.
  * @param {string} password The password of the account.
  * @param {string} email The email address of the account.
- * @returns {boolean} The operation was successful.
- */
-function createUser(username, password, email) {
-  return createUser(username, password, email, true, false);
-}
-
-/**
- * Function that creates a new account for the user.
- * 
- * @param {string} username The username of the account.
- * @param {string} password The password of the account.
- * @param {string} email The email address of the account.
  * @param {boolean} isPublicAccount The account should be public.
  * @param {boolean} isAdminAccount The account should have administrator privileges.
  * @returns {boolean} The operation was successful.
  */
-function createUser(username, password, email, isPublicAccount, isAdminAccount) {
-  let query = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess) VALUES (?, ?, ?, ?, ?)";
+function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
+  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess) VALUES (?, ?, ?, ?, ?)";
+  let data = null;
 
-  return true;
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      data = await query(sql, username, password, email, isPublicAccount, isAdminAccount);
+      return true;
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })();
+
+  return false;
 }
+
+
+
+
+
+
+//createUser("solomon", "password", "email");
+
+
 
 
 function createTag(name, description) {
@@ -105,12 +114,9 @@ function createChannel(name, description, usernameCreatedBy) {
   // INSERT INTO TagsInChannel(channelName, tagName) VALUES("Cute animal pics", "Cute animals");
 }
 
-function createPost(title, accountUsername, channelNamePostedTo, photos, tags) {
-  return createPost(title, accountUsername, channelNamePostedTo, photos, tags, null)
-}
 
 function createPost(title, accountUsername, channelNamePostedTo, photos, tags, GPSValue) {
-  let query = "INSERT INTO Channel(name, description, createdBy) VALUES(?, ?, ?);";
+  let query = "INSERT INTO Channel() VALUES(?, ?, ?);";
 
   // INSERT INTO PhotosInPost(postID, photoURL, orderInPost) VALUES(2, "www.cute-cats-in-my-area.co.uk/cat2.png", 1);
   // TAGS IN POST
@@ -139,30 +145,81 @@ function interactWithPost(postID, accountUsername, interactionType) {
 function followChannel(accountUsername, channelName) {
   let query = "INSERT INTO UserFollowingChannel(username, channelName) VALUES(?, ?);";
 
+
 }
 
 function followTag(accountUsername, tagName) {
   let query = "INSERT INTO UserFollowingTag(username, tag) VALUES(?, ?);";
 
+
 }
 
 function followUser(accountUsername, usernameToFollow) {
-  let query = "INSERT INTO UserFollowingUser(username, userBeingFollowed) VALUES(?, ?);";
+  let sql = "SELECT * FROM UserFollowingUser(username, userBeingFollowed) VALUES(?, ?);";
+  let data = null;
 
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      data = await query(sql, accountUsername, usernameToFollow);
+      return true;
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })();
+
+  return false;
 }
+
+//followUser("sol", "sol-private");
 
 
 
 
 // Get methods
 
-
+/**
+ * 
+ * @param {*} username 
+ */
 function getAllPostsByUser(username) {
+  let sql = "SELECT * FROM Post WHERE posterAccount = ?;";
+  let data = null;
 
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      data = await query(sql, username);
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })();
+
+  return data;
 }
 
-function getUserDetails(username) {
 
+/**
+ * 
+ * @param {*} username 
+ */
+function getUserDetails(username) {
+  let sql = "SELECT * FROM User WHERE username = ?;";
+  let data = null;
+
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      data = await query(sql, username);
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })();
+
+  return data;
 }
 
 
