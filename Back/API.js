@@ -13,13 +13,25 @@ var Connection = require('database-js').Connection;
 
 
 // Syntax for calling the query async function 
-(async () => { 
-  let v = await query("SELECT * FROM User WHERE username = ?", 'sol'); 
+(async () => {
+  let v = await query("SELECT * FROM User WHERE username = ?", 'sol');
   console.log(v);
 })();
 
 
-async function query(query, args) {
+/**
+ * Async function that performs a prepared statement query on the database. Must be called 
+ * from within an async function block and must include the await keyword before the call.
+ * @code (async () => { let v = await query('query', ...'args'); })();
+ * 
+ * @param {string} query A prepared statement SQl query. E.g. 'SELECT * FROM User WHERE username = ?'
+ * @param {*[]} args The arguments to substitute into the prepared statement. E.g. 'sol'
+ * @returns {*} The rows affected by the query (could be NULL if the query failed).
+ */
+async function query(query, ...args) {
+  // Function taken from official documentation: 
+  // https://github.com/mlaanderson/database-js-mysql
+
   let connection, statement, rows;
   connection = new Connection("mysql://" + config.user + ":" + config.password + "@" + config.host + "/" + config.database);
 
@@ -35,42 +47,6 @@ async function query(query, args) {
 
   return rows;
 }
-
-
-/*
-async function query() {
-  let connection, statement, rows;
-  connection = new Connection("mysql://" + config.user + ":" + config.password + "@" + config.host + "/" + config.database);
-
-  try {
-    statement = await connection.prepareStatement("SELECT * FROM User WHERE username = ?");
-    rows = await statement.query('sol');
-    console.log(rows);
-  } catch (error) {
-    console.log(error);
-  } finally {
-    await connection.close();
-  }
-}
-*/
-
-
-/*
-(async () => {
-  let connection, statement, rows;
-  connection = new Connection("mysql://" + config.user + ":" + config.password + "@" + config.host + "/" + config.database);
-
-  try {
-    statement = await connection.prepareStatement("SELECT * FROM User WHERE username = ?");
-    rows = await statement.query('sol');
-    console.log(rows);
-  } catch (error) {
-    console.log(error);
-  } finally {
-    await connection.close();
-  }
-})();
-*/
 
 
 
