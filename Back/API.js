@@ -1,7 +1,76 @@
 // https://en.wikipedia.org/wiki/JSDoc
 // JavaScriptDoc conventions
 
+const config =
+{
+  host: 'sql2.freesqldatabase.com',
+  user: 'sql2387221',
+  password: 'PictoHunt',
+  database: 'sql2387221'
+}
 
+var Connection = require('database-js').Connection;
+
+
+// Syntax for calling the query async function 
+(async () => { 
+  let v = await query("SELECT * FROM User WHERE username = ?", 'sol'); 
+  console.log(v);
+})();
+
+
+async function query(query, args) {
+  let connection, statement, rows;
+  connection = new Connection("mysql://" + config.user + ":" + config.password + "@" + config.host + "/" + config.database);
+
+  try {
+    statement = await connection.prepareStatement(query);
+    rows = await statement.query(args);
+    //console.log(rows);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    await connection.close();
+  }
+
+  return rows;
+}
+
+
+/*
+async function query() {
+  let connection, statement, rows;
+  connection = new Connection("mysql://" + config.user + ":" + config.password + "@" + config.host + "/" + config.database);
+
+  try {
+    statement = await connection.prepareStatement("SELECT * FROM User WHERE username = ?");
+    rows = await statement.query('sol');
+    console.log(rows);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    await connection.close();
+  }
+}
+*/
+
+
+/*
+(async () => {
+  let connection, statement, rows;
+  connection = new Connection("mysql://" + config.user + ":" + config.password + "@" + config.host + "/" + config.database);
+
+  try {
+    statement = await connection.prepareStatement("SELECT * FROM User WHERE username = ?");
+    rows = await statement.query('sol');
+    console.log(rows);
+  } catch (error) {
+    console.log(error);
+  } finally {
+    await connection.close();
+  }
+})();
+*/
 
 
 
