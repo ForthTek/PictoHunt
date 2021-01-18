@@ -1,22 +1,29 @@
 // https://en.wikipedia.org/wiki/JSDoc
 // JavaScriptDoc conventions
 
+// https://github.com/mlaanderson/database-js
+// Node package name: database-js
+var Connection = require('database-js').Connection;
+
 const config =
 {
   host: 'sql2.freesqldatabase.com',
   user: 'sql2387221',
   password: 'PictoHunt',
   database: 'sql2387221'
-}
+};
 
-var Connection = require('database-js').Connection;
+
 
 
 // Syntax for calling the query async function 
 (async () => {
   let v = await query("SELECT * FROM User WHERE username = ?", 'sol');
+  console.log("Test query - username = sol");
   console.log(v);
 })();
+
+
 
 
 /**
@@ -33,10 +40,10 @@ async function query(query, ...args) {
   // https://github.com/mlaanderson/database-js-mysql
 
   let connection, statement, rows;
-  connection = new Connection("mysql://" + config.user + ":" + config.password + "@" + config.host + "/" + config.database);
+  connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
 
   try {
-    statement = await connection.prepareStatement(query);
+    statement = connection.prepareStatement(query);
     rows = await statement.query(args);
     //console.log(rows);
   } catch (error) {
