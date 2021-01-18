@@ -6,7 +6,8 @@ PictoHunt is an online image sharing application being developed by ForthTek, a 
 
 Install android studio to test changes on a virtual machine \
 First install the node \
-npm i -g expo-cli
+npm i -g expo-cli \
+npm install @react-navigation/native@^5.9.0
 
 # Useful links:
 
