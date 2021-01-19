@@ -19,43 +19,88 @@ const config =
 
 
 
+
 /**
- * Async function that performs a prepared statement query on the database. Must be called 
+ * Async function that performs a query on the database. Must be called 
  * from within an async function block and must include the await keyword before the call.
  * @code (async () => { let x = await query('query', ...'args'); })();
  * 
- * @param {string} query A prepared statement SQl query. E.g. 'SELECT * FROM User WHERE username = ?'
- * @param {*[]} args The arguments to substitute into the prepared statement. 
+ * @param {string} query SQl query. Can be a basic query with predefined values or a prepared statement 
+ * with placeholder ?s for values.
+ * @param {*[]} args The arguments to substitute into the prepared statement if there are any.
  * @returns {*} The rows affected by the query (could be NULL if the query failed).
+ * @throws Various SQL database exceptions for invalid arguments, duplicate entries etc.
  */
 async function query(query, ...args) {
-  // Function taken from official documentation: 
+  // Function taken from official documentation and modified: 
   // https://github.com/mlaanderson/database-js-mysql
 
-  console.log(args);
-
-  let connection, statement, rows;
+  let connection, statement, rows, error = null;
+  // Create connection to the database
   connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
 
   try {
+    // Prepare the statement
     statement = connection.prepareStatement(query);
 
-    console.log(statement);
-
-    rows = await statement.query(args);
-    //console.log(rows);
+    switch (args.length) {
+      // Do basic query in this case (no parameters)
+      case 0:
+        rows = await statement.query();
+        break;
+      // All other cases add parameters to the prepared statement
+      case 1:
+        rows = await statement.query(args[0]);
+        break;
+      case 2:
+        rows = await statement.query(args[0], args[1]);
+        break;
+      case 3:
+        rows = await statement.query(args[0], args[1], args[2]);
+        break;
+      case 4:
+        rows = await statement.query(args[0], args[1], args[2], args[3]);
+        break;
+      case 5:
+        rows = await statement.query(args[0], args[1], args[2], args[3], args[4]);
+        break;
+      case 6:
+        rows = await statement.query(args[0], args[1], args[2], args[3], args[4], args[5]);
+        break;
+      case 7:
+        rows = await statement.query(args[0], args[1], args[2], args[3], args[4], args[5], args[6]);
+        break;
+      case 8:
+        rows = await statement.query(args[0], args[1], args[2], args[3], args[4], args[5], args[6], args[7]);
+        break;
+    }
   }
-  catch (error) {
-    console.log(error);
+  // Catch any errors
+  catch (err) {
+    error = err;
   }
+  // Always close the connection
   finally {
     await connection.close();
   }
 
-  return rows;
+  // Throw the error that we caught
+  if (error != null) {
+    throw error;
+  }
+  // Otherwise return the affected rows (could be NULL)
+  else {
+    return rows;
+  }
 }
 
 
+
+//(async () => { let x = await query("SELECT * FROM User"); console.log(x); })();
+
+//(async () => { let x = await query("SELECT * FROM User WHERE username = ?", "sol"); console.log(x); })();
+
+//(async () => { let x = await query("SELECT * FROM User WHERE (username = ? AND userPassword = ? AND levelOfAccess =  ?)", "sol", "password", "user"); console.log(x); })();
 
 
 
@@ -97,7 +142,7 @@ function createUser(username, password, email, isPublicAccount = true, isAdminAc
 
 
 
-//createUser("solomon", "password", "email");
+createUser("solomon", "password", "email");
 
 
 
