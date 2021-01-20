@@ -1,8 +1,10 @@
 // https://en.wikipedia.org/wiki/JSDoc
 // JavaScriptDoc conventions
 
-// https://github.com/mlaanderson/database-js
 // Node package name: database-js
+// https://github.com/mlaanderson/database-js
+// Documentation:
+// https://github.com/mlaanderson/database-js-mysql
 var Connection = require('database-js').Connection;
 
 const config =
@@ -12,6 +14,17 @@ const config =
   password: 'PictoHunt',
   database: 'sql2387221'
 };
+
+
+
+
+
+
+// ALL FUNCTIONS THAT INTERACT WITH THE DATABASE MUST BE CALLED FROM WITHIN AN ASYNC BLOCK:
+// (async () => { let x = await query('query', ...'args'); })();
+
+
+
 
 
 
@@ -26,17 +39,14 @@ const config =
  * @returns {*} The rows affected by the query (could be NULL if the query failed).
  * @throws Various SQL database exceptions for invalid arguments, duplicate entries etc.
  */
-async function query(query, ...args) {
-  // Function taken from official documentation and modified: 
-  // https://github.com/mlaanderson/database-js-mysql
-
-  let connection, statement, rows, error = null;
+async function singleQuery(query, ...args) {
+  let rows, error = null;
   // Create connection to the database
-  connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
+  let connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
 
   try {
     // Prepare the statement
-    statement = connection.prepareStatement(query);
+    let statement = connection.prepareStatement(query);
 
     switch (args.length) {
       // Do basic query in this case (no parameters)
@@ -90,82 +100,146 @@ async function query(query, ...args) {
 }
 
 
+
+/**
+ * Async function that performs multiple queries on the database. Must be called 
+ * from within an async function block and must include the await keyword before the call.
+ * @code (async () => { let x = await query('query', ...'args'); })();
+ * 
+ * @param {string[]} queries Array containing multiple SQl queries. Can be a basic query with predefined 
+ * values or a prepared statement with placeholder ?s for values.
+ * @param {*[]} args Array of arrays, with each containing arguments to substitute into the prepared 
+ * statement. Must include empty arrays if there are no arguments.
+ * @returns {*[]} An array containing the rows affected by each query (could be NULL if that query failed).
+ */
 async function multiQuery(queries, args) {
-  // Function taken from official documentation and modified: 
-  // https://github.com/mlaanderson/database-js-mysql
-
   // Create connection to the database
+  let connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
+  let rows = [];
 
-  try {
-    let connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
-    let rows = [];
+  for (let i = 0; i < queries.length; i++) {
+    let row = null;
 
-    for (let i = 0; i < queries.length; i++) {
-      let row = null;
+    try {
+      // Prepare the statement
+      let statement = connection.prepareStatement(queries[i]);
 
-      try {
-        // Prepare the statement
-        let statement = connection.prepareStatement(queries[i]);
-
-        switch (args.length) {
-          // Do basic query in this case (no parameters)
-          case 0:
-            row = await statement.query();
-            break;
-          // All other cases add parameters to the prepared statement
-          case 1:
-            row = await statement.query(args[i][0]);
-            break;
-          case 2:
-            row = await statement.query(args[i][0], args[i][1]);
-            break;
-          case 3:
-            row = await statement.query(args[i][0], args[i][1], args[i][2]);
-            break;
-          case 4:
-            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3]);
-            break;
-          case 5:
-            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4]);
-            break;
-          case 6:
-            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5]);
-            break;
-          case 7:
-            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6]);
-            break;
-          case 8:
-            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6], args[i][7]);
-            break;
-        }
-
-        // Assign the result of the query;
-        rows.push(row);
+      switch (args.length) {
+        // Do basic query in this case (no parameters)
+        case 0:
+          row = await statement.query();
+          break;
+        // All other cases add parameters to the prepared statement
+        case 1:
+          row = await statement.query(args[i][0]);
+          break;
+        case 2:
+          row = await statement.query(args[i][0], args[i][1]);
+          break;
+        case 3:
+          row = await statement.query(args[i][0], args[i][1], args[i][2]);
+          break;
+        case 4:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3]);
+          break;
+        case 5:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4]);
+          break;
+        case 6:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5]);
+          break;
+        case 7:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6]);
+          break;
+        case 8:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6], args[i][7]);
+          break;
       }
-      // Catch any errors
-      catch (err) {
-        rows.push(null);
-      }
+
+      // Assign the result of the query;
+      rows.push(row);
+    }
+    // Catch any errors
+    catch (err) {
+      rows.push(null);
     }
   }
-  catch (err) {
-    console.log(err);
-  }
-  // Always close the connection
-  finally {
-    await connection.close();
-  }
+
+  await connection.close();
 
   return rows;
 }
 
+/**
+ * Async function that performs one query multiple times on the database, each time with different values. 
+ * Must be called from within an async function block and must include the await keyword before the call.
+ * @code (async () => { let x = await query('query', ...'args'); })();
+ * 
+ * @param {string} query SQl query. Can be a basic query with predefined values or a prepared statement 
+ * with placeholder ?s for values.
+ * @param {*[]} args Array of arrays, with each containing arguments to substitute into the prepared 
+ * statement. Must include empty arrays if there are no arguments.
+ * @returns {*[]} An array containing the rows affected by each query (could be NULL if that query failed).
+ */
+async function repeatQuery(query, args) {
+  // Create connection to the database
+  let connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
+  let rows = [];
 
+  try {
+    // Prepare the statement
+    let statement = connection.prepareStatement(query);
 
-//(async () => { let x = await query("SELECT * FROM User"); console.log(x); })();
+    // Repeat for the number of values provided
+    for (let i = 0; i < args.length; i++) {
+      let row = null;
 
-//(async () => { let x = await query("SELECT * FROM User WHERE username = ?", "sol"); console.log(x); })();
+      switch (args[i].length) {
+        // Do basic query in this case (no parameters)
+        case 0:
+          row = await statement.query();
+          break;
+        // All other cases add parameters to the prepared statement
+        case 1:
+          row = await statement.query(args[i][0]);
+          break;
+        case 2:
+          row = await statement.query(args[i][0], args[i][1]);
+          break;
+        case 3:
+          row = await statement.query(args[i][0], args[i][1], args[i][2]);
+          break;
+        case 4:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3]);
+          break;
+        case 5:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4]);
+          break;
+        case 6:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5]);
+          break;
+        case 7:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6]);
+          break;
+        case 8:
+          row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6], args[i][7]);
+          break;
+      }
 
-//(async () => { let x = await query("SELECT * FROM User WHERE (username = ? AND userPassword = ? AND levelOfAccess =  ?)", "sol", "password", "user"); console.log(x); })();
+      // Assign the result of the query;
+      rows.push(row);
+    }
+  }
+  // Catch any errors
+  catch (err) {
+    rows.push(null);
+  }
+
+  await connection.close();
+
+  return rows;
+}
+
 
 
 // QUERIES
@@ -174,7 +248,6 @@ const SQL_GET_USER = "SELECT * FROM User WHERE username = ?;";
 const SQL_GET_ALL_POSTS_BY_USER = "SELECT * FROM Post WHERE posterAccount = ?;";
 const SQL_GET_ALL_POSTS = "SELECT * FROM Post ORDER BY globalPostID DESC;";
 const SQL_GET_ALL_COMMENTS_ON_POST = "SELECT * FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
-const SQL_GET_ALL_INTERACTION_ON_POST = "SELECT COUNT(interaction) FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
 const SQL_GET_ALL_CHANNELS = "SELECT * FROM Channel;";
 const SQL_GET_ALL_POSTS_IN_CHANNEL = "SELECT * FROM Post WHERE postedTo = ?;";
 
@@ -194,7 +267,7 @@ function getUser(username) {
   // Syntax for calling the async query function 
   (async () => {
     try {
-      return await query(SQL_GET_USER, username);
+      return await singleQuery(SQL_GET_USER, username);
     }
     catch (error) {
       throw error;
@@ -206,7 +279,7 @@ function getAllPostsByUser(username) {
   // Syntax for calling the async query function 
   (async () => {
     try {
-      return await query(SQL_GET_ALL_POSTS_BY_USER, username);
+      return await singleQuery(SQL_GET_ALL_POSTS_BY_USER, username);
     }
     catch (error) {
       throw error;
@@ -218,7 +291,7 @@ function getAllPosts() {
   // Syntax for calling the async query function 
   (async () => {
     try {
-      return await query(SQL_GET_ALL_POSTS);
+      return await singleQuery(SQL_GET_ALL_POSTS);
     }
     catch (error) {
       throw error;
@@ -231,9 +304,28 @@ function getAllCommentsOnPost(globalPostID) {
 
 }
 
-function getAllInteractionsOnPost(globalPostID) {
 
+
+/**
+ * 
+ * @param {*} globalPostID 
+ * @returns JSON object with value names "likes" and "dislikes".
+ */
+function getAllInteractionsOnPost(globalPostID) {
+  const SQL = "SELECT COUNT(interaction) AS x FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
+
+  (async () => {
+    let rows = await repeatQuery(SQL, [[globalPostID, "like"], [globalPostID, "dislike"]]);
+
+    let x = {
+      likes: rows[0][0].x,
+      dislikes: rows[1][0].x,
+    };
+
+    return x;
+  })();
 }
+
 
 function getAllChannels() {
 
@@ -288,7 +380,7 @@ function createUser(username, password, email, isPublicAccount = true, isAdminAc
   // Syntax for calling the async query function 
   (async () => {
     try {
-      let data = await query(sql, username, hash, email, isPublicAccount, isAdminAccount, salt);
+      let data = await singleQuery(sql, username, hash, email, isPublicAccount, isAdminAccount, salt);
       return true;
     }
     catch (error) {
@@ -308,11 +400,11 @@ function createTag(name, description, ...similarTags) {
   // Syntax for calling the async query function 
   (async () => {
     try {
-      data = await query(sql, name, description);
+      data = await singleQuery(sql, name, description);
 
       for (let i = 0; i < similarTags.length; i++) {
         try {
-          await query(similarTag, name, similarTags[i]);
+          await singleQuery(similarTag, name, similarTags[i]);
         }
         catch (err) {
 
@@ -337,7 +429,7 @@ function addSimilarTag(name, ...similarTags) {
     try {
       if (similarTags.length > 0) {
         for (let i = 0; i < similarTags.length; i++) {
-          await query(similarTag, name, similarTags[i]);
+          await singleQuery(similarTag, name, similarTags[i]);
         }
         return true;
       }
@@ -357,10 +449,10 @@ function createChannel(name, description, usernameCreatedBy) {
   // Syntax for calling the async query function 
   (async () => {
     try {
-      data = await query(sql, name, description);
+      data = await singleQuery(sql, name, description);
 
       for (let i = 0; i < similarTags.length; i++) {
-        await query(similarTag, name, similarTags[i]);
+        await singleQuery(similarTag, name, similarTags[i]);
       }
 
       return true;
@@ -423,7 +515,7 @@ function followUser(accountUsername, usernameToFollow) {
   // Syntax for calling the async query function 
   (async () => {
     try {
-      data = await query(sql, accountUsername, usernameToFollow);
+      data = await singleQuery(sql, accountUsername, usernameToFollow);
       return true;
     }
     catch (error) {
