@@ -15,11 +15,6 @@ const config =
 
 
 
-
-
-
-
-
 /**
  * Async function that performs a query on the database. Must be called 
  * from within an async function block and must include the await keyword before the call.
@@ -103,11 +98,84 @@ async function query(query, ...args) {
 //(async () => { let x = await query("SELECT * FROM User WHERE (username = ? AND userPassword = ? AND levelOfAccess =  ?)", "sol", "password", "user"); console.log(x); })();
 
 
+// QUERIES
+// Get rows
+const SQL_GET_USER = "SELECT * FROM User WHERE username = ?;";
+const SQL_GET_ALL_POSTS_BY_USER = "SELECT * FROM Post WHERE posterAccount = ?;";
+const SQL_GET_ALL_POSTS = "SELECT * FROM Post ORDER BY globalPostID DESC;";
+const SQL_GET_ALL_COMMENTS_ON_POST = "SELECT * FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
+const SQL_GET_ALL_INTERACTION_ON_POST = "SELECT COUNT(interaction) FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
+const SQL_GET_ALL_CHANNELS = "SELECT * FROM Channel;";
+const SQL_GET_ALL_POSTS_IN_CHANNEL = "SELECT * FROM Post WHERE postedTo = ?;";
+
+// Add rows
+const SQL_ADD_USER = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess) VALUES (?, ?, ?, ?, ?)";
+const SQL_ADD_TAG = "INSERT INTO Tag(name, description) VALUES(?, ?);";
+const SQL_ADD_SIMILAR_TAG = "INSERT INTO SimilarTags(tag, similarTag) VALUES(?, ?);";
+
+// Set rows
+
+// Remove rows
 
 
+
+// Get methods
+function getUser(username) {
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      return await query(SQL_GET_USER, username);
+    }
+    catch (error) {
+      throw error;
+    }
+  })();
+}
+
+function getAllPostsByUser(username) {
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      return await query(SQL_GET_ALL_POSTS_BY_USER, username);
+    }
+    catch (error) {
+      throw error;
+    }
+  })();
+}
+
+function getAllPosts() {
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      return await query(SQL_GET_ALL_POSTS);
+    }
+    catch (error) {
+      throw error;
+    }
+  })();
+}
+
+
+function getAllCommentsOnPost(globalPostID) {
+
+}
+
+function getAllInteractionsOnPost(globalPostID) {
+
+}
+
+function getAllChannels() {
+
+}
+
+function getAllPostsInChannel() {
+
+}
 
 
 // Create methods
+
 
 /**
  * Function that creates a new account for the user.
@@ -120,20 +188,13 @@ async function query(query, ...args) {
  * @returns {boolean} The operation was successful.
  */
 function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
-  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt) VALUES (?, ?, ?, ?, ?, ?)";
+  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess) VALUES (?, ?, ?, ?, ?)";
   let data = null;
-
-  /* This Will need moved */
-  var salt = randomStr((Math.random()*50)+10);
-    
-  var hash = hashStr(password,salt);
-  /* This Will need moved */
-
 
   // Syntax for calling the async query function 
   (async () => {
     try {
-      data = await query(sql, username, hash, email, isPublicAccount, isAdminAccount, salt);
+      data = await query(sql, username, password, email, isPublicAccount, isAdminAccount);
       return true;
     }
     catch (error) {
@@ -144,42 +205,81 @@ function createUser(username, password, email, isPublicAccount = true, isAdminAc
   return false;
 }
 
-// Function to generate a random string of length (for creating a users salt)
-function randomStr(length) {
-  var out = "";
-  var chars = "1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
-  for (var i = 0; i<length; i++) {
-      // Add random character from chars to output
-      out += chars[Math.round(Math.random()*chars.length)];
-  }
-  return out;
+
+function createTag(name, description, ...similarTags) {
+  let sql = "INSERT INTO Tag(name, description) VALUES(?, ?);";
+  let similarTag = "INSERT INTO SimilarTags(tag, similarTag) VALUES(?, ?);";
+  let data = null;
+
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      data = await query(sql, name, description);
+
+      for (let i = 0; i < similarTags.length; i++) {
+        try {
+          await query(similarTag, name, similarTags[i]);
+        }
+        catch (err) {
+
+        }
+      }
+
+      return true;
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })();
+
+  return false;
 }
 
-// Function to hash using a salt
-function hashStr(str,salt) {
-  var crypto = require('crypto');
-  var hash = crypto.createHash('md5').update(str+salt).digest('hex');
-  return hash;
-}
+function addSimilarTag(name, ...similarTags) {
+  let similarTag = "INSERT INTO SimilarTags(tag, similarTag) VALUES(?, ?);";
 
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      if (similarTags.length > 0) {
+        for (let i = 0; i < similarTags.length; i++) {
+          await query(similarTag, name, similarTags[i]);
+        }
+        return true;
+      }
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })();
 
-
-
-createUser("solomon", "password", "email");
-
-
-
-
-function createTag(name, description) {
-  let query = "INSERT INTO Tag(name, description) VALUES(?, ?);";
-
-  // INSERT INTO SimilarTags(tag, similarTag) VALUES("Cat", "Cute animals");
+  return false;
 }
 
 function createChannel(name, description, usernameCreatedBy) {
-  let query = "INSERT INTO Channel(name, description, createdBy) VALUES(?, ?, ?);";
+  let sql = "INSERT INTO Channel(name, description, createdBy) VALUES(?, ?, ?);";
+  let similarTag = "INSERT INTO TagsInChannel(channelName, tagName) VALUES(?, ?)";
 
-  // INSERT INTO TagsInChannel(channelName, tagName) VALUES("Cute animal pics", "Cute animals");
+  // Syntax for calling the async query function 
+  (async () => {
+    try {
+      data = await query(sql, name, description);
+
+      for (let i = 0; i < similarTags.length; i++) {
+        await query(similarTag, name, similarTags[i]);
+      }
+
+      return true;
+    }
+    catch (error) {
+      console.log(error);
+    }
+  })();
+
+  return false;
+
+
+
 }
 
 
@@ -244,59 +344,13 @@ function followUser(accountUsername, usernameToFollow) {
 
 
 
-
-// Get methods
-
-/**
- * 
- * @param {*} username 
- */
-function getAllPostsByUser(username) {
-  let sql = "SELECT * FROM Post WHERE posterAccount = ?;";
-  let data = null;
-
-  // Syntax for calling the async query function 
-  (async () => {
-    try {
-      data = await query(sql, username);
-    }
-    catch (error) {
-      console.log(error);
-    }
-  })();
-
-  return data;
-}
-
-
-/**
- * 
- * @param {*} username 
- */
-function getUserDetails(username) {
-  let sql = "SELECT * FROM User WHERE username = ?;";
-  let data = null;
-
-  // Syntax for calling the async query function 
-  (async () => {
-    try {
-      data = await query(sql, username);
-    }
-    catch (error) {
-      console.log(error);
-    }
-  })();
-
-  return data;
-}
-
-
-
-
 // Set methods
 
 
 function setAccountPublic(username, trueFalse) {
 
 }
+
+
+// Remove methods
 
