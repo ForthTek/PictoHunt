@@ -90,6 +90,76 @@ async function query(query, ...args) {
 }
 
 
+async function multiQuery(queries, args) {
+  // Function taken from official documentation and modified: 
+  // https://github.com/mlaanderson/database-js-mysql
+
+  // Create connection to the database
+
+  try {
+    let connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
+    let rows = [];
+
+    for (let i = 0; i < queries.length; i++) {
+      let row = null;
+
+      try {
+        // Prepare the statement
+        let statement = connection.prepareStatement(queries[i]);
+
+        switch (args.length) {
+          // Do basic query in this case (no parameters)
+          case 0:
+            row = await statement.query();
+            break;
+          // All other cases add parameters to the prepared statement
+          case 1:
+            row = await statement.query(args[i][0]);
+            break;
+          case 2:
+            row = await statement.query(args[i][0], args[i][1]);
+            break;
+          case 3:
+            row = await statement.query(args[i][0], args[i][1], args[i][2]);
+            break;
+          case 4:
+            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3]);
+            break;
+          case 5:
+            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4]);
+            break;
+          case 6:
+            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5]);
+            break;
+          case 7:
+            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6]);
+            break;
+          case 8:
+            row = await statement.query(args[i][0], args[i][1], args[i][2], args[i][3], args[i][4], args[i][5], args[i][6], args[i][7]);
+            break;
+        }
+
+        // Assign the result of the query;
+        rows.push(row);
+      }
+      // Catch any errors
+      catch (err) {
+        rows.push(null);
+      }
+    }
+  }
+  catch (err) {
+    console.log(err);
+  }
+  // Always close the connection
+  finally {
+    await connection.close();
+  }
+
+  return rows;
+}
+
+
 
 //(async () => { let x = await query("SELECT * FROM User"); console.log(x); })();
 
@@ -176,6 +246,25 @@ function getAllPostsInChannel() {
 
 // Create methods
 
+// Function to generate a random string of length (for creating a users salt)
+function randomStr(length) {
+  var out = "";
+  var chars = "1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+  for (var i = 0; i < length; i++) {
+    // Add random character from chars to output
+    out += chars[Math.round(Math.random() * chars.length)];
+  }
+  return out;
+}
+
+
+// Function to hash using a salt
+function hashStr(str, salt) {
+  var crypto = require('crypto');
+  var hash = crypto.createHash('md5').update(str + salt).digest('hex');
+  return hash;
+}
+
 
 /**
  * Function that creates a new account for the user.
@@ -188,13 +277,18 @@ function getAllPostsInChannel() {
  * @returns {boolean} The operation was successful.
  */
 function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
-  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess) VALUES (?, ?, ?, ?, ?)";
-  let data = null;
+  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt) VALUES (?, ?, ?, ?, ?, ?)";
+
+  /* This Will need moved */
+  var salt = randomStr((Math.random() * 50) + 10);
+
+  var hash = hashStr(password, salt);
+  /* This Will need moved */
 
   // Syntax for calling the async query function 
   (async () => {
     try {
-      data = await query(sql, username, password, email, isPublicAccount, isAdminAccount);
+      let data = await query(sql, username, hash, email, isPublicAccount, isAdminAccount, salt);
       return true;
     }
     catch (error) {
