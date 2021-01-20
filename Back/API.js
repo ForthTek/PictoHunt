@@ -9,60 +9,120 @@ var Database = require("./database.js");
 // (async () => { let x = await query('query', ...'args'); })();
 
 
+function getErrorMessage(error) {
+  // Just for now
+  // Will need to do custom messages for errors
+  return error.message;
+}
 
-// QUERIES
-// Get rows
-const SQL_GET_USER = "SELECT * FROM User WHERE username = ?;";
-const SQL_GET_ALL_POSTS_BY_USER = "SELECT * FROM Post WHERE posterAccount = ?;";
-const SQL_GET_ALL_POSTS = "SELECT * FROM Post ORDER BY globalPostID DESC;";
-const SQL_GET_ALL_COMMENTS_ON_POST = "SELECT * FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
-const SQL_GET_ALL_CHANNELS = "SELECT * FROM Channel;";
-const SQL_GET_ALL_POSTS_IN_CHANNEL = "SELECT * FROM Post WHERE postedTo = ?;";
 
-// Add rows
-const SQL_ADD_USER = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess) VALUES (?, ?, ?, ?, ?)";
-const SQL_ADD_TAG = "INSERT INTO Tag(name, description) VALUES(?, ?);";
-const SQL_ADD_SIMILAR_TAG = "INSERT INTO SimilarTags(tag, similarTag) VALUES(?, ?);";
+// Check methods
 
-// Set rows
+/**
+ * 
+ * @param {string} username 
+ * @param {string} password 
+ */
+async function isCorrectPassword(username, password) {
+  const SQL = "SELECT salt, userPassword FROM User WHERE username = ?";
 
-// Remove rows
+  try {
+    let rows = (await Database.singleQuery(SQL, username))[0];
+    let hash = hashStr(password, rows.salt);
+
+    return hash === rows.userPassword;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
 
 
 
 // Get methods
+
+/**
+ * 
+ * @param {string} username 
+ */
 async function getUser(username) {
+  const SQL = "SELECT * FROM User WHERE username = ?;";
+
   try {
-    return await Database.singleQuery(SQL_GET_USER, username);
+    let rows = await Database.singleQuery(SQL, username);
+    return rows;
   }
   catch (error) {
-    throw error;
+    return getErrorMessage(error);
   }
 }
 
 async function getAllPostsByUser(username) {
+  const SQL = "SELECT * FROM Post WHERE posterAccount = ?;";
+
   try {
-    return await Database.singleQuery(SQL_GET_ALL_POSTS_BY_USER, username);
+    let rows = await Database.singleQuery(SQL, username);
+    return rows;
   }
   catch (error) {
-    throw error;
+    return getErrorMessage(error);
   }
 }
 
 async function getAllPosts() {
+  const SQL = "SELECT * FROM Post ORDER BY globalPostID DESC;";
+
   try {
-    return await Database.singleQuery(SQL_GET_ALL_POSTS);
+    let rows = await Database.singleQuery(SQL);
+    return rows;
   }
   catch (error) {
-    throw error;
+    return getErrorMessage(error);
   }
 }
 
-async function getAllCommentsOnPost(globalPostID) {
+async function getAllCommentsFromPost(globalPostID) {
+  const SQL = "SELECT * FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
 
+  try {
+    let rows = await Database.singleQuery(SQL, globalPostID);
+    return rows;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
 }
 
+async function getAllTagsFromPost(globalPostID) {
+  const SQL = "SELECT tagName AS name FROM TagsInPost WHERE postID = ?;";
 
+  try {
+    let rows = await Database.singleQuery(SQL, globalPostID);
+
+    // Convert to an array of strings
+    let tags = [];
+    for (let i = 0; i < rows.length; i++) {
+      tags.push(rows[i].name);
+    }
+
+    return tags;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+async function getAllImagesFromPost(globalPostID) {
+  const SQL = "SELECT photoURL AS URL, orderInPost as position FROM PhotosInPost WHERE postID = ?;";
+
+  try {
+    let rows = await Database.singleQuery(SQL, globalPostID);
+    return rows;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
 
 /**
  * 
@@ -72,24 +132,82 @@ async function getAllCommentsOnPost(globalPostID) {
 async function getAllInteractionsOnPost(globalPostID) {
   const SQL = "SELECT COUNT(interaction) AS x FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
 
-  let rows = await Database.repeatQuery(SQL, [[globalPostID, "like"], [globalPostID, "dislike"]]);
+  try {
+    let rows = await Database.repeatQuery(SQL, [[globalPostID, "like"], [globalPostID, "dislike"]]);
 
-  let x = {
-    likes: rows[0][0].x,
-    dislikes: rows[1][0].x,
-  };
-
-  return x;
+    let x = {
+      likes: rows[0][0].x,
+      dislikes: rows[1][0].x,
+    };
+    return x;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
 }
-
 
 async function getAllChannels() {
+  const SQL = "SELECT * FROM Channel;";
 
+  try {
+    return;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
 }
 
-async function getAllPostsInChannel() {
+async function getAllPostsInChannel(channelName) {
+  const SQL_GET_ALL_POSTS_IN_CHANNEL = "SELECT * FROM Post WHERE postedTo = ?;";
 
+  try {
+    return;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
 }
+
+async function getFollowedChannels(username) {
+
+  try {
+    return;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+async function getFollowedTags(username) {
+
+  try {
+    return;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+async function getFollowedUsers(username) {
+
+  try {
+    return;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+async function getAllLikedPosts(username) {
+
+  try {
+    return;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
 
 
 // Create methods
@@ -143,7 +261,6 @@ async function createUser(username, password, email, isPublicAccount = true, isA
 
   return false;
 }
-
 
 async function createTag(name, description, ...similarTags) {
   let sql = "INSERT INTO Tag(name, description) VALUES(?, ?);";
@@ -209,7 +326,6 @@ async function createChannel(name, description, usernameCreatedBy) {
   return false;
 }
 
-
 async function createPost(title, accountUsername, channelNamePostedTo, photos, tags, GPSValue) {
   let query = "INSERT INTO Channel() VALUES(?, ?, ?);";
 
@@ -217,12 +333,10 @@ async function createPost(title, accountUsername, channelNamePostedTo, photos, t
   // TAGS IN POST
 }
 
-
 async function createComment(postID, accountUsername, comment) {
   let query = "INSERT INTO CommentsInPost(postID, commentAccount, commentText, commentTime) VALUES(?, ?, ?, NOW());";
 
 }
-
 
 const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 })
 
@@ -240,12 +354,10 @@ async function interactWithPost(postID, accountUsername, interactionType) {
 async function followChannel(accountUsername, channelName) {
   let query = "INSERT INTO UserFollowingChannel(username, channelName) VALUES(?, ?);";
 
-
 }
 
 async function followTag(accountUsername, tagName) {
   let query = "INSERT INTO UserFollowingTag(username, tag) VALUES(?, ?);";
-
 
 }
 
@@ -276,3 +388,9 @@ async function setAccountPublic(username, trueFalse) {
 
 // Remove methods
 
+
+
+module.exports = {
+  isCorrectPassword, getUser, getAllPostsByUser, getAllPosts, getAllCommentsFromPost, getAllImagesFromPost, getAllTagsFromPost, getAllInteractionsOnPost,
+  getAllChannels, getAllPostsInChannel, getFollowedChannels, getFollowedTags, getFollowedUsers, getAllLikedPosts
+};

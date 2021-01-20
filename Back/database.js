@@ -19,7 +19,6 @@ const config =
 /**
  * Async function that performs a query on the database. Must be called 
  * from within an async function block and must include the await keyword before the call.
- * @code (async () => { let x = await query('query', ...'args'); })();
  * 
  * @param {string} query SQl query. Can be a basic query with predefined values or a prepared statement 
  * with placeholder ?s for values.
@@ -28,9 +27,9 @@ const config =
  * @throws Various SQL database exceptions for invalid arguments, duplicate entries etc.
  */
 async function singleQuery(query, ...args) {
-  let rows, error = null;
   // Create connection to the database
   let connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
+  let rows;
 
   try {
     // Prepare the statement
@@ -69,30 +68,21 @@ async function singleQuery(query, ...args) {
     }
   }
   // Catch any errors
-  catch (err) {
-    error = err;
-  }
-  // Always close the connection
-  finally {
+  catch (error) {
     await connection.close();
-  }
-
-  // Throw the error that we caught
-  if (error != null) {
     throw error;
   }
-  // Otherwise return the affected rows (could be NULL)
-  else {
-    return rows;
-  }
-}
 
+  // Always try and close the connection
+  await connection.close();
+  // Return the affected rows
+  return rows;
+}
 
 
 /**
  * Async function that performs multiple queries on the database. Must be called 
  * from within an async function block and must include the await keyword before the call.
- * @code (async () => { let x = await query('query', ...'args'); })();
  * 
  * @param {string[]} queries Array containing multiple SQl queries. Can be a basic query with predefined 
  * values or a prepared statement with placeholder ?s for values.
@@ -148,20 +138,19 @@ async function multiQuery(queries, args) {
       rows.push(row);
     }
     // Catch any errors
-    catch (err) {
-      rows.push(null);
+    catch (error) {
+      await connection.close();
+      throw error;
     }
   }
 
   await connection.close();
-
   return rows;
 }
 
 /**
  * Async function that performs one query multiple times on the database, each time with different values. 
  * Must be called from within an async function block and must include the await keyword before the call.
- * @code (async () => { let x = await query('query', ...'args'); })();
  * 
  * @param {string} query SQl query. Can be a basic query with predefined values or a prepared statement 
  * with placeholder ?s for values.
@@ -219,16 +208,15 @@ async function repeatQuery(query, args) {
     }
   }
   // Catch any errors
-  catch (err) {
-    rows.push(null);
+  catch (error) {
+    await connection.close();
+    throw error;
   }
 
   await connection.close();
-
   return rows;
 }
 
 
-
-// Choose the functions to export to the module 
+// Specify which functions to export 
 module.exports = { singleQuery, multiQuery, repeatQuery };
