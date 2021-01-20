@@ -120,13 +120,20 @@ async function query(query, ...args) {
  * @returns {boolean} The operation was successful.
  */
 function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
-  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess) VALUES (?, ?, ?, ?, ?)";
+  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt) VALUES (?, ?, ?, ?, ?, ?)";
   let data = null;
+
+  /* This Will need moved */
+  var salt = randomStr((Math.random()*50)+10);
+    
+  var hash = hashStr(password,salt);
+  /* This Will need moved */
+
 
   // Syntax for calling the async query function 
   (async () => {
     try {
-      data = await query(sql, username, password, email, isPublicAccount, isAdminAccount);
+      data = await query(sql, username, hash, email, isPublicAccount, isAdminAccount, salt);
       return true;
     }
     catch (error) {
@@ -137,7 +144,23 @@ function createUser(username, password, email, isPublicAccount = true, isAdminAc
   return false;
 }
 
+// Function to generate a random string of length (for creating a users salt)
+function randomStr(length) {
+  var out = "";
+  var chars = "1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
+  for (var i = 0; i<length; i++) {
+      // Add random character from chars to output
+      out += chars[Math.round(Math.random()*chars.length)];
+  }
+  return out;
+}
 
+// Function to hash using a salt
+function hashStr(str,salt) {
+  var crypto = require('crypto');
+  var hash = crypto.createHash('md5').update(str+salt).digest('hex');
+  return hash;
+}
 
 
 
