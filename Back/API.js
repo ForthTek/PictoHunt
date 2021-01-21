@@ -22,6 +22,7 @@ function getErrorMessage(error) {
  * 
  * @param {string} username 
  * @param {string} password 
+ * @returns {boolean}
  */
 async function isCorrectPassword(username, password) {
   const SQL = "SELECT salt, userPassword FROM User WHERE username = ?";
@@ -37,6 +38,41 @@ async function isCorrectPassword(username, password) {
   }
 }
 
+/**
+ * 
+ * @param {string} username 
+ * @param {string} email 
+ * @returns {boolean}
+ */
+async function isCorrectEmail(username, email) {
+  const SQL = "SELECT emailAddress FROM User WHERE username = ?";
+
+  try {
+    let rows = (await Database.singleQuery(SQL, username))[0];
+    return email === rows.emailAddress;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * 
+ * @param {string} username 
+ * @returns {boolean}
+ */
+async function isPublicAccount(username) {
+  const SQL = "SELECT isPublic FROM User WHERE username = ?";
+
+  try {
+    let rows = (await Database.singleQuery(SQL, username))[0];
+    return rows.isPublic === 1;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
 
 
 // Get methods
@@ -44,80 +80,20 @@ async function isCorrectPassword(username, password) {
 /**
  * 
  * @param {string} username 
+ * @returns {number[]}
  */
-async function getUser(username) {
-  const SQL = "SELECT * FROM User WHERE username = ?;";
+async function getAllPostIDsByUser(username) {
+  const SQL = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
 
   try {
     let rows = await Database.singleQuery(SQL, username);
-    return rows;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
-
-async function getAllPostsByUser(username) {
-  const SQL = "SELECT * FROM Post WHERE posterAccount = ?;";
-
-  try {
-    let rows = await Database.singleQuery(SQL, username);
-    return rows;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
-
-async function getAllPosts() {
-  const SQL = "SELECT * FROM Post ORDER BY globalPostID DESC;";
-
-  try {
-    let rows = await Database.singleQuery(SQL);
-    return rows;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
-
-async function getAllCommentsFromPost(globalPostID) {
-  const SQL = "SELECT * FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
-
-  try {
-    let rows = await Database.singleQuery(SQL, globalPostID);
-    return rows;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
-
-async function getAllTagsFromPost(globalPostID) {
-  const SQL = "SELECT tagName AS name FROM TagsInPost WHERE postID = ?;";
-
-  try {
-    let rows = await Database.singleQuery(SQL, globalPostID);
-
-    // Convert to an array of strings
-    let tags = [];
+    // Convert to an array of integers
+    let posts = [];
     for (let i = 0; i < rows.length; i++) {
-      tags.push(rows[i].name);
+      posts.push(rows[i].globalPostID);
     }
 
-    return tags;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
-
-async function getAllImagesFromPost(globalPostID) {
-  const SQL = "SELECT photoURL AS URL, orderInPost as position FROM PhotosInPost WHERE postID = ?;";
-
-  try {
-    let rows = await Database.singleQuery(SQL, globalPostID);
-    return rows;
+    return posts;
   }
   catch (error) {
     return getErrorMessage(error);
@@ -126,52 +102,170 @@ async function getAllImagesFromPost(globalPostID) {
 
 /**
  * 
- * @param {*} globalPostID 
- * @returns JSON object with value names "likes" and "dislikes".
+ * @param {string} channelName 
+ * @returns {number[]}
  */
-async function getAllInteractionsOnPost(globalPostID) {
-  const SQL = "SELECT COUNT(interaction) AS x FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
+async function getAllPostIDsInChannel(channelName) {
+  const SQL = "SELECT globalPostID FROM Post WHERE postedTo = ? ORDER BY globalPostID DESC;";
 
   try {
-    let rows = await Database.repeatQuery(SQL, [[globalPostID, "like"], [globalPostID, "dislike"]]);
+    let rows = await Database.singleQuery(SQL, channelName);
+    // Convert to an array of integers
+    let posts = [];
+    for (let i = 0; i < rows.length; i++) {
+      posts.push(rows[i].globalPostID);
+    }
 
-    let x = {
-      likes: rows[0][0].x,
-      dislikes: rows[1][0].x,
+    return posts;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * @returns {number[]}
+ */
+async function getAllPostIDs() {
+  const SQL = "SELECT globalPostID FROM Post ORDER BY globalPostID DESC;";
+
+  try {
+    let rows = await Database.singleQuery(SQL);
+    // Convert to an array of integers
+    let posts = [];
+    for (let i = 0; i < rows.length; i++) {
+      posts.push(rows[i].globalPostID);
+    }
+
+    return posts;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * @typedef {object} Post 
+ * @property {number} ID 
+ * @property {string} title
+ * @property {string} user 
+ * @property {string} channel
+ * @property {number} likes
+ * @property {number} dislikes
+ * @property {timestamp} time
+ * @property {number} GPSLatitude
+ * @property {number} GPSLongitude
+ * @property {string[]} tags
+ * @property {string[]} photos 
+ * @property {Comment[]} comments
+ */
+
+/**
+* @typedef {object} Comment 
+* @property {string} user
+* @property {string} text
+* @property {timestamp} time
+*/
+
+/**
+ * 
+ * @param {number} globalPostID ID of the post to return.
+ * @returns {Post} A Post JSON object.
+ */
+async function getPost(globalPostID) {
+  const POST = "SELECT * FROM Post WHERE globalPostID = ?;";
+  const TAGS = "SELECT tagName FROM TagsInPost WHERE postID = ?;";
+  const IMAGES = "SELECT photoURL FROM PhotosInPost WHERE postID = ? ORDER BY orderInPost;";
+  const COMMENTS = "SELECT commentText, commentAccount, commentTime FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
+  const INTERACTIONS = "SELECT COUNT(interaction) AS x FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
+
+  try {
+    // Get all of the data from the post
+    let rows = await Database.multiQuery([POST, TAGS, IMAGES, INTERACTIONS, INTERACTIONS, COMMENTS],
+      [[globalPostID], [globalPostID], [globalPostID], [globalPostID, "like"], [globalPostID, "dislike"], [globalPostID]]);
+
+    /*
+    console.log("RAW DATA:")
+    console.log(rows);
+    console.log("\n")
+    */
+
+    // Now we need to process the data
+
+    // Convert tags to an array of strings
+    let tags = [];
+    for (let i = 0; i < rows[1].length; i++) {
+      tags.push(rows[1][i].tagName);
+    }
+    // Convert photos to array of URLs
+    let photos = [];
+    for (let i = 0; i < rows[2].length; i++) {
+      photos.push(rows[2][i].photoURL);
+    }
+
+    // Convert comments to array of comment objects
+    let comments = [];
+    for (let i = 0; i < rows[3].length; i++) {
+      comments.push({
+        user: rows[5][i].commentAccount,
+        text: rows[5][i].commentText,
+        time: rows[5][i].commentTime,
+      });
+    }
+
+    // Now return the object
+    let post = {
+      ID: globalPostID,
+      title: rows[0][0].title,
+      user: rows[0][0].posterAccount,
+      channel: rows[0][0].postedTo,
+      likes: rows[3][0].x,
+      dislikes: rows[4][0].x,
+      time: rows[0][0].timeOfPost,
+      GPSLatitude: rows[0][0].GPSLatitude,
+      GPSLongitude: rows[0][0].GPSLongitude,
+      tags: tags,
+      photos: photos,
+      comments: comments,
     };
-    return x;
+
+    return post;
   }
   catch (error) {
     return getErrorMessage(error);
   }
 }
 
-async function getAllChannels() {
-  const SQL = "SELECT * FROM Channel;";
+async function getFollowedChannelNames(username) {
+  const SQL = "SELECT channelName FROM UserFollowingChannel WHERE username = ?;";
 
   try {
-    return;
+    let rows = await Database.singleQuery(SQL, username);
+    // Convert to an array of strings
+    let channels = [];
+    for (let i = 0; i < rows.length; i++) {
+      channels.push(rows[i].channelName);
+    }
+
+    return channels;
   }
   catch (error) {
     return getErrorMessage(error);
   }
 }
 
-async function getAllPostsInChannel(channelName) {
-  const SQL_GET_ALL_POSTS_IN_CHANNEL = "SELECT * FROM Post WHERE postedTo = ?;";
+async function getAllChannelNames() {
+  const SQL = "SELECT name FROM Channel;";
 
   try {
-    return;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
+    let rows = await Database.singleQuery(SQL);
+    // Convert to an array of strings
+    let channels = [];
+    for (let i = 0; i < rows.length; i++) {
+      channels.push(rows[i].name);
+    }
 
-async function getFollowedChannels(username) {
-
-  try {
-    return;
+    return channels;
   }
   catch (error) {
     return getErrorMessage(error);
@@ -391,6 +485,6 @@ async function setAccountPublic(username, trueFalse) {
 
 
 module.exports = {
-  isCorrectPassword, getUser, getAllPostsByUser, getAllPosts, getAllCommentsFromPost, getAllImagesFromPost, getAllTagsFromPost, getAllInteractionsOnPost,
-  getAllChannels, getAllPostsInChannel, getFollowedChannels, getFollowedTags, getFollowedUsers, getAllLikedPosts
+  isCorrectPassword, isCorrectEmail, isPublicAccount, getAllPostIDsByUser, getAllPostIDsInChannel, getAllPostIDs, getPost,
+  getAllChannelNames, getFollowedChannelNames, getFollowedTags, getFollowedUsers, getAllLikedPosts
 };

@@ -102,7 +102,7 @@ async function multiQuery(queries, args) {
       // Prepare the statement
       let statement = connection.prepareStatement(queries[i]);
 
-      switch (args.length) {
+      switch (args[i].length) {
         // Do basic query in this case (no parameters)
         case 0:
           row = await statement.query();
