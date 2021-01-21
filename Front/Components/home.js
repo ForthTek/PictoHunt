@@ -1,11 +1,14 @@
 import React from "react";
 import { Text, View, SafeAreaView, StyleSheet } from "react-native";
 import Image from "react-native-scalable-image";
+import Score from "./score";
+import SettingBtn from "./settingBtn";
+
 export default function Home() {
     // Home page
     return (
         <SafeAreaView style={styles.container}>
-            <View style={{ flexDirection: "row", paddingBottom: "5%" }}>
+            <View style={{ flexDirection: "row", padding: "5%" }}>
                 <Image
                     source={require("../assets/pfp-placeholder.png")}
                     width={160}
@@ -23,24 +26,20 @@ export default function Home() {
                     justifyContent: "space-between",
                 }}
             >
-                <Text style={styles.info}>Score</Text>
-                <Text style={styles.info}>Pics</Text>
-                <Text style={styles.info}>Rank</Text>
+                <Score label='Score' number={5} />
+                <Score label='Pics' number={5} />
+                <Score label='Rank' number={5} />
             </View>
             <View style={styles.container}>
-                <Text
-                    style={styles.info}
-                    onPress={() => {
-                        alert("Touch");
-                    }}
-                >
-                    Achievements/ Challenges
-                </Text>
-                <Text style={styles.info}>Your Profile</Text>
-                <Text style={styles.info}>Following</Text>
-                <Text style={styles.info}>Leader Board</Text>
-                <Text style={styles.info}>Settings</Text>
-                <Text style={styles.info}>Log Out</Text>
+                <SettingBtn
+                    label='Achievements/ Challenges'
+                    icon='trophy-outline'
+                />
+                <SettingBtn label='Your Profile' icon='trophy-outline' />
+                <SettingBtn label='Following' icon='trophy-outline' />
+                <SettingBtn label='Leader Board' icon='trophy-outline' />
+                <SettingBtn label='Settings' icon='trophy-outline' />
+                <SettingBtn label='Log Out' icon='trophy-outline' />
             </View>
         </SafeAreaView>
     );
@@ -49,7 +48,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        paddingLeft: "2%",
+        padding: "1%",
     },
     username: {
         fontSize: 22,
