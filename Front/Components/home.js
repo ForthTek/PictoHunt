@@ -15,8 +15,8 @@ export default function Home() {
                 />
                 <View style={{ flexDirection: "column", paddingLeft: "3%" }}>
                     <Text style={styles.username}>[User Name]</Text>
-                    <Text style={styles.info}>Joined: [Join Date]</Text>
-                    <Text style={styles.info}>Location: [Location]</Text>
+                    <Text style={styles.info}>Joined [Join Date]</Text>
+                    <Text style={styles.info}>Location in [Location]</Text>
                 </View>
             </View>
             <View
@@ -35,11 +35,11 @@ export default function Home() {
                     label='Achievements/ Challenges'
                     icon='trophy-outline'
                 />
-                <SettingBtn label='Your Profile' icon='trophy-outline' />
-                <SettingBtn label='Following' icon='trophy-outline' />
-                <SettingBtn label='Leader Board' icon='trophy-outline' />
-                <SettingBtn label='Settings' icon='trophy-outline' />
-                <SettingBtn label='Log Out' icon='trophy-outline' />
+                <SettingBtn label='Your Profile' icon='person-outline' />
+                <SettingBtn label='Following' icon='people-outline' />
+                <SettingBtn label='Leader Board' icon='bar-chart-outline' />
+                <SettingBtn label='Settings' icon='settings-outline' />
+                <SettingBtn label='Log Out' icon='log-out-outline' />
             </View>
         </SafeAreaView>
     );
