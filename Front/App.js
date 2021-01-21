@@ -3,6 +3,7 @@ import { StyleSheet, SafeAreaView, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'; // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
 
 import Home from "./Components/home";
 import Browse from "./Components/browse";
@@ -22,19 +23,14 @@ export default function App() {
                         tabBarIcon: ({ focused, color, size }) => {
                             let iconName;
 
-                            if (route.name === "Home") {
-                                // Such as the icons
+                            if (route.name === "Home") {  // Such as the icons
                                 iconName = focused ? "home" : "home-outline";
                             } else if (route.name === "Browse") {
                                 iconName = focused ? "list" : "list-outline";
                             } else if (route.name === "Channels") {
-                                iconName = focused
-                                    ? "albums"
-                                    : "albums-outline";
+                                iconName = focused ? "albums" : "albums-outline";
                             } else if (route.name === "Upload") {
-                                iconName = focused
-                                    ? "add-circle"
-                                    : "add-circle-outline";
+                                iconName = focused ? "add-circle" : "add-circle-outline";
                             } else if (route.name === "Map") {
                                 iconName = focused ? "map" : "map-outline";
                             }
@@ -60,7 +56,7 @@ export default function App() {
                     <bButton.Screen name='Map' component={Map} />
                 </bButton.Navigator>
             </NavigationContainer>
-        </SafeAreaView> // 87 - 92 Creates the buttons and sets which page function they call
+        </SafeAreaView> // Creates the buttons and sets which page function they call
     ); // options={{tabBarBadge: 0} can be used to set notification nubers
 }
 
