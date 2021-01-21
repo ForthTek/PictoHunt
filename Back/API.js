@@ -4,6 +4,9 @@
 var Database = require("./database.js");
 
 
+const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 })
+
+
 
 // ALL FUNCTIONS THAT INTERACT WITH THE DATABASE MUST BE CALLED FROM WITHIN AN ASYNC BLOCK:
 // (async () => { let x = await query('query', ...'args'); })();
@@ -236,6 +239,11 @@ async function getPost(globalPostID) {
   }
 }
 
+/**
+ * 
+ * @param {string} username 
+ * @return {string[]}
+ */
 async function getFollowedChannelNames(username) {
   const SQL = "SELECT channelName FROM UserFollowingChannel WHERE username = ?;";
 
@@ -254,6 +262,9 @@ async function getFollowedChannelNames(username) {
   }
 }
 
+/**
+ * @returns {string[]}
+ */
 async function getAllChannelNames() {
   const SQL = "SELECT name FROM Channel;";
 
@@ -272,20 +283,90 @@ async function getAllChannelNames() {
   }
 }
 
-async function getFollowedTags(username) {
+/**
+ * @returns {string[]}
+ */
+async function getAllTags() {
+  const SQL = "SELECT name FROM Tag;";
 
   try {
-    return;
+    let rows = await Database.singleQuery(SQL);
+    // Convert to an array of strings
+    let tags = [];
+    for (let i = 0; i < rows.length; i++) {
+      tags.push(rows[i].name);
+    }
+
+    return tags;
   }
   catch (error) {
     return getErrorMessage(error);
   }
 }
 
-async function getFollowedUsers(username) {
+/**
+ * 
+ * @param {string} username 
+ * @returns {string[]}
+ */
+async function getFollowedTags(username) {
+  const SQL = "SELECT tag FROM UserFollowingTag WHERE username = ?;";
 
   try {
-    return;
+    let rows = await Database.singleQuery(SQL, username);
+    // Convert to an array of strings
+    let tags = [];
+    for (let i = 0; i < rows.length; i++) {
+      tags.push(rows[i].tag);
+    }
+
+    return tags;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * 
+ * @param {string} username 
+ * @returns {string[]} 
+ */
+async function getFollowedUsers(username) {
+  const SQL = "SELECT userBeingFollowed AS user FROM UserFollowingUser WHERE username = ?;";
+
+  try {
+    let rows = await Database.singleQuery(SQL, username);
+    // Convert to an array of strings
+    let users = [];
+    for (let i = 0; i < rows.length; i++) {
+      users.push(rows[i].user);
+    }
+
+    return users;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+
+async function getAllPostInteractions(username, postInteractionType) {
+  const SQL = "SELECT COUNT(postID) AS x FROM LikesDislikesInPost WHERE (likeAccount = ? AND interaction = ?);";
+
+  let value = "";
+  switch (postInteractionType) {
+    case PostInteractionTypes.like:
+      value = "like";
+      break;
+    case PostInteractionTypes.dislike:
+      value = "dislike";
+      break;
+  }
+
+  try {
+    let rows = await Database.singleQuery(SQL, username, value);
+    return rows[0].x;
   }
   catch (error) {
     return getErrorMessage(error);
@@ -293,14 +374,21 @@ async function getFollowedUsers(username) {
 }
 
 async function getAllLikedPosts(username) {
-
-  try {
-    return;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
+  return await getAllPostInteractions(username, PostInteractionTypes.like);
 }
+
+async function getAllDislikedPosts(username) {
+  return await getAllPostInteractions(username, PostInteractionTypes.dislike);
+}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -432,7 +520,6 @@ async function createComment(postID, accountUsername, comment) {
 
 }
 
-const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 })
 
 async function interactWithPost(postID, accountUsername, interactionType) {
   let query = "INSERT INTO CommentsInPost(postID, commentAccount, commentText, commentTime) VALUES(?, ?, ?, NOW());";
@@ -486,5 +573,5 @@ async function setAccountPublic(username, trueFalse) {
 
 module.exports = {
   isCorrectPassword, isCorrectEmail, isPublicAccount, getAllPostIDsByUser, getAllPostIDsInChannel, getAllPostIDs, getPost,
-  getAllChannelNames, getFollowedChannelNames, getFollowedTags, getFollowedUsers, getAllLikedPosts
+  getAllChannelNames, getFollowedChannelNames, getAllTags, getFollowedTags, getFollowedUsers, getAllLikedPosts, getAllDislikedPosts,
 };

@@ -21,7 +21,27 @@ var API = require("./API.js");
 
     //console.log(await API.getFollowedChannelNames("sol"));
     //console.log(await API.getAllChannelNames());
-    
+
+
+    //console.log(await API.getAllTags());
+    //console.log(await API.getFollowedTags("sol"));
+    //console.log(await API.getFollowedUsers("sol"));
+
+    //console.log(await API.getAllLikedPosts("sol"));
+    //console.log(await API.getAllDislikedPosts("sol"));
+
+
+
+
+
+
+
+
+
+
+
+
+
 })()
 
 

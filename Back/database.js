@@ -15,7 +15,6 @@ const config =
   database: 'sql2387221'
 };
 
-
 /**
  * Async function that performs a query on the database. Must be called 
  * from within an async function block and must include the await keyword before the call.
