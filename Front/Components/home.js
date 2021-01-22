@@ -6,6 +6,16 @@ import SettingBtn from "./settingBtn";
 
 export default function Home() {
     // Home page
+
+    var username = 'User Name'
+    var userjoin = '01/01/1900'
+    var userlocation = 'place'
+    var userpfp = '../assets/pfp-placeholder.png'
+
+    var userscore = 5;
+    var userpics = 5;
+    var userrank = 5;
+
     return (
         <SafeAreaView style={styles.container}>
             <View style={{ flexDirection: "row", padding: "5%" }}>
@@ -14,9 +24,9 @@ export default function Home() {
                     width={160}
                 />
                 <View style={{ flexDirection: "column", paddingLeft: "3%" }}>
-                    <Text style={styles.username}>[User Name]</Text>
-                    <Text style={styles.info}>Joined [Join Date]</Text>
-                    <Text style={styles.info}>Location in [Location]</Text>
+                    <Text style={styles.username}>{username}</Text>
+                    <Text style={styles.info}>Joined {userjoin}</Text>
+                    <Text style={styles.info}>Located in {userlocation}</Text>
                 </View>
             </View>
             <View
@@ -26,9 +36,9 @@ export default function Home() {
                     justifyContent: "space-between",
                 }}
             >
-                <Score label='Score' number={5} />
-                <Score label='Pics' number={5} />
-                <Score label='Rank' number={5} />
+                <Score label='Score' number={userscore} />
+                <Score label='Pics' number={userpics} />
+                <Score label='Rank' number={userrank} />
             </View>
             <View style={styles.container}>
                 <SettingBtn

@@ -7,6 +7,7 @@ const SettingBtn = (props) => {
         <View style={styles.container}>
             <Ionicon name={props.icon} style={styles.icon} />
             <Text style={styles.text}>{props.label}</Text>
+            <Text style={styles.indicator}> > </Text>
         </View>
     );
 };
@@ -22,5 +23,14 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 20,
     },
-    icon: { fontSize: 28, paddingRight: "2%" },
+    icon: {
+      fontSize: 28,
+      paddingRight: "2%"
+    },
+    indicator: {
+      fontSize: 26,
+      textAlign: 'right',
+      flex: 1,
+      fontFamily: 'Roboto'
+    },
 });
