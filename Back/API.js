@@ -211,7 +211,7 @@ async function getPost(globalPostID) {
 
     // Convert comments to array of comment objects
     let comments = [];
-    for (let i = 0; i < rows[3].length; i++) {
+    for (let i = 0; i < rows[5].length; i++) {
       comments.push({
         user: rows[5][i].commentAccount,
         text: rows[5][i].commentText,
@@ -502,14 +502,14 @@ async function createUser(username, password, email, isPublicAccount = true, isA
  * @param {*} description 
  * @param  {string[]} similarTags Optional string array of similar tags to this tag.
  */
-async function createTag(name, description, similarTags) {
+async function createTag(name, description, similarTags = null) {
   const TAG = "INSERT INTO Tag(name, description) VALUES(?, ?);";
 
   try {
     // Create the tag
     await Database.singleQuery(TAG, name, description);
 
-    if (similarTags != undefined && similarTags.length > 0) {
+    if (similarTags != null && similarTags.length > 0) {
       // Add similar tags
       await addSimilarTags(name, similarTags);
     }
@@ -553,7 +553,7 @@ async function addSimilarTags(name, similarTags) {
  * @param {string} usernameCreatedBy 
  * @param {string[]} relatedTags Optional string array of tags associated to this channel
  */
-async function createChannel(name, description, usernameCreatedBy, relatedTags) {
+async function createChannel(name, description, usernameCreatedBy, relatedTags = null) {
   const CHANNEL = "INSERT INTO Channel(name, description, createdBy) VALUES(?, ?, ?);";
 
   try {
@@ -561,7 +561,7 @@ async function createChannel(name, description, usernameCreatedBy, relatedTags) 
     await Database.singleQuery(CHANNEL, name, description, usernameCreatedBy);
 
     // Add the related tags to this channel
-    if (relatedTags != undefined && relatedTags.length > 0) {
+    if (relatedTags != null && relatedTags.length > 0) {
       await addRelatedTagsToChannel(name, relatedTags);
     }
 
@@ -586,8 +586,6 @@ async function addRelatedTagsToChannel(channel, relatedTags) {
       args.push([channel, relatedTags[i]]);
     }
 
-    console.log(args);
-
     try {
       // Add similar tags
       await Database.repeatQuery(TAGS, args);
@@ -604,50 +602,93 @@ async function addRelatedTagsToChannel(channel, relatedTags) {
  * @param {string} title 
  * @param {string} accountUsername 
  * @param {string} channelNamePostedTo 
- * @param {string[]} photos URLs of photos
- * @param {string[]} tags 
+ * @param {string[]} photos URLs of photos, sorted by order in post.
+ * @param {string[]} tags Names of tags in post.
  * @param {number} GPSLatitude (optional or just set null)
  * @param {number} GPSLongitude (optional or just set null)
  */
 async function createPost(title, accountUsername, channelNamePostedTo, photos, tags, GPSLatitude = null, GPSLongitude = null) {
   const SQL = "INSERT INTO Post(title, posterAccount, postedTo, timeOfPost, GPSLatitude, GPSLongitude) VALUES(?, ?, ?, NOW(), ?, ?);";
+  const GET_POST_ID = "SELECT MAX(globalPostID) AS x FROM Post WHERE posterAccount = ?";
+  const PHOTOS = "INSERT INTO PhotosInPost(postID, photoURL, orderInPost) VALUES(?, ?, ?);";
+  const TAGS = "INSERT INTO TagsInPost(postID, tagName) VALUES(?, ?);";
 
   try {
     // Create the post
     await Database.singleQuery(SQL, title, accountUsername, channelNamePostedTo, GPSLatitude, GPSLongitude);
+    // Get the most recent post by the user
+    const POST_ID = (await Database.singleQuery(GET_POST_ID, accountUsername))[0].x;
 
-    // Add the related tags and photos to the post
+    // Add the photos
+    let photoArgs = [];
+    for (let i = 0; i < photos.length; i++) {
+      photoArgs.push([POST_ID, photos[i], i]);
+    }
+    await Database.repeatQuery(PHOTOS, photoArgs);
 
-    // TODO NOT IMPLEMENTED YET
-
-
-
+    // Add the tags
+    let tagArgs = [];
+    for (let i = 0; i < tags.length; i++) {
+      tagArgs.push([POST_ID, tags[i]]);
+    }
+    await Database.repeatQuery(TAGS, tagArgs);
     return true;
   }
   catch (error) {
     return getErrorMessage(error);
   }
-
-
-
-
-  // INSERT INTO PhotosInPost(postID, photoURL, orderInPost) VALUES(2, "www.cute-cats-in-my-area.co.uk/cat2.png", 1);
-  // TAGS IN POST
 }
 
 async function createComment(postID, accountUsername, comment) {
-  let query = "INSERT INTO CommentsInPost(postID, commentAccount, commentText, commentTime) VALUES(?, ?, ?, NOW());";
+  const SQL = "INSERT INTO CommentsInPost(postID, commentAccount, commentText, commentTime) VALUES(?, ?, ?, NOW());";
 
+  try {
+    await Database.singleQuery(SQL, postID, accountUsername, comment);
+    return true;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
 }
 
 async function interactWithPost(postID, accountUsername, interactionType) {
-  let query = "INSERT INTO CommentsInPost(postID, commentAccount, commentText, commentTime) VALUES(?, ?, ?, NOW());";
+  const DELETE = "DELETE FROM LikesDislikesInPost WHERE (postID = ? AND likeAccount = ?);"
+  const UPDATE = "UPDATE LikesDislikesInPost SET interaction = ? WHERE (postID = ? AND likeAccount = ?);"
+  const INSERT = "INSERT INTO LikesDislikesInPost(postID, likeAccount, interaction) VALUES(?, ?, ?);"
 
-  if (interactionType == PostInteractionTypes.removeInteraction) {
+  try {
     // Remove the interaction instead
-  }
-  else {
+    if (interactionType == PostInteractionTypes.removeInteraction) {
+      await Database.singleQuery(DELETE, postID, accountUsername);
+      return true;
+    }
+    // Set the interaction
+    else {
+      let value;
+      switch (interactionType) {
+        case PostInteractionTypes.like:
+          value = "like";
+          break;
+        case PostInteractionTypes.dislike:
+          value = "dislike";
+          break;
+      }
 
+      // Try to insert the value
+      try {
+        await Database.singleQuery(INSERT, postID, accountUsername, value);
+        return true;
+      }
+      // Update the value instead
+      catch(err) {
+        await Database.singleQuery(UPDATE, value, postID, accountUsername);
+        return true;
+      }
+
+    }
+  }
+  catch (error) {
+    return getErrorMessage(error);
   }
 }
 
@@ -691,6 +732,7 @@ async function setAccountPublic(username, trueFalse) {
 
 // Export all the functions that should be used
 module.exports = {
+  PostInteractionTypes,
   // Check functions 
   isCorrectPassword, isCorrectEmail, isPublicAccount,
   // Post
@@ -706,4 +748,6 @@ module.exports = {
   createUser, createTag, addSimilarTags,
   createChannel, addRelatedTagsToChannel,
   createPost,
+  createComment,
+  interactWithPost,
 };
