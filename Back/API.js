@@ -89,46 +89,51 @@ async function isPublicAccount(username) {
 
 // Get methods
 
-/**
- * 
- * @param {string} username 
- * @returns {number[]}
- */
-async function getAllPostIDsByUser(username) {
-  const SQL = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
+async function getUser(username) {
+  const EXISTS = "SELECT * FROM User WHERE username = ?"
+  const SCORE = "SELECT Count(score) AS score FROM Post WHERE posterAccount = ?;";
+  const POSTS = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
+
 
   try {
-    let rows = await Database.singleQuery(SQL, username);
+    let rows = await Database.multiQuery([EXISTS, SCORE, POSTS], [[username], [username], [username]]);
+
     // Convert to an array of integers
     let posts = [];
-    for (let i = 0; i < rows.length; i++) {
-      posts.push(rows[i].globalPostID);
+    for (let i = 0; i < rows[2].length; i++) {
+      posts.push(rows[2][i].globalPostID);
     }
 
-    return posts;
+    return {
+      username: username,
+      score: rows[1][0].score,
+      posts: posts,
+    };
   }
   catch (error) {
     return getErrorMessage(error);
   }
 }
 
-/**
- * 
- * @param {string} channelName 
- * @returns {number[]}
- */
-async function getAllPostIDsInChannel(channelName) {
-  const SQL = "SELECT globalPostID FROM Post WHERE postedTo = ? ORDER BY globalPostID DESC;";
+async function getChannel(name) {
+  const EXISTS = "SELECT * FROM Channel WHERE name = ?"
+  const SCORE = "SELECT Count(score) AS score FROM Post WHERE postedTo = ?;";
+  const POSTS = "SELECT globalPostID FROM Post WHERE postedTo = ? ORDER BY globalPostID DESC;";
 
   try {
-    let rows = await Database.singleQuery(SQL, channelName);
+    let rows = await Database.multiQuery([EXISTS, SCORE, POSTS], [[name], [name], [name]]);
+
     // Convert to an array of integers
     let posts = [];
-    for (let i = 0; i < rows.length; i++) {
-      posts.push(rows[i].globalPostID);
+    for (let i = 0; i < rows[2].length; i++) {
+      posts.push(rows[2][i].globalPostID);
     }
 
-    return posts;
+    return {
+      name: name,
+      score: rows[1][0].score,
+      posts: posts,
+    };
   }
   catch (error) {
     return getErrorMessage(error);
@@ -189,12 +194,12 @@ async function getPost(globalPostID) {
   const TAGS = "SELECT tagName FROM TagsInPost WHERE postID = ?;";
   const IMAGES = "SELECT photoURL FROM PhotosInPost WHERE postID = ? ORDER BY orderInPost;";
   const COMMENTS = "SELECT commentText, commentAccount, commentTime FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
-  const INTERACTIONS = "SELECT COUNT('like') AS likes, COUNT('dislike') AS dislikes FROM LikesDislikesInPost WHERE postID = ?;";
+  const INTERACTIONS = "SELECT COUNT(interaction) AS x FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
 
   try {
     // Get all of the data from the post
-    let rows = await Database.multiQuery([POST, TAGS, IMAGES, INTERACTIONS, COMMENTS],
-      [[globalPostID], [globalPostID], [globalPostID], [globalPostID], [globalPostID]]);
+    let rows = await Database.multiQuery([POST, TAGS, IMAGES, INTERACTIONS, INTERACTIONS, COMMENTS],
+      [[globalPostID], [globalPostID], [globalPostID], [globalPostID, "like"], [globalPostID, "dislike"], [globalPostID]]);
 
     /*
     console.log("RAW DATA:")
@@ -217,11 +222,11 @@ async function getPost(globalPostID) {
 
     // Convert comments to array of comment objects
     let comments = [];
-    for (let i = 0; i < rows[4].length; i++) {
+    for (let i = 0; i < rows[5].length; i++) {
       comments.push({
-        user: rows[4][i].commentAccount,
-        text: rows[4][i].commentText,
-        time: rows[4][i].commentTime,
+        user: rows[5][i].commentAccount,
+        text: rows[5][i].commentText,
+        time: rows[5][i].commentTime,
       });
     }
 
@@ -231,8 +236,9 @@ async function getPost(globalPostID) {
       title: rows[0][0].title,
       user: rows[0][0].posterAccount,
       channel: rows[0][0].postedTo,
-      likes: rows[3][0].likes,
-      dislikes: rows[3][0].dislikes,
+      score: rows[0][0].score,
+      likes: rows[3][0].x,
+      dislikes: rows[4][0].x,
       time: rows[0][0].timeOfPost,
       GPSLatitude: rows[0][0].GPSLatitude,
       GPSLongitude: rows[0][0].GPSLongitude,
@@ -662,10 +668,13 @@ async function interactWithPost(postID, accountUsername, interactionType) {
   const UPDATE = "UPDATE LikesDislikesInPost SET interaction = ? WHERE (postID = ? AND likeAccount = ?);"
   const INSERT = "INSERT INTO LikesDislikesInPost(postID, likeAccount, interaction) VALUES(?, ?, ?);"
 
+  const SCORE = "SELECT Count(interaction) FROM LikesDislikesInPost WHERE (interaction = 'like' AND postID = ?)";
+  const UPDATE_SCORE = "UPDATE Post SET score = (" + SCORE + ") WHERE globalPostID = ?";
+
   try {
     // Remove the interaction instead
     if (interactionType == PostInteractionTypes.removeInteraction) {
-      await Database.singleQuery(DELETE, postID, accountUsername);
+      await Database.multiQuery([DELETE, UPDATE_SCORE], [[postID, accountUsername], [postID, postID]]);
       return true;
     }
     // Set the interaction
@@ -682,15 +691,14 @@ async function interactWithPost(postID, accountUsername, interactionType) {
 
       // Try to insert the value
       try {
-        await Database.singleQuery(INSERT, postID, accountUsername, value);
+        await Database.multiQuery([INSERT, UPDATE_SCORE], [[postID, accountUsername, value], [postID, postID]]);
         return true;
       }
       // Update the value instead
       catch (err) {
-        await Database.singleQuery(UPDATE, value, postID, accountUsername);
+        await Database.multiQuery([UPDATE, UPDATE_SCORE], [[value, postID, accountUsername], [postID, postID]]);
         return true;
       }
-
     }
   }
   catch (error) {
@@ -745,14 +753,14 @@ module.exports = {
   // Check functions 
   isCorrectPassword, isCorrectEmail, isPublicAccount,
   // Post
-  getAllPostIDsByUser, getAllPostIDsInChannel, getAllPostIDs, getPost,
+  getAllPostIDs, getPost,
   getNumberOfLikedPosts, getNumberOfDislikedPosts, getLikedPostIDs, getDislikedPostIDs,
   // Channels
-  getAllChannelNames, getFollowedChannelNames,
+  getChannel, getAllChannelNames, getFollowedChannelNames,
   // Tags
   getAllTags, getFollowedTags,
   // Users
-  getFollowedUsers,
+  getUser, getFollowedUsers,
 
 
   // Create functions 

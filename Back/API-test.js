@@ -35,6 +35,9 @@ var API = require("./API.js");
 
     //console.log(await API.isPublicAccount("sol"));
     //console.log(await API.isPublicAccount("solomon"));
+    
+    console.log(await API.getUser("so"));
+    console.log(await API.getChannel("Cute animals"));
 
 
     // Post stuff
@@ -86,13 +89,13 @@ var API = require("./API.js");
 
     // TEST likes, dislikes and removing interaction
     //console.log(await API.interactWithPost(16, "solomon", API.PostInteractionTypes.dislike));
-    //console.log(await API.interactWithPost(16, "sol", API.PostInteractionTypes.like));
+    //console.log(await API.interactWithPost(15, "sol", API.PostInteractionTypes.like));
     //console.log(await API.getPost(16));
     //console.log(await API.interactWithPost(16, "sol", API.PostInteractionTypes.removeInteraction));
     //console.log(await API.getPost(16));
 
 
-    //console.log(await API.getPost(17));
+    //console.log(await API.getPost(15));
     
 
 
