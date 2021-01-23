@@ -1,8 +1,7 @@
-import { useLinkProps } from "@react-navigation/native";
 import React from "react";
 import { Text, StyleSheet, View, Image } from "react-native";
 
-const Post = (props) => {
+const Channel = (props) => {
     return (
         <View style={styles.container}>
             <Image
@@ -11,17 +10,14 @@ const Post = (props) => {
             />
             <View style={styles.containerCol}>
                 <Text style={styles.title}>{props.title}</Text>
-                <Text style={styles.postName}>Account Name</Text>
-                <Text numberOfLines={3}>
-                    This is a description of the image next to this text :)
-                    There should only be three lines and nothign more. if there
-                    is more than 3 i fucked it
-                </Text>
+                <Text style={styles.info}>Followers</Text>
+                <Text style={styles.info}>Pics</Text>
+                <Text style={styles.info}>Score</Text>
             </View>
         </View>
     );
 };
-export default Post;
+export default Channel;
 
 const styles = StyleSheet.create({
     container: {
@@ -41,10 +37,10 @@ const styles = StyleSheet.create({
     },
     title: {
         fontSize: 22,
+        paddingBottom: "5%",
     },
-    postName: {
-        fontSize: 12,
-        color: "grey",
+    info: {
+        fontSize: 15,
         paddingBottom: "3%",
     },
 });

@@ -14,6 +14,7 @@ npm install @react-navigation/bottom-tabs \
 npm install @react-navigation/material-bottom-tabs react-native-paper \
 npm install @react-navigation/drawer \
 npm install react-native-scalable-image --save
+npm install expo-image-picker
 
 # Useful links:
 

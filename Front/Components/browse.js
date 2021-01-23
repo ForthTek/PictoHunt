@@ -4,18 +4,18 @@ import { shouldUseActivityState } from "react-native-screens";
 import Post from "./post";
 
 const DATA = [
-    { id: 1, title: "hi" },
-    { id: 2, title: "hi" },
-    { id: 3, title: "hi" },
-    { id: 4, title: "hi" },
-    { id: 5, title: "hi" },
-    { id: 6, title: "hi" },
-    { id: 7, title: "hi" },
-    { id: 8, title: "hi" },
-    { id: 9, title: "hi" },
-    { id: 10, title: "hi" },
-    { id: 11, title: "hi" },
-    { id: 12, title: "hi" },
+    { id: "1", title: "Title" },
+    { id: "2", title: "Title" },
+    { id: "3", title: "Title" },
+    { id: "4", title: "Title" },
+    { id: "5", title: "Title" },
+    { id: "6", title: "Title" },
+    { id: "7", title: "Title" },
+    { id: "8", title: "Title" },
+    { id: "9", title: "Title" },
+    { id: "10", title: "Title" },
+    { id: "11", title: "Title" },
+    { id: "12", title: "Title" },
 ];
 
 const Item = ({ title }) => {
