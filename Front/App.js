@@ -3,12 +3,12 @@ import { StyleSheet, SafeAreaView, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
-import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs'; // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs"; // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
 
 import Home from "./Components/home";
 import Browse from "./Components/browse";
 import Channels from "./Components/channels";
-import Upload from "./Components/upload";
+import Upload from "./Components/UploadScreen";
 import Map from "./Components/map";
 
 const bButton = createBottomTabNavigator(); // Create the bottom tab bar
@@ -23,14 +23,19 @@ export default function App() {
                         tabBarIcon: ({ focused, color, size }) => {
                             let iconName;
 
-                            if (route.name === "Home") {  // Such as the icons
+                            if (route.name === "Home") {
+                                // Such as the icons
                                 iconName = focused ? "home" : "home-outline";
                             } else if (route.name === "Browse") {
                                 iconName = focused ? "list" : "list-outline";
                             } else if (route.name === "Channels") {
-                                iconName = focused ? "albums" : "albums-outline";
+                                iconName = focused
+                                    ? "albums"
+                                    : "albums-outline";
                             } else if (route.name === "Upload") {
-                                iconName = focused ? "add-circle" : "add-circle-outline";
+                                iconName = focused
+                                    ? "add-circle"
+                                    : "add-circle-outline";
                             } else if (route.name === "Map") {
                                 iconName = focused ? "map" : "map-outline";
                             }

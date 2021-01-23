@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { Button, Image, View, Platform } from "react-native";
+import { Button, Image, View, Platform, StyleSheet } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import Constants from "expo-constants";
 
 export default function ImagePickerExample() {
     const [image, setImage] = useState(null);
@@ -53,3 +52,5 @@ export default function ImagePickerExample() {
         </View>
     );
 }
+
+const styles = StyleSheet.create({});
