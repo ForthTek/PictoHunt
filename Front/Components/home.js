@@ -7,10 +7,9 @@ import SettingBtn from "./settingBtn";
 export default function Home() {
     // Home page
 
-    var username = 'User Name'
-    var userjoin = '01/01/1900'
-    var userlocation = 'place'
-    var userpfp = '../assets/pfp-placeholder.png'
+    var username = "User Name";
+    var userjoin = "01/01/1900";
+    var userlocation = "place";
 
     var userscore = 5;
     var userpics = 5;
