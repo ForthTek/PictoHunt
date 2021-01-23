@@ -3,7 +3,9 @@
 
 var Database = require("./database.js");
 
-
+/**
+ * Enum for identifying the type of an interaction with a post.
+ */
 const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 })
 
 
@@ -11,14 +13,18 @@ const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInt
 // ALL FUNCTIONS THAT INTERACT WITH THE DATABASE MUST BE CALLED FROM WITHIN AN ASYNC BLOCK:
 // (async () => { let x = await query('query', ...'args'); })();
 
-// CHECK THE API-test.js FILE FOR EXAMPLES 
+// CHECK THE API-test.js FILE FOR FULL EXAMPLES 
+
+
 
 
 
 function getErrorMessage(error) {
   // Just for now
   // Will need to do custom messages for errors
-  return error.message;
+  let message = error.message;
+
+  return { error: message };
 }
 
 
@@ -183,12 +189,12 @@ async function getPost(globalPostID) {
   const TAGS = "SELECT tagName FROM TagsInPost WHERE postID = ?;";
   const IMAGES = "SELECT photoURL FROM PhotosInPost WHERE postID = ? ORDER BY orderInPost;";
   const COMMENTS = "SELECT commentText, commentAccount, commentTime FROM CommentsInPost WHERE postID = ? ORDER BY globalCommentID DESC;";
-  const INTERACTIONS = "SELECT COUNT(interaction) AS x FROM LikesDislikesInPost WHERE (postID = ? AND interaction = ?)";
+  const INTERACTIONS = "SELECT COUNT('like') AS likes, COUNT('dislike') AS dislikes FROM LikesDislikesInPost WHERE postID = ?;";
 
   try {
     // Get all of the data from the post
-    let rows = await Database.multiQuery([POST, TAGS, IMAGES, INTERACTIONS, INTERACTIONS, COMMENTS],
-      [[globalPostID], [globalPostID], [globalPostID], [globalPostID, "like"], [globalPostID, "dislike"], [globalPostID]]);
+    let rows = await Database.multiQuery([POST, TAGS, IMAGES, INTERACTIONS, COMMENTS],
+      [[globalPostID], [globalPostID], [globalPostID], [globalPostID], [globalPostID]]);
 
     /*
     console.log("RAW DATA:")
@@ -211,11 +217,11 @@ async function getPost(globalPostID) {
 
     // Convert comments to array of comment objects
     let comments = [];
-    for (let i = 0; i < rows[5].length; i++) {
+    for (let i = 0; i < rows[4].length; i++) {
       comments.push({
-        user: rows[5][i].commentAccount,
-        text: rows[5][i].commentText,
-        time: rows[5][i].commentTime,
+        user: rows[4][i].commentAccount,
+        text: rows[4][i].commentText,
+        time: rows[4][i].commentTime,
       });
     }
 
@@ -225,8 +231,8 @@ async function getPost(globalPostID) {
       title: rows[0][0].title,
       user: rows[0][0].posterAccount,
       channel: rows[0][0].postedTo,
-      likes: rows[3][0].x,
-      dislikes: rows[4][0].x,
+      likes: rows[3][0].likes,
+      dislikes: rows[3][0].dislikes,
       time: rows[0][0].timeOfPost,
       GPSLatitude: rows[0][0].GPSLatitude,
       GPSLongitude: rows[0][0].GPSLongitude,
@@ -680,7 +686,7 @@ async function interactWithPost(postID, accountUsername, interactionType) {
         return true;
       }
       // Update the value instead
-      catch(err) {
+      catch (err) {
         await Database.singleQuery(UPDATE, value, postID, accountUsername);
         return true;
       }
@@ -730,6 +736,9 @@ async function setAccountPublic(username, trueFalse) {
 
 
 
+
+
+
 // Export all the functions that should be used
 module.exports = {
   PostInteractionTypes,
@@ -745,6 +754,8 @@ module.exports = {
   // Users
   getFollowedUsers,
 
+
+  // Create functions 
   createUser, createTag, addSimilarTags,
   createChannel, addRelatedTagsToChannel,
   createPost,

@@ -1,11 +1,30 @@
 var API = require("./API.js");
 
+
 // ALL API ASYNC FUNCTIONS MUST BE CALLED FROM WITHIN AN ASYNC BLOCK:
 // (async () => { })();
 
-// ALL IMPLEMENTED METHODS:
 
-// TEST GET FUNCTIONS
+// Example - how to call API functions 
+/*
+(async () => {
+    let value = await API.createUser("solomon", "password", "sol@email.address");
+    if (!value.error) {
+        // Do something 
+    }
+    else {
+        // Deal with the error
+    }
+})();
+*/
+
+// All API functions will return either:
+// - a JSON object if there was an error => { error: message } (use this message for feedback to the user)
+// - or their return type
+
+
+
+// TEST SOME FUNCTIONS
 (async () => {
     // Basic login stuff
     //console.log(await API.isCorrectPassword("solomon", "password"));
@@ -44,12 +63,12 @@ var API = require("./API.js");
     //console.log(await API.getFollowedUsers("sol"));
 
 
-})();
 
-// TEST CREATE FUNCTIONS
-(async () => {
-    //console.log(await API.createUser("sol", "password", "email"));
+    //console.log(await API.createUser("solomon", "password", "sol@email.address"));
+    //console.log(await API.createUser("ryan", "secure password", "ryan@email.address"));
 
+
+    //console.log(await API.createTag("cat", "pictures of cute cats"));
     //console.log(await API.createTag("cat", "pictures of cute cats"));
 
     //console.log(await API.createTag("dog", "pictures of dogs"));
@@ -73,5 +92,21 @@ var API = require("./API.js");
     //console.log(await API.getPost(16));
 
 
+    //console.log(await API.getPost(17));
+    
+
 
 })();
+
+
+
+
+// POPULATE THE DATABASE
+/*
+(async () => {
+
+    //console.log(await API.createUser("solomon", "password", "sol@email.address"));
+    //console.log(await API.createUser("ryan", "secure password", "ryan@email.address"));
+
+})();
+*/
