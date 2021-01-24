@@ -858,6 +858,10 @@ async function followTag(accountUsername, tagName) {
 async function followUser(accountUsername, usernameToFollow) {
   const SQL = "INSERT INTO UserFollowingUser(username, userBeingFollowed) VALUES(?, ?);";
 
+  if(accountUsername === usernameToFollow) {
+    throw new Error("User cannot follow themselves");
+  }
+
   try {
     await Database.singleQuery(SQL, accountUsername, usernameToFollow);
     return true;
