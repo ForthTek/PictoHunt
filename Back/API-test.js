@@ -48,6 +48,8 @@ var API = require("./API.js");
 
     //console.log(await API.getPost(17));
 
+    
+
     //console.log(await API.getNumberOfLikedPosts("sol"));
     //console.log(await API.getNumberOfDislikedPosts("sol"));
 

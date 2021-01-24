@@ -37,7 +37,7 @@ function getErrorMessage(error) {
  * @param {string} username 
  * @param {string} email 
  * @param {string} password 
- * @returns {boolean} True or error struct.
+ * @returns {boolean} True or error object.
  */
 async function isValidSignInDetails(username, email, password) {
   const SQL = "SELECT username, emailAddress, salt, userPassword FROM User WHERE username = ?";
@@ -76,7 +76,7 @@ async function isValidSignInDetails(username, email, password) {
  * Async function that returns if an account is public or not.
  * 
  * @param {string} username 
- * @returns {boolean} True or error struct.
+ * @returns {boolean} True or error object.
  */
 async function isPublicAccount(username) {
   const SQL = "SELECT username, isPublic FROM User WHERE username = ?";
@@ -107,7 +107,10 @@ async function isPublicAccount(username) {
  * Async function that returns a User's profile.
  * 
  * @param {string} username 
- * @returns {object} User struct or error struct.
+ * @returns {object} User object or error object.
+ * @returns {string} user.username
+ * @returns {number} user.score
+ * @returns {number[]} user.posts Array of post IDs
  */
 async function getUser(username) {
   const EXISTS = "SELECT username FROM User WHERE username = ?"
@@ -146,7 +149,10 @@ async function getUser(username) {
  * Async function that returns a Channel's profile.
  * 
  * @param {string} name 
- * @returns {object} Channel struct or error struct.
+ * @returns {object} Channel object or error object.
+ * @returns {string} channel.name 
+ * @returns {number} channel.score 
+ * @returns {number[]} channel.posts Array of post IDs
  */
 async function getChannel(name) {
   const EXISTS = "SELECT name FROM Channel WHERE name = ?"
@@ -205,33 +211,25 @@ async function getAllPostIDs() {
 }
 
 /**
- * @typedef {object} Post 
- * @property {number} ID 
- * @property {string} title
- * @property {string} user 
- * @property {string} channel
- * @property {number} likes
- * @property {number} dislikes
- * @property {timestamp} time
- * @property {number} GPSLatitude
- * @property {number} GPSLongitude
- * @property {string[]} tags
- * @property {string[]} photos 
- * @property {Comment[]} comments
- */
-
-/**
-* @typedef {object} Comment 
-* @property {string} user
-* @property {string} text
-* @property {timestamp} time
-*/
-
-/**
  * Async function that returns a post.
  * 
  * @param {number} globalPostID ID of the post to return.
- * @returns {object} A Post struct or error struct.
+ * @returns {object} A Post object or error object.
+ * @returns {number} post.ID 
+ * @returns {string} post.title
+ * @returns {string} post.user 
+ * @returns {string} post.channel 
+ * @returns {number} post.likes
+ * @returns {number} post.dislikes
+ * @returns {timestamp} post.time
+ * @returns {number} post.GPSLatitude
+ * @returns {number} post.GPSLongitude
+ * @returns {string[]} post.tags Array of strings
+ * @returns {string[]} post.photos Array of string URLs
+ * @returns {Comment[]} post.comments Array of comment objects
+ * @returns {string} post.comments[i].user
+ * @returns {string} post.comments[i].text
+ * @returns {timestamp} post.comments[i].time Timestamp
  */
 async function getPost(globalPostID) {
   const POST = "SELECT * FROM Post WHERE globalPostID = ?;";
@@ -310,7 +308,9 @@ async function getPost(globalPostID) {
  * Async function that returns a Tag.
  * 
  * @param {string} name 
- * @returns {object} Tag struct or error struct.
+ * @returns {object} Tag object or error object.
+ * @returns {string} tag.name
+ * @returns {string} tag.description
  */
 async function getTag(name) {
   const SQL = "SELECT name, description FROM Tag WHERE name = ?;";
@@ -340,7 +340,7 @@ async function getTag(name) {
  * Async function that returns all Channel names followed by the user.
  * 
  * @param {string} username 
- * @return {string[]} Array of Channel names.
+ * @returns {string[]} Array of Channel names.
  */
 async function getFollowedChannelNames(username) {
   const SQL = "SELECT channelName FROM UserFollowingChannel WHERE username = ?;";
@@ -815,7 +815,7 @@ async function interactWithPost(postID, accountUsername, interactionType) {
  * 
  * @param {string} accountUsername 
  * @param {string} channelName 
- * @returns {boolean} True or error struct.
+ * @returns {boolean} True or error object.
  */
 async function followChannel(accountUsername, channelName) {
   const SQL = "INSERT INTO UserFollowingChannel(username, channelName) VALUES(?, ?);";
@@ -834,7 +834,7 @@ async function followChannel(accountUsername, channelName) {
  * 
  * @param {string} accountUsername 
  * @param {string} tagName 
- * @returns {boolean} True or error struct.
+ * @returns {boolean} True or error object.
  */
 async function followTag(accountUsername, tagName) {
   const SQL = "INSERT INTO UserFollowingTag(username, tag) VALUES(?, ?);";
@@ -853,12 +853,12 @@ async function followTag(accountUsername, tagName) {
  * 
  * @param {string} accountUsername 
  * @param {string} usernameToFollow 
- * @returns {boolean} True or error struct.
+ * @returns {boolean} True or error object.
  */
 async function followUser(accountUsername, usernameToFollow) {
   const SQL = "INSERT INTO UserFollowingUser(username, userBeingFollowed) VALUES(?, ?);";
 
-  if(accountUsername === usernameToFollow) {
+  if (accountUsername === usernameToFollow) {
     throw new Error("User cannot follow themselves");
   }
 
@@ -914,4 +914,6 @@ module.exports = {
   interactWithPost,
 
   followChannel, followTag, followUser,
+
+
 };
