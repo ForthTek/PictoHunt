@@ -10,13 +10,16 @@ var API = require("./API.js");
 (async () => {
     let value = await API.createUser("solomon", "password", "sol@email.address");
     if (!value.error) {
-        // Do something 
+        // Do something with the data
+        console.log(value);
     }
     else {
-        // Deal with the error
+        // Deal with the error - display the code to user?
+        console.log(value.error);
     }
 })();
 */
+
 
 // All API functions will return either:
 // - a JSON object if there was an error => { error: message } (use this message for feedback to the user)
@@ -36,8 +39,10 @@ var API = require("./API.js");
     //console.log(await API.isPublicAccount("sol"));
     //console.log(await API.isPublicAccount("solomon"));
     
-    console.log(await API.getUser("so"));
-    console.log(await API.getChannel("Cute animals"));
+    //console.log(await API.getUser("sol"));
+    //console.log(await API.getUser("so"));
+    //console.log(await API.getChannel("invalid channel name"));
+    //console.log(await API.getChannel("Cute animal pics"));
 
 
     // Post stuff

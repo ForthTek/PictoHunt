@@ -90,13 +90,20 @@ async function isPublicAccount(username) {
 // Get methods
 
 async function getUser(username) {
-  const EXISTS = "SELECT * FROM User WHERE username = ?"
+  const EXISTS = "SELECT username FROM User WHERE username = ?"
   const SCORE = "SELECT Count(score) AS score FROM Post WHERE posterAccount = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
 
-
   try {
     let rows = await Database.multiQuery([EXISTS, SCORE, POSTS], [[username], [username], [username]]);
+
+    // Throw a useful error if the username doesn't exist
+    try {
+      rows[0][0].username;
+    }
+    catch (e) {
+      throw new Error("Account username is not valid");
+    }
 
     // Convert to an array of integers
     let posts = [];
@@ -116,12 +123,23 @@ async function getUser(username) {
 }
 
 async function getChannel(name) {
-  const EXISTS = "SELECT * FROM Channel WHERE name = ?"
+  const EXISTS = "SELECT name FROM Channel WHERE name = ?"
   const SCORE = "SELECT Count(score) AS score FROM Post WHERE postedTo = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE postedTo = ? ORDER BY globalPostID DESC;";
 
+  // check exists, throw error if not
+  // Merge all related stuff together
+
   try {
     let rows = await Database.multiQuery([EXISTS, SCORE, POSTS], [[name], [name], [name]]);
+
+    // Throw a useful error if the username doesn't exist
+    try {
+      rows[0][0].name;
+    }
+    catch (e) {
+      throw new Error("Channel name is not valid");
+    }
 
     // Convert to an array of integers
     let posts = [];
@@ -492,7 +510,22 @@ function hashStr(str, salt) {
  * @param {boolean} isAdminAccount The account should have administrator privileges.
  */
 async function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
-  let sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt) VALUES (?, ?, ?, ?, ?, ?)";
+  const sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt) VALUES (?, ?, ?, ?, ?, ?)";
+
+  // Invalid username?
+  if (false) {
+    throw new Error("Username is not valid");
+  }
+
+  // Invalid email
+  if (false) {
+    throw new Error("Email address is not valid");
+  }
+
+  // Invalid password
+  if (false) {
+    throw new Error("Password is not valid");
+  }
 
   /* This Will need moved */
   var salt = randomStr((Math.random() * 50) + 10);
