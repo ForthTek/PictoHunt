@@ -30,38 +30,42 @@ function getErrorMessage(error) {
 
 // Check methods
 
-/**
- * 
- * @param {string} username 
- * @param {string} password 
- * @returns {boolean}
- */
-async function isCorrectPassword(username, password) {
-  const SQL = "SELECT salt, userPassword FROM User WHERE username = ?";
-
-  try {
-    let rows = (await Database.singleQuery(SQL, username))[0];
-    let hash = hashStr(password, rows.salt);
-
-    return hash === rows.userPassword;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
 
 /**
+ * Async function that evaluates if the sign in details are correct.
  * 
  * @param {string} username 
  * @param {string} email 
- * @returns {boolean}
+ * @param {string} password 
+ * @returns {boolean} True or error struct.
  */
-async function isCorrectEmail(username, email) {
-  const SQL = "SELECT emailAddress FROM User WHERE username = ?";
+async function isValidSignInDetails(username, email, password) {
+  const SQL = "SELECT username, emailAddress, salt, userPassword FROM User WHERE username = ?";
 
   try {
-    let rows = (await Database.singleQuery(SQL, username))[0];
-    return email === rows.emailAddress;
+    let rows = await Database.singleQuery(SQL, username);
+
+    // Throw a useful error if the username is invalid
+    try {
+      rows[0].username;
+    }
+    catch (e) {
+      throw new Error("Username is not valid");
+    }
+
+    // Email is invalid
+    if (email !== rows[0].emailAddress) {
+      throw new Error("Email address is not valid");
+    }
+
+    let hash = hashStr(password, rows[0].salt);
+
+    // Password is invalid 
+    if (hash !== rows[0].userPassword) {
+      throw new Error("Password is not valid");
+    }
+
+    return true;
   }
   catch (error) {
     return getErrorMessage(error);
@@ -69,16 +73,26 @@ async function isCorrectEmail(username, email) {
 }
 
 /**
+ * Async function that returns if an account is public or not.
  * 
  * @param {string} username 
- * @returns {boolean}
+ * @returns {boolean} True or error struct.
  */
 async function isPublicAccount(username) {
-  const SQL = "SELECT isPublic FROM User WHERE username = ?";
+  const SQL = "SELECT username, isPublic FROM User WHERE username = ?";
 
   try {
-    let rows = (await Database.singleQuery(SQL, username))[0];
-    return rows.isPublic === 1;
+    let rows = await Database.singleQuery(SQL, username);
+
+    // Throw a useful error if the username is invalid
+    try {
+      rows[0].username;
+    }
+    catch (e) {
+      throw new Error("Username is not valid");
+    }
+
+    return rows[0].isPublic === 1;
   }
   catch (error) {
     return getErrorMessage(error);
@@ -89,6 +103,12 @@ async function isPublicAccount(username) {
 
 // Get methods
 
+/**
+ * Async function that returns a User's profile.
+ * 
+ * @param {string} username 
+ * @returns {object} User struct or error struct.
+ */
 async function getUser(username) {
   const EXISTS = "SELECT username FROM User WHERE username = ?"
   const SCORE = "SELECT Count(score) AS score FROM Post WHERE posterAccount = ?;";
@@ -122,13 +142,16 @@ async function getUser(username) {
   }
 }
 
+/**
+ * Async function that returns a Channel's profile.
+ * 
+ * @param {string} name 
+ * @returns {object} Channel struct or error struct.
+ */
 async function getChannel(name) {
   const EXISTS = "SELECT name FROM Channel WHERE name = ?"
   const SCORE = "SELECT Count(score) AS score FROM Post WHERE postedTo = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE postedTo = ? ORDER BY globalPostID DESC;";
-
-  // check exists, throw error if not
-  // Merge all related stuff together
 
   try {
     let rows = await Database.multiQuery([EXISTS, SCORE, POSTS], [[name], [name], [name]]);
@@ -159,7 +182,9 @@ async function getChannel(name) {
 }
 
 /**
- * @returns {number[]}
+ * Async function that gets a list of every single post ID.
+ * 
+ * @returns {number[]} ID's sorted by newest first.
  */
 async function getAllPostIDs() {
   const SQL = "SELECT globalPostID FROM Post ORDER BY globalPostID DESC;";
@@ -203,9 +228,10 @@ async function getAllPostIDs() {
 */
 
 /**
+ * Async function that returns a post.
  * 
  * @param {number} globalPostID ID of the post to return.
- * @returns {Post} A Post JSON object.
+ * @returns {object} A Post struct or error struct.
  */
 async function getPost(globalPostID) {
   const POST = "SELECT * FROM Post WHERE globalPostID = ?;";
@@ -224,6 +250,14 @@ async function getPost(globalPostID) {
     console.log(rows);
     console.log("\n")
     */
+
+    // Throw a useful error if the post doesn't exist
+    try {
+      rows[0][0].postID;
+    }
+    catch (e) {
+      throw new Error("Post does not exist");
+    }
 
     // Now we need to process the data
 
@@ -273,9 +307,40 @@ async function getPost(globalPostID) {
 }
 
 /**
+ * Async function that returns a Tag.
+ * 
+ * @param {string} name 
+ * @returns {object} Tag struct or error struct.
+ */
+async function getTag(name) {
+  const SQL = "SELECT name, description FROM Tag WHERE name = ?;";
+
+  try {
+    let rows = await Database.singleQuery(SQL, name);
+
+    // Throw a useful error if the post doesn't exist
+    try {
+      rows[0].name;
+    }
+    catch (e) {
+      throw new Error("Tag name does not exist");
+    }
+
+    return {
+      name: name,
+      description: rows[0].description,
+    };
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * Async function that returns all Channel names followed by the user.
  * 
  * @param {string} username 
- * @return {string[]}
+ * @return {string[]} Array of Channel names.
  */
 async function getFollowedChannelNames(username) {
   const SQL = "SELECT channelName FROM UserFollowingChannel WHERE username = ?;";
@@ -296,7 +361,9 @@ async function getFollowedChannelNames(username) {
 }
 
 /**
- * @returns {string[]}
+ * Async function that returns all Channel names.
+ * 
+ * @returns {string[]} Array containing all Channel names.
  */
 async function getAllChannelNames() {
   const SQL = "SELECT name FROM Channel;";
@@ -317,30 +384,10 @@ async function getAllChannelNames() {
 }
 
 /**
- * @returns {string[]}
- */
-async function getAllTags() {
-  const SQL = "SELECT name FROM Tag;";
-
-  try {
-    let rows = await Database.singleQuery(SQL);
-    // Convert to an array of strings
-    let tags = [];
-    for (let i = 0; i < rows.length; i++) {
-      tags.push(rows[i].name);
-    }
-
-    return tags;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
-}
-
-/**
+ * Async function that returns all Tag names followed by the user.
  * 
  * @param {string} username 
- * @returns {string[]}
+ * @returns {string[]} Array of Tag names.
  */
 async function getFollowedTags(username) {
   const SQL = "SELECT tag FROM UserFollowingTag WHERE username = ?;";
@@ -361,9 +408,33 @@ async function getFollowedTags(username) {
 }
 
 /**
+ * Async function that returns all Tag names.
+ * 
+ * @returns {string[]} Array of all Tag names.
+ */
+async function getAllTagNames() {
+  const SQL = "SELECT name FROM Tag;";
+
+  try {
+    let rows = await Database.singleQuery(SQL);
+    // Convert to an array of strings
+    let tags = [];
+    for (let i = 0; i < rows.length; i++) {
+      tags.push(rows[i].name);
+    }
+
+    return tags;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * Async function that returns all usernames that the user is following.  
  * 
  * @param {string} username 
- * @returns {string[]} 
+ * @returns {string[]} Array of usernames.
  */
 async function getFollowedUsers(username) {
   const SQL = "SELECT userBeingFollowed AS user FROM UserFollowingUser WHERE username = ?;";
@@ -739,22 +810,56 @@ async function interactWithPost(postID, accountUsername, interactionType) {
   }
 }
 
+/**
+ * Async function that allows a user to follow a Channel.
+ * 
+ * @param {string} accountUsername 
+ * @param {string} channelName 
+ * @returns {boolean} True or error struct.
+ */
 async function followChannel(accountUsername, channelName) {
-  let query = "INSERT INTO UserFollowingChannel(username, channelName) VALUES(?, ?);";
-
-}
-
-async function followTag(accountUsername, tagName) {
-  let query = "INSERT INTO UserFollowingTag(username, tag) VALUES(?, ?);";
-
-}
-
-async function followUser(accountUsername, usernameToFollow) {
-  let sql = "SELECT * FROM UserFollowingUser(username, userBeingFollowed) VALUES(?, ?);";
-  let data = null;
+  const SQL = "INSERT INTO UserFollowingChannel(username, channelName) VALUES(?, ?);";
 
   try {
-    data = await Database.singleQuery(sql, accountUsername, usernameToFollow);
+    await Database.singleQuery(SQL, accountUsername, channelName);
+    return true;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * Async function that allows a user to follow a Tag.
+ * 
+ * @param {string} accountUsername 
+ * @param {string} tagName 
+ * @returns {boolean} True or error struct.
+ */
+async function followTag(accountUsername, tagName) {
+  const SQL = "INSERT INTO UserFollowingTag(username, tag) VALUES(?, ?);";
+
+  try {
+    await Database.singleQuery(SQL, accountUsername, tagName);
+    return true;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * Async function that allows a user to follow another user.
+ * 
+ * @param {string} accountUsername 
+ * @param {string} usernameToFollow 
+ * @returns {boolean} True or error struct.
+ */
+async function followUser(accountUsername, usernameToFollow) {
+  const SQL = "INSERT INTO UserFollowingUser(username, userBeingFollowed) VALUES(?, ?);";
+
+  try {
+    await Database.singleQuery(SQL, accountUsername, usernameToFollow);
     return true;
   }
   catch (error) {
@@ -784,17 +889,18 @@ async function setAccountPublic(username, trueFalse) {
 module.exports = {
   PostInteractionTypes,
   // Check functions 
-  isCorrectPassword, isCorrectEmail, isPublicAccount,
+  isValidSignInDetails, isPublicAccount,
   // Post
-  getAllPostIDs, getPost,
+  getPost, getAllPostIDs,
   getNumberOfLikedPosts, getNumberOfDislikedPosts, getLikedPostIDs, getDislikedPostIDs,
   // Channels
-  getChannel, getAllChannelNames, getFollowedChannelNames,
+  getChannel, getAllChannelNames,
   // Tags
-  getAllTags, getFollowedTags,
+  getTag, getAllTagNames,
   // Users
-  getUser, getFollowedUsers,
-
+  getUser,
+  // Following
+  getFollowedUsers, getFollowedTags, getFollowedChannelNames,
 
   // Create functions 
   createUser, createTag, addSimilarTags,
@@ -802,4 +908,6 @@ module.exports = {
   createPost,
   createComment,
   interactWithPost,
+
+  followChannel, followTag, followUser,
 };

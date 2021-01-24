@@ -30,15 +30,11 @@ var API = require("./API.js");
 // TEST SOME FUNCTIONS
 (async () => {
     // Basic login stuff
-    //console.log(await API.isCorrectPassword("solomon", "password"));
-    //console.log(await API.isCorrectPassword("solomon", "wrong password"));
-
-    //console.log(await API.isCorrectEmail("solomon", "email"));
-    //console.log(await API.isCorrectEmail("solomon", "not email"));
+    //console.log(await API.isValidSignInDetails("solomon", "email", "password"));
 
     //console.log(await API.isPublicAccount("sol"));
-    //console.log(await API.isPublicAccount("solomon"));
-    
+    //console.log(await API.isPublicAccount("solomo"));
+
     //console.log(await API.getUser("sol"));
     //console.log(await API.getUser("so"));
     //console.log(await API.getChannel("invalid channel name"));
@@ -78,6 +74,8 @@ var API = require("./API.js");
 
     //console.log(await API.createTag("cat", "pictures of cute cats"));
     //console.log(await API.createTag("cat", "pictures of cute cats"));
+    //console.log(await API.getTag("cat"));
+    //console.log(await API.getTag("ca"));
 
     //console.log(await API.createTag("dog", "pictures of dogs"));
     //console.log(await API.addSimilarTags("dog", ["Cute animals"]));
@@ -97,11 +95,15 @@ var API = require("./API.js");
     //console.log(await API.interactWithPost(15, "sol", API.PostInteractionTypes.like));
     //console.log(await API.getPost(16));
     //console.log(await API.interactWithPost(16, "sol", API.PostInteractionTypes.removeInteraction));
-    //console.log(await API.getPost(16));
+    //console.log(await API.getPost(15));
 
 
     //console.log(await API.getPost(15));
-    
+
+
+    //console.log(await API.followChannel("solomon", "dogs"));
+    //console.log(await API.followTag("solomon", "dog"));
+    //console.log(await API.followUser("solomon", "sol"));
 
 
 })();
