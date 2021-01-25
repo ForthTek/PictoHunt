@@ -2,6 +2,20 @@
 
 PictoHunt is an online image sharing application being developed by ForthTek, a group of 3rd year students from Heriot-Watt in Edinburgh.
 
+#To Do:
+Link to Database \
+  -Posts \
+  -Channels\
+  -accounts\
+  -upload\
+Finish Upload\
+  -Link Location\
+  -Input details\
+Account Creation\
+  -Sign-up\
+  -Sign-in\
+  -Account Deletion\
+  
 # Install Dependencies:
 
 Install android studio to test changes on a virtual machine \
