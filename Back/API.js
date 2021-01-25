@@ -6,7 +6,7 @@ var Database = require("./database.js");
 /**
  * Enum for identifying the type of an interaction with a post.
  */
-const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 })
+const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 });
 
 
 
@@ -30,6 +30,13 @@ function getErrorMessage(error) {
 
 // Check methods
 
+async function usernameAlreadyTaken(username) {
+
+}
+
+async function emailAlreadyTaken(email) {
+
+}
 
 /**
  * Async function that evaluates if the sign in details are correct.
