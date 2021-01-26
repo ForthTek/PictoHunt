@@ -729,6 +729,7 @@ async function addRelatedTagsToChannel(channel, relatedTags) {
  * @param {string[]} tags Names of tags in post.
  * @param {number} GPSLatitude (optional or just set null)
  * @param {number} GPSLongitude (optional or just set null)
+ * @returns {number} The new ID of the post, or error object
  */
 async function createPost(title, accountUsername, channelNamePostedTo, photos, tags, GPSLatitude = null, GPSLongitude = null) {
   const SQL = "INSERT INTO Post(title, posterAccount, postedTo, timeOfPost, GPSLatitude, GPSLongitude) VALUES(?, ?, ?, NOW(), ?, ?);";
@@ -755,7 +756,7 @@ async function createPost(title, accountUsername, channelNamePostedTo, photos, t
       tagArgs.push([POST_ID, tags[i]]);
     }
     await Database.repeatQuery(TAGS, tagArgs);
-    return true;
+    return POST_ID;
   }
   catch (error) {
     return getErrorMessage(error);

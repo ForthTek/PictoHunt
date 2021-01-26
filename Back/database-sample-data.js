@@ -9,6 +9,7 @@ const TAGS = [
 // POPULATE THE DATABASE
 (async () => {
 
+    /*
     // Create all tags
     for (let i = 0; i < TAGS.length; i++) {
         console.log(await API.createTag(TAGS[i], "This is the description of the tag"));
@@ -26,7 +27,8 @@ const TAGS = [
     console.log(await API.createChannel("Holiday Pictures", "Pictures taken on holiday. Wherever that may be!", "Joe Bloggs"));
     console.log(await API.createChannel("Animals", "Pictures of animals.", "John Smith", ["animal"]));
     console.log(await API.createChannel("Pets", "Household pet pictures.", "John Smith", ["pet", "animal", "cute"]));
-
+    console.log(await API.createChannel("Architecture", "Architecture - any", "Professional Photography", ["architecture", "modern-architecture", "historic-architecture"]));
+    
 
     // Follow things
     console.log(await API.followUser("Joe Bloggs", "Professional Photography"));
@@ -55,15 +57,33 @@ const TAGS = [
     console.log(await API.followTag("Professional Photography", "history"));
     console.log(await API.followTag("Professional Photography", "animal"));
 
-    // Create posts
-    //console.log(await API.createPost("new post", "sol", "dogs", ["1", "2", "3"], ["dog", "Cute animals"]));
+    
 
+    // Create posts
+    let post1 = await API.createPost("Big Ben and the Palace of Westminster", "Professional Photography", "London", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben1.jpg", "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben2.jpg"], ["architecture", "historic-architecture", "city"], 51.510357, -0.116773);
+    let post2 = await API.createPost("Big Ben at night", "Professional Photography", "London", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben4.jpg"], ["architecture", "historic-architecture", "city"], 51.510357, -0.116773);
+    let post3 = await API.createPost("A pic from my holiday in London", "Joe Bloggs", "Holiday Pictures", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben3.jpg"], ["architecture", "historic-architecture", "city", "holiday"], 51.510357, -0.116773);
+
+    let post4 = await API.createPost("modern", "Professional Photography", "Architecture", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/modern.jpg"], ["architecture", "modern-architecture"]);
+
+    let post5 = await API.createPost("Safari pics", "Professional Photography", "Holiday Pictures", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/e1.jpg", "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/e2.jpg", "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/e3.jpg"], ["animal", "holiday"], 5.464497, 9.071827);
+    let post6 = await API.createPost("Holiday pic from last year", "Joe Bloggs", "Holiday Pictures", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/e4.jpg"], ["animal", "holiday"], 5.466131, 9.069080);
+
+    let post7 = await API.createPost("What a cutie!", "John Smith", "Pets", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog1.jpg"], ["animal", "pet", "dog", "cute"]);
+    let post8 = await API.createPost("He is the cutest boy!", "John Smith", "Pets", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog2.jpg"], ["animal", "pet", "dog", "cute"]);
+    let post9 = await API.createPost("The best doggo!", "John Smith", "Pets", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog3.jpg"], ["animal", "pet", "dog", "cute"]);
+
+
+    // Add some interactions
+    console.log(await API.interactWithPost(, "", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(, "", API.PostInteractionTypes.like));
 
 
     // Create comments
-    //console.log(await API.createComment(17, "sol", "this is a comment"));
+    //console.log(await API.createComment(, "", "this is a comment"));
 
 
+    */
 
 
 

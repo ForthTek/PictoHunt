@@ -1,32 +1,6 @@
 var API = require("./API.js");
 
 
-// ALL API ASYNC FUNCTIONS MUST BE CALLED FROM WITHIN AN ASYNC BLOCK:
-// (async () => { })();
-
-
-// Example - how to call API functions 
-/*
-(async () => {
-    let value = await API.createUser("solomon", "password", "sol@email.address");
-    if (!value.error) {
-        // Do something with the data
-        console.log(value);
-    }
-    else {
-        // Deal with the error - display the code to user?
-        console.log(value.error);
-    }
-})();
-*/
-
-
-// All API functions will return either:
-// - a JSON object if there was an error => { error: message } (use this message for feedback to the user)
-// - or their return type
-
-
-
 // TEST SOME FUNCTIONS
 (async () => {
     // Basic login stuff
@@ -48,7 +22,7 @@ var API = require("./API.js");
 
     //console.log(await API.getPost(17));
 
-    
+
 
     //console.log(await API.getNumberOfLikedPosts("sol"));
     //console.log(await API.getNumberOfDislikedPosts("sol"));
@@ -110,15 +84,3 @@ var API = require("./API.js");
 
 })();
 
-
-
-
-// POPULATE THE DATABASE
-/*
-(async () => {
-
-    //console.log(await API.createUser("solomon", "password", "sol@email.address"));
-    //console.log(await API.createUser("ryan", "secure password", "ryan@email.address"));
-
-})();
-*/
