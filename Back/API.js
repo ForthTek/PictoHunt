@@ -226,7 +226,10 @@ async function getAllPostIDs() {
  * @returns {string} post.icon
  */
 async function getAllPostsWithLocation() {
-  const SQL = "SELECT Post.globalPostID, Post.GPSLongitude, Post.GPSLatitude, PhotosInPost.photoURL FROM Post JOIN PhotosInPost ON PhotosInPost.postID = Post.globalPostID WHERE (Post.GPSLongitude IS NOT NULL AND Post.GPSLatitude IS NOT NULL) GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC;";
+  const SQL = "SELECT Post.globalPostID, Post.GPSLongitude, Post.GPSLatitude, PhotosInPost.photoURL FROM Post " +
+    "JOIN PhotosInPost ON PhotosInPost.postID = Post.globalPostID " +
+    "WHERE (Post.GPSLongitude IS NOT NULL AND Post.GPSLatitude IS NOT NULL) " +
+    "GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC, PhotosInPost.orderInPost ASC;";
 
   try {
     let rows = await Database.singleQuery(SQL);
