@@ -121,7 +121,7 @@ async function isPublicAccount(username) {
  */
 async function getUser(username) {
   const EXISTS = "SELECT username FROM User WHERE username = ?"
-  const SCORE = "SELECT Count(score) AS score FROM Post WHERE posterAccount = ?;";
+  const SCORE = "SELECT SUM(score) AS score FROM Post WHERE posterAccount = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
 
   try {
