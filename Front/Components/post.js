@@ -1,6 +1,6 @@
-import { useLinkProps } from "@react-navigation/native";
 import React from "react";
 import { Text, StyleSheet, View, Image } from "react-native";
+import LikeBtn from "./likeBtn";
 
 const Post = (props) => {
     return (
@@ -12,11 +12,11 @@ const Post = (props) => {
             <View style={styles.containerCol}>
                 <Text style={styles.title}>{props.title}</Text>
                 <Text style={styles.postName}>Account Name</Text>
-                <Text numberOfLines={3}>
-                    This is a description of the image next to this text :)
-                    There should only be three lines and nothign more. if there
-                    is more than 3 i fucked it
-                </Text>
+                <View style={styles.likeCon}>
+                    <LikeBtn icon='heart-outline' title='Like' />
+                    <Text style={{ fontSize: 22, paddingRight: "2%" }}>0</Text>
+                    <LikeBtn icon='heart-dislike-outline' title='Dis-Like' />
+                </View>
             </View>
         </View>
     );
@@ -31,9 +31,9 @@ const styles = StyleSheet.create({
     },
     containerCol: {
         flex: 1,
-        backgroundColor: "#fff",
+        justifyContent: "center",
+        alignItems: "center",
         flexDirection: "column",
-        paddingLeft: "2%",
     },
     Image: {
         width: 128,
@@ -45,6 +45,11 @@ const styles = StyleSheet.create({
     postName: {
         fontSize: 12,
         color: "grey",
-        paddingBottom: "3%",
+        paddingBottom: "10%",
+    },
+    likeCon: {
+        flex: 1,
+        justifyContent: "center",
+        flexDirection: "row",
     },
 });
