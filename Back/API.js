@@ -11,9 +11,9 @@ const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInt
 
 
 // ALL FUNCTIONS THAT INTERACT WITH THE DATABASE MUST BE CALLED FROM WITHIN AN ASYNC BLOCK:
-// (async () => { let x = await query('query', ...'args'); })();
+// (async () => { ... })();
 
-// CHECK THE API-test.js FILE FOR FULL EXAMPLES 
+// CHECK THE API-example.js FILE FOR FULL EXAMPLES 
 
 
 
@@ -163,7 +163,7 @@ async function getUser(username) {
  */
 async function getChannel(name) {
   const EXISTS = "SELECT name FROM Channel WHERE name = ?"
-  const SCORE = "SELECT Count(score) AS score FROM Post WHERE postedTo = ?;";
+  const SCORE = "SELECT SUM(score) AS score FROM Post WHERE postedTo = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE postedTo = ? ORDER BY globalPostID DESC;";
 
   try {
@@ -208,6 +208,38 @@ async function getAllPostIDs() {
     let posts = [];
     for (let i = 0; i < rows.length; i++) {
       posts.push(rows[i].globalPostID);
+    }
+
+    return posts;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * Async function that returns all posts that have a GPS location.
+ * @returns {object[]} Array of objects or error object
+ * @returns {number} post.ID 
+ * @returns {number} post.GPSLatitude
+ * @returns {number} post.GPSLongitude
+ * @returns {string} post.icon
+ */
+async function getAllPostsWithLocation() {
+  const SQL = "SELECT Post.globalPostID, Post.GPSLongitude, Post.GPSLatitude, PhotosInPost.photoURL FROM Post JOIN PhotosInPost ON PhotosInPost.postID = Post.globalPostID WHERE (Post.GPSLongitude IS NOT NULL AND Post.GPSLatitude IS NOT NULL) GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC;";
+
+  try {
+    let rows = await Database.singleQuery(SQL);
+    // Convert to an array of integers
+    let posts = [];
+
+    for (let i = 0; i < rows.length; i++) {
+      posts.push({
+        ID: rows[i].globalPostID,
+        GPSLatitude: rows[i].GPSLatitude,
+        GPSLongitude: rows[i].GPSLongitude,
+        icon: rows[i].photoURL,
+      });
     }
 
     return posts;
@@ -904,6 +936,7 @@ module.exports = {
   isValidSignInDetails, isPublicAccount,
   // Post
   getPost, getAllPostIDs,
+  getAllPostsWithLocation,
   getNumberOfLikedPosts, getNumberOfDislikedPosts, getLikedPostIDs, getDislikedPostIDs,
   // Channels
   getChannel, getAllChannelNames,
