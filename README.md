@@ -22,9 +22,9 @@ Account Creation\
 Install android studio to test changes on a virtual machine \
 First install the node \
 
-If you go into the Front or Back folder and and run the command 'npm install' it should install all dependencies \
-
 npm i -g expo-cli
+
+If you go into the Front or Back folder and and run the command 'npm install' it should install all dependencies \
 
 npm install @react-navigation/native
 
