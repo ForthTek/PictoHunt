@@ -6,7 +6,7 @@ var Database = require("./database.js");
 /**
  * Enum for identifying the type of an interaction with a post.
  */
-const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 })
+const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInteraction": 3 });
 
 
 
@@ -30,6 +30,13 @@ function getErrorMessage(error) {
 
 // Check methods
 
+async function usernameAlreadyTaken(username) {
+
+}
+
+async function emailAlreadyTaken(email) {
+
+}
 
 /**
  * Async function that evaluates if the sign in details are correct.
@@ -114,7 +121,7 @@ async function isPublicAccount(username) {
  */
 async function getUser(username) {
   const EXISTS = "SELECT username FROM User WHERE username = ?"
-  const SCORE = "SELECT Count(score) AS score FROM Post WHERE posterAccount = ?;";
+  const SCORE = "SELECT SUM(score) AS score FROM Post WHERE posterAccount = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
 
   try {
@@ -722,6 +729,7 @@ async function addRelatedTagsToChannel(channel, relatedTags) {
  * @param {string[]} tags Names of tags in post.
  * @param {number} GPSLatitude (optional or just set null)
  * @param {number} GPSLongitude (optional or just set null)
+ * @returns {number} The new ID of the post, or error object
  */
 async function createPost(title, accountUsername, channelNamePostedTo, photos, tags, GPSLatitude = null, GPSLongitude = null) {
   const SQL = "INSERT INTO Post(title, posterAccount, postedTo, timeOfPost, GPSLatitude, GPSLongitude) VALUES(?, ?, ?, NOW(), ?, ?);";
@@ -748,7 +756,7 @@ async function createPost(title, accountUsername, channelNamePostedTo, photos, t
       tagArgs.push([POST_ID, tags[i]]);
     }
     await Database.repeatQuery(TAGS, tagArgs);
-    return true;
+    return POST_ID;
   }
   catch (error) {
     return getErrorMessage(error);
