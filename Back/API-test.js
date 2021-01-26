@@ -82,5 +82,7 @@ var API = require("./API.js");
     //console.log(await API.followUser("solomon", "sol"));
 
 
+    console.log(await API.getAllPostsWithLocation());
+
 })();
 
