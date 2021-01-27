@@ -9,7 +9,7 @@ const TAGS = [
 // POPULATE THE DATABASE
 (async () => {
 
-    /*
+
     // Create all tags
     for (let i = 0; i < TAGS.length; i++) {
         console.log(await API.createTag(TAGS[i], "This is the description of the tag"));
@@ -28,7 +28,7 @@ const TAGS = [
     console.log(await API.createChannel("Animals", "Pictures of animals.", "John Smith", ["animal"]));
     console.log(await API.createChannel("Pets", "Household pet pictures.", "John Smith", ["pet", "animal", "cute"]));
     console.log(await API.createChannel("Architecture", "Architecture - any", "Professional Photography", ["architecture", "modern-architecture", "historic-architecture"]));
-    
+
 
     // Follow things
     console.log(await API.followUser("Joe Bloggs", "Professional Photography"));
@@ -57,8 +57,8 @@ const TAGS = [
     console.log(await API.followTag("Professional Photography", "history"));
     console.log(await API.followTag("Professional Photography", "animal"));
 
-    
 
+    /*
     // Create posts
     let post1 = await API.createPost("Big Ben and the Palace of Westminster", "Professional Photography", "London", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben1.jpg", "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben2.jpg"], ["architecture", "historic-architecture", "city"], 51.510357, -0.116773);
     let post2 = await API.createPost("Big Ben at night", "Professional Photography", "London", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben4.jpg"], ["architecture", "historic-architecture", "city"], 51.510357, -0.116773);
@@ -71,21 +71,41 @@ const TAGS = [
 
     let post7 = await API.createPost("What a cutie!", "John Smith", "Pets", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog1.jpg"], ["animal", "pet", "dog", "cute"]);
     let post8 = await API.createPost("He is the cutest boy!", "John Smith", "Pets", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog2.jpg"], ["animal", "pet", "dog", "cute"]);
-    let post9 = await API.createPost("The best doggo!", "John Smith", "Pets", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog3.jpg"], ["animal", "pet", "dog", "cute"]);
+    let post9 = await API.createPost("The best doggo!", "John Smith", "Pets", ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog3.jpg"], ["animal", "pet", "dog"]);
 
 
     // Add some interactions
-    console.log(await API.interactWithPost(, "", API.PostInteractionTypes.like));
-    console.log(await API.interactWithPost(, "", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post3, "Professional Photography", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post6, "Professional Photography", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post7, "Professional Photography", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post8, "Professional Photography", API.PostInteractionTypes.like));
 
+    console.log(await API.interactWithPost(post1, "Joe Bloggs", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post2, "Joe Bloggs", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post5, "Joe Bloggs", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post8, "Joe Bloggs", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post9, "Joe Bloggs", API.PostInteractionTypes.like));
+
+    console.log(await API.interactWithPost(post1, "John Smith", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post2, "John Smith", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post6, "John Smith", API.PostInteractionTypes.like));
+    console.log(await API.interactWithPost(post5, "John Smith", API.PostInteractionTypes.like));
+
+    console.log(await API.interactWithPost(post4, "John Smith", API.PostInteractionTypes.dislike));
+    console.log(await API.interactWithPost(post4, "Joe Bloggs", API.PostInteractionTypes.dislike));
 
     // Create comments
-    //console.log(await API.createComment(, "", "this is a comment"));
+    console.log(await API.createComment(post3, "Professional Photography", "Great shot!"));
+    console.log(await API.createComment(post7, "Professional Photography", "Such a cute dog!"));
 
+    console.log(await API.createComment(post1, "Joe Bloggs", "Cracking picture mate"));
+    console.log(await API.createComment(post2, "Joe Bloggs", "Nice one"));
+    console.log(await API.createComment(post8, "Joe Bloggs", "What a cute doggo"));
 
+    console.log(await API.createComment(post5, "John Smith", "wow! great shots!"));
+    console.log(await API.createComment(post6, "John Smith", "lovely"));
+    console.log(await API.createComment(post1, "John Smith", "great picture"));
     */
-
-
 
     console.log("Added new data to the database.");
 })();

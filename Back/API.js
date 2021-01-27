@@ -1,6 +1,7 @@
 // https://en.wikipedia.org/wiki/JSDoc
 // JavaScriptDoc conventions
 
+const { throws } = require("assert");
 var Database = require("./database.js");
 
 /**
@@ -204,13 +205,7 @@ async function getAllPostIDs() {
 
   try {
     let rows = await Database.singleQuery(SQL);
-    // Convert to an array of integers
-    let posts = [];
-    for (let i = 0; i < rows.length; i++) {
-      posts.push(rows[i].globalPostID);
-    }
-
-    return posts;
+    return JSON.parse(JSON.stringify(rows));
   }
   catch (error) {
     return getErrorMessage(error);
@@ -226,23 +221,35 @@ async function getAllPostIDs() {
  * @returns {string} post.icon
  */
 async function getAllPostsWithLocation() {
-  const SQL = "SELECT Post.globalPostID, Post.GPSLongitude, Post.GPSLatitude, PhotosInPost.photoURL FROM Post JOIN PhotosInPost ON PhotosInPost.postID = Post.globalPostID WHERE (Post.GPSLongitude IS NOT NULL AND Post.GPSLatitude IS NOT NULL) GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC;";
+  const SQL = "SELECT Post.globalPostID AS ID, Post.GPSLongitude, Post.GPSLatitude, PhotosInPost.photoURL AS icon FROM Post " +
+    "JOIN PhotosInPost ON PhotosInPost.postID = Post.globalPostID " +
+    "WHERE (Post.GPSLongitude IS NOT NULL AND Post.GPSLatitude IS NOT NULL) " +
+    "GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC, PhotosInPost.orderInPost ASC;";
 
   try {
     let rows = await Database.singleQuery(SQL);
-    // Convert to an array of integers
-    let posts = [];
+    return JSON.parse(JSON.stringify(rows));
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
 
-    for (let i = 0; i < rows.length; i++) {
-      posts.push({
-        ID: rows[i].globalPostID,
-        GPSLatitude: rows[i].GPSLatitude,
-        GPSLongitude: rows[i].GPSLongitude,
-        icon: rows[i].photoURL,
-      });
-    }
+/**
+ * Async function that returns a list of all users and their corresponding score.
+ * @returns {object[]} Array of user objects or error object
+ * @returns {string} user.username
+ * @returns {number} user.score
+ */
+async function getUsersRankedByScore() {
+  const SQL = "SELECT User.username, SUM(Post.score) AS score FROM User " +
+    "JOIN Post ON Post.posterAccount = User.username " +
+    "GROUP BY User.username " +
+    "ORDER BY score DESC;";
 
-    return posts;
+  try {
+    let rows = await Database.singleQuery(SQL);
+    return JSON.parse(JSON.stringify(rows));
   }
   catch (error) {
     return getErrorMessage(error);
@@ -385,7 +392,9 @@ async function getFollowedChannelNames(username) {
   const SQL = "SELECT channelName FROM UserFollowingChannel WHERE username = ?;";
 
   try {
+
     let rows = await Database.singleQuery(SQL, username);
+
     // Convert to an array of strings
     let channels = [];
     for (let i = 0; i < rows.length; i++) {
@@ -943,7 +952,7 @@ module.exports = {
   // Tags
   getTag, getAllTagNames,
   // Users
-  getUser,
+  getUser, getUsersRankedByScore,
   // Following
   getFollowedUsers, getFollowedTags, getFollowedChannelNames,
 
