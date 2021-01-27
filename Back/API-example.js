@@ -24,6 +24,8 @@ var API = require("./API.js");
     else {
         console.log(`User ${value.username} has score ${value.score}`)
 
+        console.log(value);
+
         // Load the most recent post
         if (value.posts.length > 0) {
             let mostRecentPost = await API.getPost(value.posts[0]);

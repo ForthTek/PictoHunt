@@ -119,9 +119,11 @@ async function isPublicAccount(username) {
  * @returns {string} user.username
  * @returns {number} user.score
  * @returns {number[]} user.posts Array of post IDs
+ * @returns {boolean} user.isPublic
+ * @returns {timestamp} user.joined Timestamp when user created account 
  */
 async function getUser(username) {
-  const EXISTS = "SELECT username, isPublic FROM User WHERE username = ?"
+  const EXISTS = "SELECT username, isPublic, timeJoined FROM User WHERE username = ?"
   const SCORE = "SELECT SUM(score) AS score FROM Post WHERE posterAccount = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
 
@@ -145,6 +147,7 @@ async function getUser(username) {
     return {
       username: rows[0][0].username,
       isPublic: rows[0][0].isPublic,
+      joined: rows[0][0].timeJoined,
       score: rows[1][0].score,
       posts: posts,
     };
@@ -677,7 +680,7 @@ function hashStr(str, salt) {
  * @param {boolean} isAdminAccount The account should have administrator privileges.
  */
 async function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
-  const sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt) VALUES (?, ?, ?, ?, ?, ?)";
+  const sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt, timeJoined) VALUES (?, ?, ?, ?, ?, ?, NOW())";
 
   // Invalid username?
   if (false) {
@@ -700,7 +703,17 @@ async function createUser(username, password, email, isPublicAccount = true, isA
   var hash = hashStr(password, salt);
 
   try {
-    await Database.singleQuery(sql, username, hash, email, isPublicAccount, isAdminAccount, salt);
+    let public = 0;
+    if(isPublicAccount) {
+      public = 1;
+    }
+
+    let admin = "user";
+    if(isAdminAccount) {
+      admin = "admin";
+    }
+
+    await Database.singleQuery(sql, username, hash, email, public, admin, salt);
     return true;
   }
   catch (error) {
