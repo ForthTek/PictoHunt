@@ -7,14 +7,20 @@ const Post = (props) => {
         <View style={styles.container}>
             <Image
                 style={styles.Image}
-                source={require("../assets/icon.png")}
+                source={{
+                    uri: props.item.photos[0],
+                }}
             />
             <View style={styles.containerCol}>
-                <Text style={styles.title}>{props.title}</Text>
-                <Text style={styles.postName}>Account Name</Text>
+                <Text style={styles.title} numberOfLines={1}>
+                    {props.item.title}
+                </Text>
+                <Text style={styles.postName}>{props.item.user}</Text>
                 <View style={styles.likeCon}>
                     <LikeBtn icon='heart-outline' title='Like' />
-                    <Text style={{ fontSize: 22, paddingRight: "2%" }}>0</Text>
+                    <Text style={{ fontSize: 22, paddingRight: "2%" }}>
+                        {props.item.likes + props.item.dislikes}
+                    </Text>
                     <LikeBtn icon='heart-dislike-outline' title='Dis-Like' />
                 </View>
             </View>
@@ -34,13 +40,14 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         flexDirection: "column",
+        padding: "1%",
     },
     Image: {
         width: 128,
         height: 128,
     },
     title: {
-        fontSize: 22,
+        fontSize: 18,
     },
     postName: {
         fontSize: 12,
