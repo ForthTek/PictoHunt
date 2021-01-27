@@ -3,13 +3,13 @@
 PictoHunt is an online image sharing application being developed by ForthTek, a group of 3rd year students from Heriot-Watt in Edinburgh.
 
 # Changes to make:
-Set browse to be home, and centre it on the navbar
-Set old home to be profile
+Set browse to be home, and centre it on the navbar \
+Set old home to be profile \
 
-Profile page: 
-    remove "your profile" button
-    add "liked/disliked posts"
-    remove location?
+Profile page: \
+    remove "your profile" button \
+    add "liked/disliked posts" \
+    remove location? \
 
 
 
