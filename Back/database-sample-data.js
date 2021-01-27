@@ -35,6 +35,8 @@ const TAGS = [
     console.log(await API.followUser("Joe Bloggs", "John Smith"));
     console.log(await API.followUser("John Smith", "Professional Photography"));
     console.log(await API.followUser("John Smith", "Joe Bloggs"));
+    console.log(await API.followUser("Professional Photography", "Joe Bloggs"));
+
 
     console.log(await API.followChannel("Joe Bloggs", "London"));
     console.log(await API.followChannel("Joe Bloggs", "Holiday Pictures"));

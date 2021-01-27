@@ -31,7 +31,7 @@ var API = require("./API.js");
     //console.log(await API.getDislikedPostIDs("sol"));
 
     // Channel stuff
-    console.log(await API.getFollowedChannelNames("Professional Photography"));
+    //console.log(await API.getFollowedChannelNames("Professional Photography"));
     //console.log(await API.getAllChannelNames());
 
 
@@ -85,6 +85,13 @@ var API = require("./API.js");
     //console.log(await API.getAllPostsWithLocation());
 
     //console.log(await API.getUsersRankedByScore());
+
+
+
+    console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
+
+
+
 
 })();
 

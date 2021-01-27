@@ -121,7 +121,7 @@ async function isPublicAccount(username) {
  * @returns {number[]} user.posts Array of post IDs
  */
 async function getUser(username) {
-  const EXISTS = "SELECT username FROM User WHERE username = ?"
+  const EXISTS = "SELECT username, isPublic FROM User WHERE username = ?"
   const SCORE = "SELECT SUM(score) AS score FROM Post WHERE posterAccount = ?;";
   const POSTS = "SELECT globalPostID FROM Post WHERE posterAccount = ? ORDER BY globalPostID DESC;";
 
@@ -143,7 +143,8 @@ async function getUser(username) {
     }
 
     return {
-      username: username,
+      username: rows[0][0].username,
+      isPublic: rows[0][0].isPublic,
       score: rows[1][0].score,
       posts: posts,
     };
@@ -496,6 +497,53 @@ async function getFollowedUsers(username) {
     }
 
     return users;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+/**
+ * Async function that returns a list of all posts from feeds followed.
+ * 
+ * @param {string} username 
+ * @returns {number[]} List of post IDs, sorted by most recent first
+ */
+async function getPostsFromAllFollowedFeeds(username) {
+  // Get posts from followed channels and users
+  const SQL = "SELECT Post.globalPostID FROM Post " +
+    "JOIN UserFollowingUser ON UserFollowingUser.userBeingFollowed = Post.posterAccount " +
+    "JOIN UserFollowingChannel ON UserFollowingChannel.channelName = Post.postedTo " +
+    "WHERE UserFollowingUser.username = ? OR UserFollowingChannel.username = ? " +
+    "GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC;";
+
+  // Get posts from followed tags
+  const TAG = "SELECT Post.globalPostID FROM Post " +
+    "JOIN TagsInPost ON TagsInPost.postID = Post.globalPostID " +
+    "JOIN UserFollowingTag ON TagsInPost.tagName = UserFollowingTag.tag " +
+    "WHERE UserFollowingTag.username = ? " +
+    "GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC;";
+
+
+  // All three combined - not quite working yet
+  const COMBINED = "SELECT Post.globalPostID FROM Post " +
+    "JOIN TagsInPost ON TagsInPost.postID = Post.globalPostID " +
+    "JOIN UserFollowingTag ON UserFollowingTag.tag = TagsInPost.tagName " +
+    "JOIN UserFollowingUser ON UserFollowingUser.userBeingFollowed = Post.posterAccount " +
+    "JOIN UserFollowingChannel ON UserFollowingChannel.channelName = Post.postedTo " +
+    "WHERE (UserFollowingUser.username = ? OR UserFollowingChannel.username = ? OR UserFollowingTag.username = ?) " +
+    "GROUP BY Post.globalPostID ORDER BY Post.globalPostID DESC;";
+
+  try {
+    let rows = await Database.singleQuery(SQL, username, username);
+
+    // Convert to an array of post IDs
+    let posts = [];
+    for (let i = 0; i < rows.length; i++) {
+      posts.push(rows[i].globalPostID);
+    }
+
+    return posts;
   }
   catch (error) {
     return getErrorMessage(error);
@@ -945,7 +993,7 @@ module.exports = {
   isValidSignInDetails, isPublicAccount,
   // Post
   getPost, getAllPostIDs,
-  getAllPostsWithLocation,
+  getAllPostsWithLocation, getPostsFromAllFollowedFeeds,
   getNumberOfLikedPosts, getNumberOfDislikedPosts, getLikedPostIDs, getDislikedPostIDs,
   // Channels
   getChannel, getAllChannelNames,
