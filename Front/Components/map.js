@@ -8,14 +8,50 @@ import Geocoder from 'react-native-geocoding';
 
 Geocoder.init('AIzaSyBcGAtTu4TlPOaWcObIqQisYnvEvlAqH1Y', {language : "en"});
 
+
+
 export default function Map() {
     // Map Page
     var initialRegion={
-      latitude: 37.78825,
-      longitude: -122.4324,
+      latitude: 5.464497,
+      longitude: 9.06908,
       latitudeDelta: 0.0922,
       longitudeDelta: 0.0421,
     };
+
+    var MarkerArray = [
+      {
+        ID: 6,
+        GPSLatitude: 5.466131,
+        GPSLongitude: 9.06908,
+        icon: 'https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/e4.jpg'
+      },
+      {
+        ID: 5,
+        GPSLatitude: 5.464497,
+        GPSLongitude: 9.071827,
+        icon: 'https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/e1.jpg'
+      },
+      {
+        ID: 3,
+        GPSLatitude: 51.510357,
+        GPSLongitude: -0.116773,
+        icon: 'https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben3.jpg'
+      },
+      {
+        ID: 2,
+        GPSLatitude: 51.510357,
+        GPSLongitude: -0.116773,
+        icon: 'https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben4.jpg'
+      },
+      {
+        ID: 1,
+        GPSLatitude: 51.510357,
+        GPSLongitude: -0.116773,
+        icon: 'https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben1.jpg'
+      }
+    ]
+    
     return (
         <SafeAreaView style={styles.container}>
           <MapView
@@ -24,12 +60,17 @@ export default function Map() {
             initialRegion={initialRegion}
             mapType='standard'
           >
-          <MapView.Marker coordinate={{latitude: 37.78825, longitude: -122.4324}}>
-            <View style={{flexDirection: 'column', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
-              <Image source={require('../assets/icon.png')} style={{ width: 80, height: 80 }} />
-                <Text style={{backgroundColor: "#fff"}}> [Image Title] </Text>
-            </View>
-          </MapView.Marker>
+            {MarkerArray.map( m => {
+              return(
+                <MapView.Marker coordinate={{latitude: m.GPSLatitude, longitude: m.GPSLongitude}} key={m.ID}>
+                  <View style={{flexDirection: 'column', flex: 1, alignItems: 'center', justifyContent: 'center'}}>
+                    <Image source={{uri: m.icon}} style={{ width: 80, height: 80 }} />
+                    <Text style={{backgroundColor: "#fff"}}> {m.ID} </Text>
+                  </View>
+                </MapView.Marker>
+              );
+            })}
+
           </MapView>
         </SafeAreaView>
     );
@@ -42,11 +83,3 @@ const styles = StyleSheet.create({
         justifyContent: 'center'
     },
 });
-
-
-//          <Marker
-//            coordinate={{ latitude: 37.78825, longitude: -122.4324,}}
-//            image={require('../assets/icon.png')}
-//            title='Picture Title'
-//            description='Posted by User Name'
-//          />
