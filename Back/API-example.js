@@ -24,8 +24,6 @@ var API = require("./API.js");
     else {
         console.log(`User ${value.username} has score ${value.score}`)
 
-        console.log(value);
-
         // Load the most recent post
         if (value.posts.length > 0) {
             let mostRecentPost = await API.getPost(value.posts[0]);
@@ -41,5 +39,17 @@ var API = require("./API.js");
             console.log(`${value.username} hasn't made any posts yet`)
         }
     }
+});
+
+
+(async () => {
+    let IDs = await API.getPostsFromAllFollowedFeeds("Professional Photography");
+
+    let posts = [];
+    for (let i = 0; i < IDs.length; i++) {
+        posts.push(await API.getPost(IDs[i]));
+    }
+
+    console.log(posts);
 })();
 
