@@ -71,9 +71,11 @@ async function singleQuery(query, ...args) {
     await connection.close();
     throw error;
   }
-
   // Always try and close the connection
-  await connection.close();
+  finally {
+    await connection.close();
+  }
+
   // Return the affected rows
   return rows;
 }
@@ -94,10 +96,11 @@ async function multiQuery(queries, args) {
   let connection = new Connection(`mysql://${config.user}:${config.password}@${config.host}/${config.database}`);
   let rows = [];
 
-  for (let i = 0; i < queries.length; i++) {
-    let row = null;
+  try {
+    for (let i = 0; i < queries.length; i++) {
+      let row = null;
 
-    try {
+
       // Prepare the statement
       let statement = connection.prepareStatement(queries[i]);
 
@@ -136,14 +139,17 @@ async function multiQuery(queries, args) {
       // Assign the result of the query;
       rows.push(row);
     }
-    // Catch any errors
-    catch (error) {
-      await connection.close();
-      throw error;
-    }
+  }
+  // Catch any errors
+  catch (error) {
+    await connection.close();
+    throw error;
+  }
+  // Always try and close the connection
+  finally {
+    await connection.close();
   }
 
-  await connection.close();
   return rows;
 }
 
@@ -211,8 +217,11 @@ async function repeatQuery(query, args) {
     await connection.close();
     throw error;
   }
+  // Always try and close the connection
+  finally {
+    await connection.close();
+  }
 
-  await connection.close();
   return rows;
 }
 

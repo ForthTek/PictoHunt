@@ -704,12 +704,12 @@ async function createUser(username, password, email, isPublicAccount = true, isA
 
   try {
     let public = 0;
-    if(isPublicAccount) {
+    if (isPublicAccount) {
       public = 1;
     }
 
     let admin = "user";
-    if(isAdminAccount) {
+    if (isAdminAccount) {
       admin = "admin";
     }
 
@@ -968,11 +968,11 @@ async function followTag(accountUsername, tagName) {
 async function followUser(accountUsername, usernameToFollow) {
   const SQL = "INSERT INTO UserFollowingUser(username, userBeingFollowed) VALUES(?, ?);";
 
-  if (accountUsername === usernameToFollow) {
-    throw new Error("User cannot follow themselves");
-  }
-
   try {
+    if (accountUsername === usernameToFollow) {
+      throw new Error("User cannot follow themselves");
+    }
+
     await Database.singleQuery(SQL, accountUsername, usernameToFollow);
     return true;
   }
