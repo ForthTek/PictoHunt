@@ -48,7 +48,7 @@ async function populateDatabase() {
 
     // Create users
     for (let i = 0; i < USERS.length; i++) {
-        let x = await API.createUser(USERS[i], `${USERS[i]}password`, `${USERS[i]}@email.address`);
+        let x = await API.createUser(USERS[i], `${USERS[i]}passWORD1`, `${USERS[i]}@email.address`);
         console.log(x);
     }
 

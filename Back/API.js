@@ -17,16 +17,6 @@ const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInt
 // CHECK THE API-example.js FILE FOR FULL EXAMPLES 
 
 
-
-
-
-
-
-// input validation, sample data, regex,
-
-
-
-
 function getErrorMessage(error) {
   // Just for now
   // Will need to do custom messages for errors
@@ -664,30 +654,34 @@ async function getDislikedPostIDs(username) {
 async function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
   const sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt, timeJoined) VALUES (?, ?, ?, ?, ?, ?, NOW())";
 
-  // Invalid username?
-  if (false) {
-    throw new Error("Username is not valid");
-  }
-
-  // Invalid email
-  if (false) {
-    throw new Error("Email address is not valid");
-  }
-
-  // Invalid password
-  if (false) {
-    throw new Error("Password is not valid");
-  }
-
-
-  var validation = require("./input-validation.js");
-
-  /* This Will need moved */
-  var salt = validation.randomStr((Math.random() * 50) + 10);
-  /* This Will need moved */
-  var hash = validation.hashStr(password, salt);
-
   try {
+    var validation = require("./input-validation.js");
+
+    // Invalid username?
+    if (false) {
+      throw new Error("Username is not valid");
+    }
+
+
+
+    /** @TODO Move validation to front end */
+
+    // Invalid email
+    if (!validation.isEmailValidFormat(email)) {
+      throw new Error("Email address is not valid");
+    }
+
+    // Invalid password
+    if (!validation.isPasswordValidFormat(password)) {
+      throw new Error("Password is not valid");
+    }
+
+    /* This Will need moved */
+    var salt = validation.randomStr((Math.random() * 50) + 10);
+    /* This Will need moved */
+    var hash = validation.hashStr(password, salt);
+
+
     let public = 0;
     if (isPublicAccount) {
       public = 1;
