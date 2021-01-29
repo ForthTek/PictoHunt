@@ -68,7 +68,6 @@ async function singleQuery(query, ...args) {
   }
   // Catch any errors
   catch (error) {
-    await connection.close();
     throw error;
   }
   // Always try and close the connection
@@ -142,7 +141,6 @@ async function multiQuery(queries, args) {
   }
   // Catch any errors
   catch (error) {
-    await connection.close();
     throw error;
   }
   // Always try and close the connection
@@ -214,7 +212,6 @@ async function repeatQuery(query, args) {
   }
   // Catch any errors
   catch (error) {
-    await connection.close();
     throw error;
   }
   // Always try and close the connection

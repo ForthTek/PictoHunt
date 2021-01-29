@@ -36,9 +36,9 @@ function isEmailValidFormat(email) {
   // Expression taken from
   // https://stackoverflow.com/questions/46155/how-to-validate-an-email-address-in-javascript
   // i modifier is used for case insensitive search
-  let regex = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
+  let regex = /(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})/i;
 
-  regex.test(String(email).toLowerCase());
+  regex.test(email.trim());
 }
 
 /**
@@ -60,7 +60,7 @@ function isPasswordValidFormat(password) {
 
   let regex = /(?=.*[a-z])(?=.*[A-Z])(?=.*[\d#?!@$%^&*-])[a-zA-Z\d#?!@$%^&*-]{8,64}/;
 
-  regex.test(password);
+  regex.test(password.trim());
 }
 
 

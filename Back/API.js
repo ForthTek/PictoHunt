@@ -22,6 +22,16 @@ function getErrorMessage(error) {
   // Will need to do custom messages for errors
   let message = error.message;
 
+  // This allows error detection in the form
+  /*
+  if(x.error) {
+    // Deal with error
+  }
+  else {
+    // Deal with data
+  }
+  */
+
   return { error: message };
 }
 
@@ -194,6 +204,24 @@ async function getChannel(name) {
       score: rows[1][0].score,
       posts: posts,
     };
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+async function getChannelsWithTag(tag) {
+  const SQL = "SELECT channelName FROM TagsInChannel WHERE tagName = ? GROUP BY channelName;";
+
+  try {
+    let rows = await Database.singleQuery(SQL, tag);
+
+    let channels = [];
+    for (let i = 0; i < rows.length; i++) {
+      channels.push(rows[i].channelName);
+    }
+
+    return channels;
   }
   catch (error) {
     return getErrorMessage(error);
@@ -668,12 +696,12 @@ async function createUser(username, password, email, isPublicAccount = true, isA
 
     // Invalid email
     if (!validation.isEmailValidFormat(email)) {
-      throw new Error("Email address is not valid");
+      //throw new Error(`Email address ${email} is not valid`);
     }
 
     // Invalid password
     if (!validation.isPasswordValidFormat(password)) {
-      throw new Error("Password is not valid");
+      //throw new Error("Password is not valid");
     }
 
     /* This Will need moved */
@@ -988,7 +1016,7 @@ module.exports = {
   getAllPostsWithLocation, getPostsFromAllFollowedFeeds,
   getNumberOfLikedPosts, getNumberOfDislikedPosts, getLikedPostIDs, getDislikedPostIDs,
   // Channels
-  getChannel, getAllChannelNames,
+  getChannel, getAllChannelNames, getChannelsWithTag,
   // Tags
   getTag, getAllTagNames,
   // Users
