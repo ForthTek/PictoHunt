@@ -2,6 +2,7 @@ import React from "react";
 import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native";
 import { shouldUseActivityState } from "react-native-screens";
 import Post from "./post";
+import ServerTest from "./ServerTest";
 
 DATA = [
     {
@@ -139,11 +140,13 @@ export default function Browse() {
     const renderItem = ({ item }) => <Item item={item} />;
     return (
         <SafeAreaView style={styles.container}>
-            <FlatList
+            {/* <FlatList
                 data={DATA}
                 renderItem={renderItem}
                 keyExtractor={(item) => item.ID.toString()}
-            />
+            /> */}
+
+            <ServerTest />
         </SafeAreaView>
     );
 }

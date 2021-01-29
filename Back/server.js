@@ -1,17 +1,39 @@
-// Requiring modules 
-const express = require('express');
+const express = require("express");
+const bodyParser = require("body-parser");
+const api = require("./API");
+
 const app = express();
+const port = process.env.PORT || 5000;
 
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
-
-// Get request 
-app.get('/', function (req, res) {
-
-    res.send("text");
+app.get("/api/hello", (req, res) => {
+    res.send({ express: "Hello From Express" });
 });
 
+app.get("/api/getUser", (req, res) => {
+    var user = async () => {
+        let IDs = await api.getPostsFromAllFollowedFeeds(
+            "Professional Photography"
+        );
 
-var server = app.listen(5000, function () {
-    console.log('Server is listening at port 5000...');
+        let posts = [];
+        for (let i = 0; i < IDs.length; i++) {
+            posts.push(await api.getPost(IDs[i]));
+        }
+
+        console.log(posts);
+    };
+
+    res.send(user);
 });
 
+app.post("/api/world", (req, res) => {
+    console.log(req.body);
+    res.send(
+        `I received your POST request. This is what you sent me: ${req.body.post}`
+    );
+});
+
+app.listen(port, () => console.log(`Listening on port ${port}`));
