@@ -11,7 +11,7 @@ class ServerTest extends Component {
     componentDidMount() {
         console.log("Mounted");
         this.callApi()
-            .then((res) => this.setState({ response: res.express }))
+            .then((res) => this.setState({ response: res.tags }))
             .catch((err) => console.log(err));
     }
 
