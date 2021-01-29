@@ -1,8 +1,8 @@
-import React from "react";
-import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native";
-import { shouldUseActivityState } from "react-native-screens";
-import Post from "./post";
-import ServerTest from "./ServerTest";
+import React from "react"
+import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native"
+import { shouldUseActivityState } from "react-native-screens"
+import Post from "./post"
+import ServerTest from "./ServerTest"
 
 DATA = [
     {
@@ -125,19 +125,19 @@ DATA = [
         ],
         comments: [],
     },
-];
+]
 
 const Item = ({ item }) => {
     return (
         <View style={styles.post}>
-            <Post item={item} />
+            <Post url='http://10.0.2.2:5000/api/getUser' />
         </View>
-    );
-};
+    )
+}
 
 export default function Browse() {
     // Browse Page
-    const renderItem = ({ item }) => <Item item={item} />;
+    const renderItem = ({ item }) => <Item item={item} />
     return (
         <SafeAreaView style={styles.container}>
             {/* <FlatList
@@ -145,10 +145,9 @@ export default function Browse() {
                 renderItem={renderItem}
                 keyExtractor={(item) => item.ID.toString()}
             /> */}
-
-            <ServerTest />
+            <Post url='http://10.0.2.2:5000/api/getBrowse' />
         </SafeAreaView>
-    );
+    )
 }
 const styles = StyleSheet.create({
     container: {
@@ -160,4 +159,4 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomWidth: 1,
     },
-});
+})
