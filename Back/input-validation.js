@@ -63,9 +63,39 @@ function isPasswordValidFormat(password) {
   regex.test(password);
 }
 
+/**
+ * Function to check for any profanity
+ * 
+ * @param {string} str 
+ * @returns {string} Clean version of any string
+ */
+function checkProf(str) {
+  var Filter = require('bad-words');
 
+  filter = new Filter();
+  var isClean = !filter.isProfane(str);
+  return isClean;
+}
+
+/**
+ * Function to check for any profanity
+ * 
+ * @param {string} str 
+ * @returns {boolean} String is clean
+ */
+function filterProf(str) {
+  var Filter = require('bad-words');
+  filter = new Filter();
+
+  var clean = filter.clean(str);
+  return clean;
+}
+
+//var test = "Don't be an asshole";
+//console.log(filterProf(test));
 
 module.exports = {
   randomStr, hashStr,
-  isEmailValidFormat, isPasswordValidFormat,
+  isEmailValidFormat, isPasswordValidFormat, 
+  checkProf, filterProf,
 }
