@@ -13,20 +13,42 @@ app.get("/api/hello", (req, res) => {
 });
 
 app.get("/api/getUser", (req, res) => {
-    var user = async () => {
-        let IDs = await api.getPostsFromAllFollowedFeeds(
-            "Professional Photography"
-        );
+    (async () => {
 
-        let posts = [];
-        for (let i = 0; i < IDs.length; i++) {
-            posts.push(await api.getPost(IDs[i]));
+        let value = await api.getUser("Professional Photography");
+
+        // There was an error
+        if (value.error) {
+            // Deal with the error - display the code to user?
+            console.log(value.error);
         }
+        // Return value is valid
+        else {
+            console.log(`User ${value.username} has score ${value.score}`)
 
-        console.log(posts);
-    };
+            // Load the most recent post
+            if (value.posts.length > 0) {
+                let mostRecentPost = await api.getPost(value.posts[0]);
 
-    res.send(user);
+
+                res.send(mostRecentPost);
+
+                // Do something with the post
+                console.log(mostRecentPost)
+
+                // Maybe you would want to have an array of these post objects 
+                // and keep appending new ones as you scroll down the page
+                // and load them
+            }
+            else {
+                console.log(`${value.username} hasn't made any posts yet`)
+            }
+        }
+    })();
+
+
+
+
 });
 
 app.post("/api/world", (req, res) => {
