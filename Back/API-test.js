@@ -33,6 +33,7 @@ var API = require("./API.js");
     // Channel stuff
     //console.log(await API.getFollowedChannelNames("Professional Photography"));
     //console.log(await API.getAllChannelNames());
+    //console.log(await API.getFollowedChannelNames("Professional Photography"));
 
 
     // Tag stuff
@@ -88,7 +89,7 @@ var API = require("./API.js");
 
 
 
-    console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
+    //console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
 
 
 

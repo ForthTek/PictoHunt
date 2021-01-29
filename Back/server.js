@@ -58,12 +58,27 @@ app.get("/api/getBrowse", (req, res) => {
 
             res.send(posts);
         }
-
-
     })();
 });
 
+app.get("/api/getAllChannels", (req, res) => {
+    (async () => {
+        let value = await api.getAllChannelNames();
 
+        let channels = [];
+        for (let i = 0; i < value.length; i++) {
+            let channel = await api.getChannel(value[i]);
+
+            if (!channel.error) {
+                channels.push(channel);
+            }
+        }
+
+        console.log(channels);
+
+        res.send(channels);
+    })();
+});
 
 app.post("/api/world", (req, res) => {
     console.log(req.body);
