@@ -20,6 +20,13 @@ const PostInteractionTypes = Object.freeze({ "like": 1, "dislike": 2, "removeInt
 
 
 
+
+
+// input validation, sample data, regex,
+
+
+
+
 function getErrorMessage(error) {
   // Just for now
   // Will need to do custom messages for errors
@@ -53,6 +60,8 @@ async function isValidSignInDetails(username, email, password) {
   try {
     let rows = await Database.singleQuery(SQL, username);
 
+    var validation = require("./input-validation.js");
+
     // Throw a useful error if the username is invalid
     try {
       rows[0].username;
@@ -61,12 +70,14 @@ async function isValidSignInDetails(username, email, password) {
       throw new Error("Username is not valid");
     }
 
+    console.log(rows[0].emailAddress);
+
     // Email is invalid
     if (email !== rows[0].emailAddress) {
       throw new Error("Email address is not valid");
     }
 
-    let hash = hashStr(password, rows[0].salt);
+    let hash = validation.hashStr(password, rows[0].salt);
 
     // Password is invalid 
     if (hash !== rows[0].userPassword) {
@@ -642,35 +653,6 @@ async function getDislikedPostIDs(username) {
 
 
 /**
- * Function to generate a random string of length (for creating a users salt)
- * 
- * @param {number} length 
- * @returns {string}
- */
-function randomStr(length) {
-  var out = "";
-  var chars = "1234567890AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz";
-  for (var i = 0; i < length; i++) {
-    // Add random character from chars to output
-    out += chars[Math.round(Math.random() * chars.length)];
-  }
-  return out;
-}
-
-/**
- * Function to hash using a salt
- * 
- * @param {string} str 
- * @param {string} salt 
- * @returns {string}
- */
-function hashStr(str, salt) {
-  var crypto = require('crypto');
-  var hash = crypto.createHash('md5').update(str + salt).digest('hex');
-  return hash;
-}
-
-/**
  * Function that creates a new account for the user.
  * 
  * @param {string} username The username of the account.
@@ -697,10 +679,13 @@ async function createUser(username, password, email, isPublicAccount = true, isA
     throw new Error("Password is not valid");
   }
 
+
+  var validation = require("./input-validation.js");
+
   /* This Will need moved */
-  var salt = randomStr((Math.random() * 50) + 10);
+  var salt = validation.randomStr((Math.random() * 50) + 10);
   /* This Will need moved */
-  var hash = hashStr(password, salt);
+  var hash = validation.hashStr(password, salt);
 
   try {
     let public = 0;

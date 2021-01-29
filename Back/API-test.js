@@ -4,7 +4,7 @@ var API = require("./API.js");
 // TEST SOME FUNCTIONS
 (async () => {
     // Basic login stuff
-    //console.log(await API.isValidSignInDetails("solomon", "email", "password"));
+    //console.log(await API.isValidSignInDetails("Professional Photography", "Professional Photographypassword", "Professional Photography@email.address"));
 
     //console.log(await API.isPublicAccount("sol"));
     //console.log(await API.isPublicAccount("solomo"));
@@ -88,7 +88,7 @@ var API = require("./API.js");
 
 
 
-    console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
+    //console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
 
 
 

@@ -8,7 +8,7 @@ const TAGS = [
 ];
 
 const USERS = [
-    "Professional Photography", "Joe Bloggs", "John Smith"
+    "Professional Photography", "Joe Bloggs", "John Smith",
 ];
 
 const CHANNELS = [
@@ -34,13 +34,11 @@ const POSTS = [
     { photos: ["https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog3.jpg"], tags: ["animal", "pet", "dog", "cute"] },
 ];
 
-
 (async () => {
     await populateDatabase();
-})()
+})();
 
 async function populateDatabase() {
-
     // Create tags with random description
     for (let i = 0; i < TAGS.length; i++) {
         let x = await API.createTag(TAGS[i], RandomDescription());
@@ -88,7 +86,7 @@ async function populateDatabase() {
         for (let i = 0; i < TAGS.length; i++) {
             if (Math.random() < 0.2) {
                 let x = await API.followTag(USERS[j], TAGS[i]);
-                if(!x.error) {
+                if (!x.error) {
                     console.log("USER FOLLOWED TAG");
                 }
                 console.log(x);
@@ -99,7 +97,7 @@ async function populateDatabase() {
         for (let i = 0; i < USERS.length; i++) {
             if (Math.random() < 0.2) {
                 let x = await API.followUser(USERS[j], USERS[i]);
-                if(!x.error) {
+                if (!x.error) {
                     console.log("USER FOLLOWED USER");
                 }
                 console.log(x);
@@ -110,7 +108,7 @@ async function populateDatabase() {
         for (let i = 0; i < CHANNELS.length; i++) {
             if (Math.random() < 0.2) {
                 let x = await API.followChannel(USERS[j], CHANNELS[i].name);
-                if(!x.error) {
+                if (!x.error) {
                     console.log("USER FOLLOWED CHANNEL");
                 }
                 console.log(x);
@@ -119,25 +117,25 @@ async function populateDatabase() {
 
         // Interact with post
         for (let i = 0; i < allPostIDs.length; i++) {
-            if (Math.random() < 0.5) {
+            if (Math.random() < 0.75) {
 
                 let interaction = API.PostInteractionTypes.like;
                 // Chance to like or dislike
-                if (Math.random() < 0.2) {
+                if (Math.random() < 0.3) {
                     interaction = API.PostInteractionTypes.dislike;
                 }
 
                 // Interact with the post
                 let x = await API.interactWithPost(allPostIDs[i], USERS[i], interaction);
 
-                if(!x.error) {
+                if (!x.error) {
                     console.log("USER INTERACTED");
                 }
 
                 if (Math.random() < 0.5) {
                     x = await API.createComment(allPostIDs[i], USERS[i], RandomComment());
 
-                    if(!x.error) {
+                    if (!x.error) {
                         console.log("USER COMMENTED");
                     }
                 }
