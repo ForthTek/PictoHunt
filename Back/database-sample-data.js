@@ -2,8 +2,7 @@ var API = require("./API.js");
 var RandomWord = require("random-words");
 
 const TAGS = [
-    "animal", "pet", "dog", "pug", "cat", "duck", "panda", "cow", "bird", "cute", "funny", "butterfly", "chicken", "cow",
-    "duck", "elephant", "flamingo",
+    "animal", "pet", "dog", "pug", "cat", "duck", "panda", "cow", "bird", "cute", "funny", "butterfly", "chicken", "elephant", "flamingo", "deer",
 ];
 
 const USERS = [
@@ -48,7 +47,7 @@ const POSTS = [
     { names: ["cow3.jpg"], tags: ["animal", "cow", "cute"] },
     { names: ["cow4.jpg"], tags: ["animal", "cow", "cute"] },
     { names: ["cows.jpg"], tags: ["animal", "cow"] },
-    { names: ["deer.jpg"], tags: ["animal"] },
+    { names: ["deer.jpg"], tags: ["animal", "deer"] },
     { names: ["deer2.jpg"], tags: ["animal", "deer"] },
     { names: ["dog.jpg"], tags: ["animal", "pet", "dog"] },
     { names: ["dog1.jpg"], tags: ["animal", "pet", "dog"] },
@@ -162,13 +161,21 @@ async function populateDatabase() {
         let channel = allChannels[randomChannel];
 
         let ID = await API.createPost(RandomPostTitle(), USERS[randomUser], channel, photos, POSTS[i].tags, lat, long);
-        allPostIDs.push(ID);
+        if (ID.error) {
+            console.log(`ERROR when creating post by user ${USERS[randomUser]} in channel ${channel} with photos:`);
+            console.log(ID.error);
+        }
+        else {
+            allPostIDs.push(ID);
 
-        console.log(`Creating posts ${ID} by user ${USERS[randomUser]} in channel ${channel} with photos:`);
-        for (let j = 0; j < photos.length; j++) {
-            console.log(photos[j]);
+            console.log(`Creating post ${ID} by user ${USERS[randomUser]} in channel ${channel} with photos:`);
+            for (let j = 0; j < photos.length; j++) {
+                console.log(photos[j]);
+            }
         }
     }
+
+    console.log(`*Created ${allPostIDs.length} posts`);
 
     // Users interact with things
     for (let j = 0; j < USERS.length; j++) {
@@ -208,25 +215,31 @@ async function populateDatabase() {
 
         // Interact with post
         for (let i = 0; i < allPostIDs.length; i++) {
-            if (Math.random() < 0.50) {
+            if (Math.random() < 0.5) {
 
                 let interaction = API.PostInteractionTypes.like;
-                // Chance to like or dislike
-                if (Math.random() < 0.2) {
+                // Chance to dislike
+                if (Math.random() < 0.3) {
                     interaction = API.PostInteractionTypes.dislike;
                 }
 
                 // Interact with the post
-                let x = await API.interactWithPost(allPostIDs[i], USERS[i], interaction);
+                let x = await API.interactWithPost(allPostIDs[i], USERS[j], interaction);
 
-                if (!x.error) {
+                if (x.error) {
+                    console.log(x.error)
+                }
+                else {
                     console.log(`User ${USERS[j]} interacted with post ${allPostIDs[i]}`);
                 }
 
                 if (Math.random() < 0.5) {
-                    x = await API.createComment(allPostIDs[i], USERS[i], RandomComment());
+                    x = await API.createComment(allPostIDs[i], USERS[j], RandomComment());
 
-                    if (!x.error) {
+                    if (x.error) {
+                        console.log(x.error)
+                    }
+                    else {
                         console.log(`User ${USERS[j]} commented on post ${allPostIDs[i]}`);
                     }
                 }

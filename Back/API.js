@@ -864,6 +864,7 @@ async function createPost(title, accountUsername, channelNamePostedTo, photos, t
     for (let i = 0; i < tags.length; i++) {
       tagArgs.push([POST_ID, tags[i]]);
     }
+
     await Database.repeatQuery(TAGS, tagArgs);
     return POST_ID;
   }
@@ -894,21 +895,23 @@ async function interactWithPost(postID, accountUsername, interactionType) {
 
   try {
     // Remove the interaction instead
-    if (interactionType == PostInteractionTypes.removeInteraction) {
+    if (interactionType === PostInteractionTypes.removeInteraction) {
       await Database.multiQuery([DELETE, UPDATE_SCORE], [[postID, accountUsername], [postID, postID]]);
       return true;
     }
     // Set the interaction
     else {
       let value;
-      switch (interactionType) {
-        case PostInteractionTypes.like:
-          value = "like";
-          break;
-        case PostInteractionTypes.dislike:
-          value = "dislike";
-          break;
+      if (interactionType === PostInteractionTypes.like) {
+        value = "like";
       }
+      else if (interactionType === PostInteractionTypes.dislike) {
+        value = "dislike";
+      }
+      else {
+        throw new Error("Interaction type is invalid");
+      }
+
 
       // Try to insert the value
       try {
