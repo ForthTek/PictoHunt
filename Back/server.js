@@ -12,44 +12,58 @@ app.get("/api/hello", (req, res) => {
     res.send({ express: "Hello From Express" });
 });
 
+
+const USERNAME = "Professional Photography";
+
+
+
 app.get("/api/getUser", (req, res) => {
     (async () => {
-
-        let value = await api.getUser("Professional Photography");
+        let value = await api.getUser(USERNAME);
 
         // There was an error
         if (value.error) {
-            // Deal with the error - display the code to user?
+            // Deal with the error 
             console.log(value.error);
         }
         // Return value is valid
         else {
-            console.log(`User ${value.username} has score ${value.score}`)
-
-            // Load the most recent post
-            if (value.posts.length > 0) {
-                let mostRecentPost = await api.getPost(value.posts[0]);
-
-
-                res.send(mostRecentPost);
-
-                // Do something with the post
-                console.log(mostRecentPost)
-
-                // Maybe you would want to have an array of these post objects 
-                // and keep appending new ones as you scroll down the page
-                // and load them
-            }
-            else {
-                console.log(`${value.username} hasn't made any posts yet`)
+            // Load all the user's posts 
+            for (let i = 0; i < value.posts.length; i++) {
+                value.posts[i] = await api.getPost(value.posts[i]);
             }
         }
+
+        res.send(value);
     })();
-
-
-
-
 });
+
+app.get("/api/getBrowse", (req, res) => {
+    (async () => {
+        let value = await api.getPostsFromAllFollowedFeeds(USERNAME);
+
+        // There was an error
+        if (value.error) {
+            console.log(value.error);
+            return value;
+        }
+        // Return value is valid
+        else {
+            // Load all the posts into an array
+            let posts = [];
+            for (let i = 0; i < value.length; i++) {
+                posts.push(await api.getPost(value[i]));
+            }
+            console.log(posts);
+
+            res.send(posts);
+        }
+
+
+    })();
+});
+
+
 
 app.post("/api/world", (req, res) => {
     console.log(req.body);

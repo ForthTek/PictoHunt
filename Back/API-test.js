@@ -88,7 +88,7 @@ var API = require("./API.js");
 
 
 
-    //console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
+    console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
 
 
 

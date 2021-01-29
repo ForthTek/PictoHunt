@@ -16,7 +16,8 @@ class ServerTest extends Component {
     }
 
     callApi = async () => {
-        const response = await fetch("http://10.0.2.2:5000/api/getUser");
+        const response = await fetch("http://10.0.2.2:5000/api/getBrowse");
+        //console.log(response);
         const body = await response.json();
         if (response.status !== 200) throw Error(body.message);
 
