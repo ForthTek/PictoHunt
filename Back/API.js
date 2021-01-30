@@ -1,8 +1,11 @@
 // https://en.wikipedia.org/wiki/JSDoc
 // JavaScriptDoc conventions
 
-const { throws } = require("assert");
 var Database = require("./database.js");
+var InputValidation = require("./Components/input-validation.js");
+var HashCode = require('./Components/murmurhash-js/murmurhash3_gc.js');
+var Random = require('./Components/seedrandom.js');
+
 
 /**
  * Enum for identifying the type of an interaction with a post.
@@ -35,6 +38,37 @@ function getErrorMessage(error) {
   return { error: message };
 }
 
+async function getDailyChallenge() {
+  try {
+    const today = new Date();
+    const seed = HashCode.murmurhash3_32_gc(`${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}`);
+    const r = new Random(seed);
+
+    const MAX_TAGS = 3;
+    let numberOfTags = clamp(Math.floor(r() * MAX_TAGS), 1, MAX_TAGS);
+
+    const SQL = "SELECT name FROM Tag;";
+    let allTags = await Database.singleQuery(SQL);
+
+    let tags = [];
+    for (let i = 0; i < numberOfTags; i++) {
+      let randomIndex = Math.floor(r() * allTags.length);
+      let tag = allTags[randomIndex].name;
+
+      tags.push(tag);
+    }
+
+    return tags;
+  }
+  catch (error) {
+    return getErrorMessage(error);
+  }
+}
+
+function clamp(val, min, max) {
+  return Math.min(Math.max(val, min), max);
+};
+
 
 // Check methods
 
@@ -60,8 +94,6 @@ async function isValidSignInDetails(username, email, password) {
   try {
     let rows = await Database.singleQuery(SQL, username);
 
-    var validation = require("./input-validation.js");
-
     // Throw a useful error if the username is invalid
     try {
       rows[0].username;
@@ -77,7 +109,7 @@ async function isValidSignInDetails(username, email, password) {
       throw new Error("Email address is not valid");
     }
 
-    let hash = validation.hashStr(password, rows[0].salt);
+    let hash = InputValidation.hashStr(password, rows[0].salt);
 
     // Password is invalid 
     if (hash !== rows[0].userPassword) {
@@ -683,8 +715,6 @@ async function createUser(username, password, email, isPublicAccount = true, isA
   const sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt, timeJoined) VALUES (?, ?, ?, ?, ?, ?, NOW())";
 
   try {
-    var validation = require("./input-validation.js");
-
     // Invalid username?
     if (false) {
       throw new Error("Username is not valid");
@@ -695,19 +725,19 @@ async function createUser(username, password, email, isPublicAccount = true, isA
     /** @TODO Move validation to front end */
 
     // Invalid email
-    if (!validation.isEmailValidFormat(email)) {
+    if (!InputValidation.isEmailValidFormat(email)) {
       //throw new Error(`Email address ${email} is not valid`);
     }
 
     // Invalid password
-    if (!validation.isPasswordValidFormat(password)) {
+    if (!InputValidation.isPasswordValidFormat(password)) {
       //throw new Error("Password is not valid");
     }
 
     /* This Will need moved */
-    var salt = validation.randomStr((Math.random() * 50) + 10);
+    var salt = InputValidation.randomStr((Math.random() * 50) + 10);
     /* This Will need moved */
-    var hash = validation.hashStr(password, salt);
+    var hash = InputValidation.hashStr(password, salt);
 
 
     let public = 0;
@@ -1036,5 +1066,5 @@ module.exports = {
 
   followChannel, followTag, followUser,
 
-
+  getDailyChallenge,
 };
