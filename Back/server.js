@@ -48,7 +48,7 @@ app.get("/api/getBrowse", (req, res) => {
         else {
             // Load all the posts into an array
             let posts = []
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < value.length; i++) {
                 posts.push(await api.getPost(value[i]))
             }
             console.log(posts)

@@ -6,38 +6,20 @@ import ServerTest from "./ServerTest"
 class Post extends Component {
     constructor(props) {
         super(props)
-        this.state = {
-            url: this.props.url,
-            title: "",
-            user: "",
-            likes: "",
-            dislikes: "",
-            photos: "",
-        }
-    }
 
-    componentDidMount() {
-        return fetch(this.props.url)
-            .then((response) => response.json())
-            .then((responseJson) => {
-                this.setState({
-                    title: responseJson[0].title,
-                    user: responseJson[0].user,
-                    likes: responseJson[0].likes,
-                    dislikes: responseJson[0].dislikes,
-                    photos: responseJson[0].photos,
-                })
-                console.log(responseJson[0].photos)
-            })
-            .catch((error) => {
-                console.log(error)
-            })
+        this.state = {
+            title: this.props.item.title,
+            user: this.props.item.user,
+            likes: this.props.item.likes,
+            dislikes: this.props.item.dislikes,
+            photos: this.props.item.photos,
+        }
+        console.log(this.state)
     }
 
     render() {
         return (
             <View style={styles.container}>
-                <ServerTest />
                 <Image
                     style={styles.Image}
                     source={{
