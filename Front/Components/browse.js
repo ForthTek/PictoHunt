@@ -1,157 +1,90 @@
-import React from "react";
-import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native";
-import { shouldUseActivityState } from "react-native-screens";
-import Post from "./post";
-import ServerTest from "./ServerTest";
+import React, { Component } from "react"
+import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native"
+import Post from "./post"
+import SinglePost from "./singlePost"
 
-DATA = [
-    {
-        ID: 9,
-        title: "The best doggo!",
-        user: "John Smith",
-        channel: "Pets",
-        score: 1,
-        likes: 1,
-        dislikes: 0,
-        time: 0,
-        GPSLatitude: null,
-        GPSLongitude: null,
-        tags: ["animal", "dog", "pet"],
-        photos: [
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog3.jpg",
-        ],
-        comments: [],
-    },
-    {
-        ID: 8,
-        title: "He is the cutest boy!",
-        user: "John Smith",
-        channel: "Pets",
-        score: 2,
-        likes: 2,
-        dislikes: 0,
-        time: 0,
-        GPSLatitude: null,
-        GPSLongitude: null,
-        tags: ["animal", "cute", "dog", "pet"],
-        photos: [
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog2.jpg",
-        ],
-        comments: [],
-    },
-    {
-        ID: 7,
-        title: "What a cutie!",
-        user: "John Smith",
-        channel: "Pets",
-        score: 1,
-        likes: 1,
-        dislikes: 0,
-        time: 0,
-        GPSLatitude: null,
-        GPSLongitude: null,
-        tags: ["animal", "cute", "dog", "pet"],
-        photos: [
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/dog1.jpg",
-        ],
-        comments: [],
-    },
-    {
-        ID: 6,
-        title: "Holiday pic from last year",
-        user: "Joe Bloggs",
-        channel: "Holiday Pictures",
-        score: 2,
-        likes: 2,
-        dislikes: 0,
-        time: 0,
-        GPSLatitude: 5.466131,
-        GPSLongitude: 9.06908,
-        tags: ["animal", "holiday"],
-        photos: [
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Animals/e4.jpg",
-        ],
-        comments: [],
-    },
-    {
-        ID: 3,
-        title: "A pic from my holiday in London",
-        user: "Joe Bloggs",
-        channel: "Holiday Pictures",
-        score: 1,
-        likes: 1,
-        dislikes: 0,
-        time: 0,
-        GPSLatitude: 51.510357,
-        GPSLongitude: -0.116773,
-        tags: ["architecture", "city", "historic-architecture", "holiday"],
-        photos: [
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben3.jpg",
-        ],
-        comments: [],
-    },
-    {
-        ID: 2,
-        title: "Big Ben at night",
-        user: "Professional Photography",
-        channel: "London",
-        score: 2,
-        likes: 2,
-        dislikes: 0,
-        time: 0,
-        GPSLatitude: 51.510357,
-        GPSLongitude: -0.116773,
-        tags: ["architecture", "city", "historic-architecture"],
-        photos: [
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben4.jpg",
-        ],
-        comments: [],
-    },
-    {
-        ID: 1,
-        title: "Big Ben and the Palace of Westmi",
-        user: "Professional Photography",
-        channel: "London",
-        score: 2,
-        likes: 2,
-        dislikes: 0,
-        time: 0,
-        GPSLatitude: 51.510357,
-        GPSLongitude: -0.116773,
-        tags: ["architecture", "city", "historic-architecture"],
-        photos: [
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben1.jpg",
-            "https://www2.macs.hw.ac.uk/~sb169/PictoHunt/SamplePhotos/Architecture/ben2.jpg",
-        ],
-        comments: [],
-    },
-];
-
-const Item = ({ item }) => {
-    return (
-        <View style={styles.post}>
-            <Post item={item} />
-        </View>
-    );
-};
-
-export default function Browse() {
+export default class Browse extends Component {
     // Browse Page
-    const renderItem = ({ item }) => <Item item={item} />;
-    return (
-        <SafeAreaView style={styles.container}>
-            {/* <FlatList
-                data={DATA}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.ID.toString()}
-            /> */}
 
-            <ServerTest />
-        </SafeAreaView>
-    );
+    state = {
+        isLoading: true,
+        isPost: false,
+        singlePostID: "",
+        DATA: "",
+    }
+
+    componentDidMount() {
+        this.callApi()
+            .then((res) => {
+                this.setState({ DATA: res })
+                this.setState({ isLoading: false })
+            })
+            .catch((err) => console.log(err))
+    }
+
+    callApi = async () => {
+        const response = await fetch("http://10.0.2.2:5000/api/getBrowse")
+        const body = await response.json()
+        if (response.status !== 200) throw Error(body.message)
+        return body
+    }
+
+    getID = (id) => {
+        let i = 0
+        for (; i < this.state.DATA.length; i++) {
+            if (id == this.state.DATA[i].ID) {
+                this.setState({ singlePostID: i })
+            }
+        }
+        this.handleSinglePost()
+    }
+
+    handleSinglePost = () => {
+        this.setState({ isPost: !this.state.isPost })
+    }
+
+    render() {
+        if (this.state.isLoading) {
+            return (
+                <View style={styles.container}>
+                    <Text>Loading</Text>
+                </View>
+            )
+        }
+        if (this.state.isPost) {
+            return (
+                <View style={styles.container}>
+                    <SinglePost
+                        item={this.state.DATA[this.state.singlePostID]}
+                        back={this.handleSinglePost}
+                    />
+                </View>
+            )
+        } else {
+            return (
+                <SafeAreaView style={styles.postCon}>
+                    <FlatList
+                        data={this.state.DATA}
+                        renderItem={({ item }) => (
+                            <View style={styles.post}>
+                                <Post item={item} onpressable={this.getID} />
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.ID.toString()}
+                    />
+                </SafeAreaView>
+            )
+        }
+    }
 }
 const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    postCon: {
         flex: 1,
         backgroundColor: "#fff",
     },
@@ -160,4 +93,4 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomWidth: 1,
     },
-});
+})

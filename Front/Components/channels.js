@@ -1,50 +1,71 @@
-import React from "react";
-import { FlatList, StyleSheet, SafeAreaView, View } from "react-native";
-import Channel from "./channel";
+import React, { Component } from "react"
+import { FlatList, StyleSheet, SafeAreaView, View, Text } from "react-native"
+import Channel from "./channel"
 
-const DATA = [
-    { id: "1", title: "Title" },
-    { id: "2", title: "Title" },
-    { id: "3", title: "Title" },
-    { id: "4", title: "Title" },
-    { id: "5", title: "Title" },
-    { id: "6", title: "Title" },
-    { id: "7", title: "Title" },
-    { id: "8", title: "Title" },
-    { id: "9", title: "Title" },
-    { id: "10", title: "Title" },
-    { id: "11", title: "Title" },
-    { id: "12", title: "Title" },
-];
+export default class Channels extends Component {
+    // Channel Page
 
-const Item = ({ title }) => {
-    return (
-        <View style={styles.channel}>
-            <Channel title={title} />
-        </View>
-    );
-};
-export default function Channels() {
-    // Channels Page
-    const renderItem = ({ item }) => <Item title={item.title} />;
-    return (
-        <SafeAreaView style={styles.container}>
-            <FlatList
-                data={DATA}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-            />
-        </SafeAreaView>
-    );
+    state = {
+        isLoading: true,
+        DATA: "",
+    }
+
+    componentDidMount() {
+        this.callApi()
+            .then((res) => {
+                this.setState({ DATA: res })
+                this.setState({ isLoading: false })
+            })
+            .catch((err) => console.log(err))
+    }
+
+    callApi = async () => {
+        const response = await fetch("http://10.0.2.2:5000/api/getChannels")
+        const body = await response.json()
+        if (response.status !== 200) throw Error(body.message)
+
+        return body
+    }
+
+    render() {
+        if (this.state.isLoading) {
+            return (
+                <View style={styles.container}>
+                    <Text>Loading</Text>
+                </View>
+            )
+        } else {
+            return (
+                <SafeAreaView style={styles.postCon}>
+                    <FlatList
+                        data={this.state.DATA}
+                        renderItem={({ item }) => (
+                            <View style={styles.post}>
+                                <Channel item={item} />
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.name}
+                    />
+                </SafeAreaView>
+            )
+        }
+    }
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
     },
-    channel: {
+    postCon: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
+    post: {
         borderColor: "grey",
         borderTopWidth: 1,
         borderBottomWidth: 1,
     },
-});
+})

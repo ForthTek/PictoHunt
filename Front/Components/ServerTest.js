@@ -7,7 +7,9 @@ class ServerTest extends Component {
         post: "",
         responseToPost: "",
     };
-
+    constructor(props) {
+        super(props);
+    }
     componentDidMount() {
         console.log("Mounted");
         this.callApi()
@@ -25,13 +27,7 @@ class ServerTest extends Component {
     };
 
     render() {
-        return (
-            <View>
-                <Text style={this.styles.text}>
-                    Getting data : {this.state.response}
-                </Text>
-            </View>
-        );
+        return <View></View>;
     }
 
     styles = StyleSheet.create({

@@ -1,33 +1,57 @@
-import React from "react";
-import { Text, StyleSheet, View, Image } from "react-native";
-import LikeBtn from "./likeBtn";
+import React, { Component } from "react"
+import { Text, StyleSheet, View, Image, Pressable } from "react-native"
+import LikeBtn from "./likeBtn"
 
-const Post = (props) => {
-    return (
-        <View style={styles.container}>
-            <Image
-                style={styles.Image}
-                source={{
-                    uri: props.item.photos[0],
-                }}
-            />
-            <View style={styles.containerCol}>
-                <Text style={styles.title} numberOfLines={1}>
-                    {props.item.title}
-                </Text>
-                <Text style={styles.postName}>{props.item.user}</Text>
-                <View style={styles.likeCon}>
-                    <LikeBtn icon='heart-outline' title='Like' />
-                    <Text style={{ fontSize: 22, paddingRight: "2%" }}>
-                        {props.item.likes + props.item.dislikes}
+class Post extends Component {
+    constructor(props) {
+        super(props)
+
+        this.state = {
+            title: this.props.item.title,
+            user: this.props.item.user,
+            likes: this.props.item.likes,
+            dislikes: this.props.item.dislikes,
+            photos: this.props.item.photos,
+        }
+    }
+
+    handleSinglePost = () => {
+        let value = this.props.item.ID
+        this.props.onpressable(value)
+    }
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <Pressable onPress={this.handleSinglePost}>
+                    <Image
+                        style={styles.Image}
+                        source={{
+                            uri: this.state.photos[0],
+                        }}
+                    />
+                </Pressable>
+                <View style={styles.containerCol}>
+                    <Text style={styles.title} numberOfLines={1}>
+                        {this.state.title}
                     </Text>
-                    <LikeBtn icon='heart-dislike-outline' title='Dis-Like' />
+                    <Text style={styles.postName}>{this.state.user}</Text>
+                    <View style={styles.likeCon}>
+                        <LikeBtn icon='heart-outline' title='Like' />
+                        <Text style={{ fontSize: 22, paddingRight: "2%" }}>
+                            {this.state.likes + this.state.dislikes}
+                        </Text>
+                        <LikeBtn
+                            icon='heart-dislike-outline'
+                            title='Dis-Like'
+                        />
+                    </View>
                 </View>
             </View>
-        </View>
-    );
-};
-export default Post;
+        )
+    }
+}
+export default Post
 
 const styles = StyleSheet.create({
     container: {
@@ -59,4 +83,4 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flexDirection: "row",
     },
-});
+})
