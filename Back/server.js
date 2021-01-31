@@ -17,21 +17,8 @@ const USERNAME = "Professional Photography"
 app.get("/api/getUser", (req, res) => {
     ;(async () => {
         let value = await api.getUser(USERNAME)
-
-        // There was an error
-        if (value.error) {
-            // Deal with the error
-            console.log(value.error)
-        }
-        // Return value is valid
-        else {
-            // Load all the user's posts
-            for (let i = 0; i < value.posts.length; i++) {
-                value.posts[i] = await api.getPost(value.posts[i])
-            }
-        }
-
-        res.send(value.posts[0])
+        console.log(value)
+        res.send(value)
     })()
 })
 
@@ -51,7 +38,6 @@ app.get("/api/getBrowse", (req, res) => {
             for (let i = 0; i < value.length; i++) {
                 posts.push(await api.getPost(value[i]))
             }
-            console.log(posts)
 
             res.send(posts)
         }
@@ -61,13 +47,12 @@ app.get("/api/getBrowse", (req, res) => {
 app.get("/api/getChannels", (req, res) => {
     ;(async () => {
         let value = await api.getAllChannels()
-        console.log(value)
+
         res.send(value)
     })()
 })
 
 app.post("/api/world", (req, res) => {
-    console.log(req.body)
     res.send(
         `I received your POST request. This is what you sent me: ${req.body.post}`
     )

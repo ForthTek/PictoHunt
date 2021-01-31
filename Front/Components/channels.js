@@ -11,23 +11,19 @@ export default class Channels extends Component {
     }
 
     componentDidMount() {
-        console.log("Mounted")
         this.callApi()
             .then((res) => {
                 this.setState({ DATA: res })
                 this.setState({ isLoading: false })
-                console.log(res)
-                console.log(this.state.DATA)
             })
             .catch((err) => console.log(err))
     }
 
     callApi = async () => {
         const response = await fetch("http://10.0.2.2:5000/api/getChannels")
-        //console.log(response);
         const body = await response.json()
         if (response.status !== 200) throw Error(body.message)
-        console.log("this is the body: " + body)
+
         return body
     }
 

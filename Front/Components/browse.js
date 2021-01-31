@@ -11,7 +11,6 @@ export default class Browse extends Component {
     }
 
     componentDidMount() {
-        console.log("Mounted")
         this.callApi()
             .then((res) => {
                 this.setState({ DATA: res })

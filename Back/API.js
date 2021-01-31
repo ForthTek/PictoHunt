@@ -1083,6 +1083,7 @@ module.exports = {
     getChannel,
     getAllChannelNames,
     getChannelsWithTag,
+    getAllChannels,
     // Tags
     getTag,
     getAllTagNames,
