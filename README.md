@@ -3,15 +3,14 @@
 PictoHunt is an online image sharing application being developed by ForthTek, a group of 3rd year students from Heriot-Watt in Edinburgh.
 
 # Changes to make:
+
 Set browse to be home, and centre it on the navbar \
 Set old home to be profile \
 
 Profile page: \
-    remove "your profile" button \
-    add "liked/disliked posts" \
-    remove location? \
-
-
+ remove "your profile" button \
+ add "liked/disliked posts" \
+ remove location? \
 
 # To Do:
 
@@ -27,7 +26,7 @@ Account Creation\
  -Sign-up\
  -Sign-in\
  -Account Deletion\
- 
+
 # Install Dependencies:
 
 Install android studio to test changes on a virtual machine \
@@ -52,6 +51,8 @@ npm install react-native-geolocation-service
 expo install expo-location
 
 npm install --save react-native-geocoding
+
+npm install --save react-native-snap-carousel
 
 # Useful links:
 

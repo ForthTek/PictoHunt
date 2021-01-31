@@ -1,12 +1,15 @@
 import React, { Component } from "react"
 import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native"
 import Post from "./post"
+import SinglePost from "./singlePost"
 
 export default class Browse extends Component {
     // Browse Page
 
     state = {
         isLoading: true,
+        isPost: false,
+        singlePostID: "",
         DATA: "",
     }
 
@@ -26,12 +29,35 @@ export default class Browse extends Component {
         return body
     }
 
-    renderItem = ({ item }) => <ListItem item={item} />
+    getID = (id) => {
+        let i = 0
+        for (; i < this.state.DATA.length; i++) {
+            if (id == this.state.DATA[i].ID) {
+                this.setState({ singlePostID: i })
+            }
+        }
+        this.handleSinglePost()
+    }
+
+    handleSinglePost = () => {
+        this.setState({ isPost: !this.state.isPost })
+    }
+
     render() {
         if (this.state.isLoading) {
             return (
                 <View style={styles.container}>
                     <Text>Loading</Text>
+                </View>
+            )
+        }
+        if (this.state.isPost) {
+            return (
+                <View style={styles.container}>
+                    <SinglePost
+                        item={this.state.DATA[this.state.singlePostID]}
+                        back={this.handleSinglePost}
+                    />
                 </View>
             )
         } else {
@@ -41,7 +67,7 @@ export default class Browse extends Component {
                         data={this.state.DATA}
                         renderItem={({ item }) => (
                             <View style={styles.post}>
-                                <Post item={item} />
+                                <Post item={item} onpressable={this.getID} />
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}

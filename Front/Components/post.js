@@ -1,5 +1,5 @@
 import React, { Component } from "react"
-import { Text, StyleSheet, View, Image } from "react-native"
+import { Text, StyleSheet, View, Image, Pressable } from "react-native"
 import LikeBtn from "./likeBtn"
 
 class Post extends Component {
@@ -15,15 +15,22 @@ class Post extends Component {
         }
     }
 
+    handleSinglePost = () => {
+        let value = this.props.item.ID
+        this.props.onpressable(value)
+    }
+
     render() {
         return (
             <View style={styles.container}>
-                <Image
-                    style={styles.Image}
-                    source={{
-                        uri: this.state.photos[0],
-                    }}
-                />
+                <Pressable onPress={this.handleSinglePost}>
+                    <Image
+                        style={styles.Image}
+                        source={{
+                            uri: this.state.photos[0],
+                        }}
+                    />
+                </Pressable>
                 <View style={styles.containerCol}>
                     <Text style={styles.title} numberOfLines={1}>
                         {this.state.title}
