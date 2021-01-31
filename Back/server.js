@@ -58,6 +58,14 @@ app.get("/api/getBrowse", (req, res) => {
     })()
 })
 
+app.get("/api/getChannels", (req, res) => {
+    ;(async () => {
+        let value = await api.getAllChannels()
+        console.log(value)
+        res.send(value)
+    })()
+})
+
 app.post("/api/world", (req, res) => {
     console.log(req.body)
     res.send(

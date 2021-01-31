@@ -1,7 +1,6 @@
 import React, { Component } from "react"
 import { Text, StyleSheet, View, Image } from "react-native"
 import LikeBtn from "./likeBtn"
-import ServerTest from "./ServerTest"
 
 class Post extends Component {
     constructor(props) {
@@ -14,7 +13,6 @@ class Post extends Component {
             dislikes: this.props.item.dislikes,
             photos: this.props.item.photos,
         }
-        console.log(this.state)
     }
 
     render() {

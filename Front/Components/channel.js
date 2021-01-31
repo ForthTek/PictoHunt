@@ -1,23 +1,31 @@
-import React from "react";
-import { Text, StyleSheet, View, Image } from "react-native";
+import React, { Component } from "react"
+import { Text, StyleSheet, View, Image } from "react-native"
 
-const Channel = (props) => {
-    return (
-        <View style={styles.container}>
-            <Image
-                style={styles.Image}
-                source={require("../assets/icon.png")}
-            />
-            <View style={styles.containerCol}>
-                <Text style={styles.title}>{props.title}</Text>
-                <Text style={styles.info}>Followers</Text>
-                <Text style={styles.info}>Pics</Text>
-                <Text style={styles.info}>Score</Text>
+class Post extends Component {
+    constructor(props) {
+        super(props)
+        this.state = {
+            name: this.props.item.name,
+            description: this.props.item.description,
+        }
+    }
+
+    render() {
+        return (
+            <View style={styles.container}>
+                <Image
+                    style={styles.Image}
+                    source={require("../assets/icon.png")}
+                />
+                <View style={styles.containerCol}>
+                    <Text style={styles.title}>{this.state.name}</Text>
+                    <Text style={styles.info}>{this.state.description}</Text>
+                </View>
             </View>
-        </View>
-    );
-};
-export default Channel;
+        )
+    }
+}
+export default Post
 
 const styles = StyleSheet.create({
     container: {
@@ -43,4 +51,4 @@ const styles = StyleSheet.create({
         fontSize: 15,
         paddingBottom: "3%",
     },
-});
+})
