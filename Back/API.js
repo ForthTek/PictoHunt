@@ -1,10 +1,10 @@
 // https://en.wikipedia.org/wiki/JSDoc
 // JavaScriptDoc conventions
 
-var Database = require("./database.js");
-var InputValidation = require("./Components/input-validation.js");
-var HashCode = require('./Components/murmurhash-js/murmurhash3_gc.js');
-var Random = require('./Components/seedrandom.js');
+var Database = require("./database.js")
+var InputValidation = require("./Components/input-validation.js")
+var HashCode = require("./Components/murmurhash-js/murmurhash3_gc.js")
+var Random = require("./Components/seedrandom.js")
 
 const { throws } = require("assert")
 var Database = require("./database.js")
@@ -42,36 +42,36 @@ function getErrorMessage(error) {
 }
 
 async function getDailyChallenge() {
-  try {
-    const today = new Date();
-    const seed = HashCode.murmurhash3_32_gc(`${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}`);
-    const r = new Random(seed);
+    try {
+        const today = new Date()
+        const seed = HashCode.murmurhash3_32_gc(
+            `${today.getFullYear()}${today.getMonth() + 1}${today.getDate()}`
+        )
+        const r = new Random(seed)
 
-    const MAX_TAGS = 3;
-    let numberOfTags = clamp(Math.floor(r() * MAX_TAGS), 1, MAX_TAGS);
+        const MAX_TAGS = 3
+        let numberOfTags = clamp(Math.floor(r() * MAX_TAGS), 1, MAX_TAGS)
 
-    const SQL = "SELECT name FROM Tag;";
-    let allTags = await Database.singleQuery(SQL);
+        const SQL = "SELECT name FROM Tag;"
+        let allTags = await Database.singleQuery(SQL)
 
-    let tags = [];
-    for (let i = 0; i < numberOfTags; i++) {
-      let randomIndex = Math.floor(r() * allTags.length);
-      let tag = allTags[randomIndex].name;
+        let tags = []
+        for (let i = 0; i < numberOfTags; i++) {
+            let randomIndex = Math.floor(r() * allTags.length)
+            let tag = allTags[randomIndex].name
 
-      tags.push(tag);
+            tags.push(tag)
+        }
+
+        return tags
+    } catch (error) {
+        return getErrorMessage(error)
     }
-
-    return tags;
-  }
-  catch (error) {
-    return getErrorMessage(error);
-  }
 }
 
 function clamp(val, min, max) {
-  return Math.min(Math.max(val, min), max);
-};
-
+    return Math.min(Math.max(val, min), max)
+}
 
 // Check methods
 
@@ -94,13 +94,12 @@ async function isValidSignInDetails(username, email, password) {
     try {
         let rows = await Database.singleQuery(SQL, username)
 
-    // Throw a useful error if the username is invalid
-    try {
-      rows[0].username;
-    }
-    catch (e) {
-      throw new Error("Username is not valid");
-    }
+        // Throw a useful error if the username is invalid
+        try {
+            rows[0].username
+        } catch (e) {
+            throw new Error("Username is not valid")
+        }
 
         console.log(rows[0].emailAddress)
 
@@ -109,7 +108,7 @@ async function isValidSignInDetails(username, email, password) {
             throw new Error("Email address is not valid")
         }
 
-    let hash = InputValidation.hashStr(password, rows[0].salt);
+        let hash = InputValidation.hashStr(password, rows[0].salt)
 
         // Password is invalid
         if (hash !== rows[0].userPassword) {
@@ -728,43 +727,51 @@ async function getDislikedPostIDs(username) {
  * @param {boolean} isPublicAccount The account should be public.
  * @param {boolean} isAdminAccount The account should have administrator privileges.
  */
-async function createUser(username, password, email, isPublicAccount = true, isAdminAccount = false) {
-  const sql = "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt, timeJoined) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+async function createUser(
+    username,
+    password,
+    email,
+    isPublicAccount = true,
+    isAdminAccount = false
+) {
+    const sql =
+        "INSERT INTO User(username, userPassword, emailAddress, isPublic, levelOfAccess, salt, timeJoined) VALUES (?, ?, ?, ?, ?, ?, NOW())"
 
-  try {
-    // Invalid username?
-    if (false) {
-      throw new Error("Username is not valid");
+    try {
+        // Invalid username?
+        if (false) {
+            throw new Error("Username is not valid")
+        }
+
+        /** @TODO Move validation to front end */
+
+        // Invalid email
+        if (!InputValidation.isEmailValidFormat(email)) {
+            //throw new Error(`Email address ${email} is not valid`);
+        }
+
+        // Invalid password
+        if (!InputValidation.isPasswordValidFormat(password)) {
+            //throw new Error("Password is not valid");
+        }
+
+        return true
+    } catch (error) {
+        return getErrorMessage(error)
     }
-
-
-
-    /** @TODO Move validation to front end */
-
-    // Invalid email
-    if (!InputValidation.isEmailValidFormat(email)) {
-      //throw new Error(`Email address ${email} is not valid`);
-    }
-
-    // Invalid password
-    if (!InputValidation.isPasswordValidFormat(password)) {
-      //throw new Error("Password is not valid");
-    }
-
     /* This Will need moved */
-    var salt = InputValidation.randomStr((Math.random() * 50) + 10);
+    var salt = InputValidation.randomStr(Math.random() * 50 + 10)
     /* This Will need moved */
-    var hash = InputValidation.hashStr(password, salt);
+    var hash = InputValidation.hashStr(password, salt)
 
-
-    let public = 0;
+    let public = 0
     if (isPublicAccount) {
-      public = 1;
+        public = 1
     }
 
-    let admin = "user";
+    let admin = "user"
     if (isAdminAccount) {
-      admin = "admin";
+        admin = "admin"
     }
 }
 
