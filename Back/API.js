@@ -6,9 +6,6 @@ var InputValidation = require("./Components/input-validation.js")
 var HashCode = require("./Components/murmurhash-js/murmurhash3_gc.js")
 var Random = require("./Components/seedrandom.js")
 
-const { throws } = require("assert")
-var Database = require("./database.js")
-
 /**
  * Enum for identifying the type of an interaction with a post.
  */
@@ -75,9 +72,9 @@ function clamp(val, min, max) {
 
 // Check methods
 
-async function usernameAlreadyTaken(username) {}
+async function usernameAlreadyTaken(username) { }
 
-async function emailAlreadyTaken(email) {}
+async function emailAlreadyTaken(email) { }
 
 /**
  * Async function that evaluates if the sign in details are correct.
@@ -1083,7 +1080,7 @@ async function followUser(accountUsername, usernameToFollow) {
 
 // Set methods
 
-async function setAccountPublic(username, trueFalse) {}
+async function setAccountPublic(username, trueFalse) { }
 
 // Remove methods
 
@@ -1131,4 +1128,6 @@ module.exports = {
     followChannel,
     followTag,
     followUser,
+
+    getDailyChallenge,
 }

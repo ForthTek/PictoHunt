@@ -1,19 +1,10 @@
 var API = require("./API.js");
 
+const TEST_USER = "Professional Photography";
 
 // TEST SOME FUNCTIONS
 (async () => {
     // Basic login stuff
-    //console.log(await API.isValidSignInDetails("Professional Photography", "Professional Photographypassword", "Professional Photography@email.address"));
-
-    //console.log(await API.isPublicAccount("sol"));
-    //console.log(await API.isPublicAccount("solomo"));
-
-    //console.log(await API.getUser("sol"));
-    //console.log(await API.getUser("so"));
-    //console.log(await API.getChannel("invalid channel name"));
-    //console.log(await API.getChannel("Cute animal pics"));
-
 
     // Post stuff
     //console.log(await API.getAllPostIDs());
@@ -83,16 +74,18 @@ var API = require("./API.js");
     //console.log(await API.followUser("solomon", "sol"));
 
 
+
+
+
+    
     //console.log(await API.getAllPostsWithLocation());
 
     //console.log(await API.getUsersRankedByScore());
 
+    //console.log(await API.getPostsFromAllFollowedFeeds(TEST_USER));
+    //console.log(await API.getPost(80));
 
-
-    //console.log(await API.getPostsFromAllFollowedFeeds("Professional Photography"));
-
-
-    console.log(await API.getDailyChallenge());
+    //console.log(await API.getDailyChallenge());
 
 })();
 
