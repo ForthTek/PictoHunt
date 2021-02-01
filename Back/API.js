@@ -689,7 +689,11 @@ async function getPostsInteractedWith(username, postInteractionType) {
 
     try {
         let rows = await Database.singleQuery(SQL, username, value)
-        return rows[0].postID
+        let array = [];
+        for (let i = 0; i < rows.length; i++) {
+            array.push(rows[i].postID);
+        }
+        return array;
     } catch (error) {
         return getErrorMessage(error)
     }

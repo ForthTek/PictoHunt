@@ -109,7 +109,7 @@ const POSTS = [
 
 
 (async () => {
-    await populateDatabase();
+    //await populateDatabase();
 })();
 
 async function populateDatabase() {
