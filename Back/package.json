@@ -13,6 +13,7 @@
     "database-js": "^3.0.10",
     "database-js-mysql": "^1.1.3",
     "express": "^4.17.1",
+    "firebase": "^8.2.9",
     "mysql": "^2.18.1",
     "random-words": "^1.1.1"
   },
