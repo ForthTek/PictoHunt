@@ -29,10 +29,7 @@ const TEST_USER = "Professional Photography";
 
     // Tag stuff
     //console.log(await API.getAllTags());
-    //console.log(await API.getFollowedTags("sol"));
 
-    // User stuff
-    //console.log(await API.getFollowedUsers("sol"));
 
 
 
@@ -57,17 +54,10 @@ const TEST_USER = "Professional Photography";
     //console.log(await API.createPost("new post", "sol", "dogs", ["1", "2", "3"], ["dog", "Cute animals"]));
     //console.log(await API.createComment(17, "sol", "this is a comment"));
 
-
     // TEST likes, dislikes and removing interaction
     //console.log(await API.interactWithPost(16, "solomon", API.PostInteractionTypes.dislike));
     //console.log(await API.interactWithPost(15, "sol", API.PostInteractionTypes.like));
-    //console.log(await API.getPost(16));
     //console.log(await API.interactWithPost(16, "sol", API.PostInteractionTypes.removeInteraction));
-    //console.log(await API.getPost(15));
-
-
-    //console.log(await API.getPost(15));
-
 
     //console.log(await API.followChannel("solomon", "dogs"));
     //console.log(await API.followTag("solomon", "dog"));
@@ -77,11 +67,19 @@ const TEST_USER = "Professional Photography";
 
 
 
-    
+    //console.log(await API.getNumberOfLikedPosts(TEST_USER));
+    //console.log(await API.getNumberOfDislikedPosts(TEST_USER));
+    //console.log(await API.getLikedPostIDs(TEST_USER));
+    //console.log(await API.getDislikedPostIDs(TEST_USER));
+
+
+
     //console.log(await API.getAllPostsWithLocation());
 
     //console.log(await API.getUsersRankedByScore());
 
+    //console.log(await API.getFollowedTags(TEST_USER));
+    //console.log(await API.getFollowedUsers(TEST_USER));
     //console.log(await API.getPostsFromAllFollowedFeeds(TEST_USER));
     //console.log(await API.getPost(80));
 
