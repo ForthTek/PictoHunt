@@ -1,17 +1,17 @@
-import React from "react";
-import { StyleSheet, SafeAreaView, StatusBar, View } from "react-native";
-import { NavigationContainer } from "@react-navigation/native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import Ionicons from "react-native-vector-icons/Ionicons";
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs"; // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
+import React from "react"
+import { StyleSheet, SafeAreaView, StatusBar, View } from "react-native"
+import { NavigationContainer } from "@react-navigation/native"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
+import Ionicons from "react-native-vector-icons/Ionicons"
+import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs" // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
 
-import Home from "./Components/home";
-import Browse from "./Components/browse";
-import Channels from "./Components/channels";
-import Upload from "./Components/UploadScreen";
-import Map from "./Components/map";
+import Home from "./Components/home"
+import Browse from "./Components/browse"
+import Channels from "./Components/channels"
+import Upload from "./Components/UploadScreen"
+import Map from "./Components/map"
 
-const bButton = createMaterialBottomTabNavigator(); // Create the bottom tab bar
+const bButton = createMaterialBottomTabNavigator() // Create the bottom tab bar
 
 export default function App() {
     // Main app function
@@ -26,7 +26,7 @@ export default function App() {
                         name='Home'
                         component={Home}
                         options={{
-                            tabBarColor: "purple",
+                            tabBarColor: "black",
                             tabBarIcon: ({ color }) => (
                                 <Ionicons
                                     name='person-circle'
@@ -88,7 +88,7 @@ export default function App() {
             </NavigationContainer>
         </SafeAreaView>
         // Creates the buttons and sets which page function they call
-    ); // options={{tabBarBadge: 0} can be used to set notification nubers
+    ) // options={{tabBarBadge: 0} can be used to set notification nubers
 }
 
 const styles = StyleSheet.create({
@@ -97,4 +97,4 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         paddingTop: StatusBar.currentHeight + 12,
     },
-});
+})
