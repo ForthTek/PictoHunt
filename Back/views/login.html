@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Firebase Server Auth</title>
-    <link rel="stylesheet" href="./mvp.css" />
     <script
       src="https://www.gstatic.com/firebasejs/7.14.1/firebase-app.js"
       defer
@@ -52,8 +51,6 @@
               event.preventDefault();
               const login = event.target.login.value;
               const password = event.target.password.value;
-
-              console.log(`tried to login with email ${login} password ${password}`)
 
               firebase
                 .auth()

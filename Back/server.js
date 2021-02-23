@@ -24,9 +24,7 @@ const app = express();
 app.engine("html", require("ejs").renderFile);
 app.use(express.static("static"));
 
-/** DO WE NEED THIS? */
-//app.use(bodyParser.urlencoded({ extended: true }));
-
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(csrfMiddleware);
@@ -34,14 +32,6 @@ app.use(csrfMiddleware);
 app.all("*", (req, res, next) => {
   res.cookie("XSRF-TOKEN", req.csrfToken());
   next();
-});
-
-app.get("/login", function (req, res) {
-  res.render("login.html");
-});
-
-app.get("/signup", function (req, res) {
-  res.render("signup.html");
 });
 
 app.get("/profile", function (req, res) {
@@ -103,7 +93,6 @@ app.get("/api/getUser", (req, res) => {
     res.send(value);
   })();
 });
-
 
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
