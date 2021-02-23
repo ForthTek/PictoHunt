@@ -1,3 +1,5 @@
+import * as firebase from "firebase";
+
 const config = {
   apiKey: "AIzaSyCvQv_waR8vtFZIrmHlgVexp0VrrGNwGBE",
   authDomain: "picto-hunt.firebaseapp.com",
@@ -8,24 +10,14 @@ const config = {
   measurementId: "G-HDTRBXWKV1",
 };
 
-import * as firebase from "firebase";
-
 export default class Auth {
   constructor() {
     firebase.initializeApp(config);
-
-    window.firebase = firebase;
-
     this.auth = firebase.auth();
-    auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
+    this.firestore = firebase.firestore();
+    this.storage = firebase.storage();
+    this.functions = firebase.functions();
 
-    // Listen for authentication state to change.
-    auth.onAuthStateChanged((user) => {
-      if (user != null) {
-        console.log("We are authenticated now!");
-      }
-
-      // Do other things
-    });
+    //auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
   }
 }

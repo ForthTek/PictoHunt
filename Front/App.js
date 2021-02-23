@@ -14,10 +14,8 @@ import Login from "./Components/login"
 
 import Auth from './Auth';
 
+//auth = new Auth();
 
-// componentDidMount = () => {
-//     const auth = new Auth();
-// }
 
 const bButton = createMaterialBottomTabNavigator() // Create the bottom tab bar
 
