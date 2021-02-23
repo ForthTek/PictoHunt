@@ -7,7 +7,15 @@ const port = process.env.PORT || 5000;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-const API = require("./API.js");
+const auth = require("./Components/firebase-auth.js");
+
+var admin = require("firebase-admin");
+
+var serviceAccount = require("./serviceAccountKey.json");
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+});
 
 app.get("/api/getUser", (req, res) => {
   (async () => {
@@ -18,3 +26,9 @@ app.get("/api/getUser", (req, res) => {
 });
 
 app.listen(port, () => console.log(`Listening on port ${port}`));
+
+
+
+
+
+
