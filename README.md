@@ -54,6 +54,10 @@ npm install --save react-native-geocoding
 
 npm install --save react-native-snap-carousel
 
+npm install --save @react-native-firebase/app
+
+expo install firebase
+
 # Useful links:
 
 https://getbootstrap.com/ - bootstrap \

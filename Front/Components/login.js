@@ -21,6 +21,8 @@ export default function Home(props) {
     const forgot = "Forgot Password"
     const create = "Create an Account"
 
+    const apiCall = () => {}
+
     return (
         <SafeAreaView style={styles.container}>
             <View
