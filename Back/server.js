@@ -12,6 +12,7 @@ const auth = require("./serviceAccountKey.json");
 
 admin.initializeApp({
   credential: admin.credential.cert(auth),
+  /** FIND DB URL */
   //databaseURL: "https://server-auth-41acc.firebaseio.com",
 });
 
@@ -94,7 +95,7 @@ app.get("/sessionLogout", (req, res) => {
   res.redirect("/login");
 });
 
-/** TODO ??? */
+/** TODO */
 app.get("/api/getUser", (req, res) => {
   (async () => {
     let value = await api.getUser(USERNAME);
@@ -103,6 +104,7 @@ app.get("/api/getUser", (req, res) => {
   })();
 });
 
+
 app.listen(PORT, () => {
-  app.listen(port, () => console.log(`Listening on port ${port}`));
+  console.log(`Listening on http://localhost:${PORT}`);
 });

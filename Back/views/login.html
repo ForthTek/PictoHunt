@@ -53,6 +53,8 @@
               const login = event.target.login.value;
               const password = event.target.password.value;
 
+              console.log(`tried to login with email ${login} password ${password}`)
+
               firebase
                 .auth()
                 .signInWithEmailAndPassword(login, password)
