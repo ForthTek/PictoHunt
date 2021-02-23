@@ -12,6 +12,13 @@ import Upload from "./Components/UploadScreen"
 import Map from "./Components/map"
 import Login from "./Components/login"
 
+import Auth from './Auth';
+
+
+// componentDidMount = () => {
+//     const auth = new Auth();
+// }
+
 const bButton = createMaterialBottomTabNavigator() // Create the bottom tab bar
 
 export default function App() {
