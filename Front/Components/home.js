@@ -1,9 +1,9 @@
-import React, { Component } from "react"
-import { Text, View, SafeAreaView, StyleSheet } from "react-native"
-import Image from "react-native-scalable-image"
-import Score from "./score"
-import SettingBtn from "./settingBtn"
-
+import React, { Component } from "react";
+import { Text, View, SafeAreaView, StyleSheet, Button } from "react-native";
+import Image from "react-native-scalable-image";
+import Score from "./score";
+import SettingBtn from "./settingBtn";
+import * as firebase from "firebase";
 class Home extends Component {
     // Home page
 
@@ -18,33 +18,42 @@ class Home extends Component {
     state = {
         isLoading: true,
         DATA: "",
-    }
+    };
 
     componentDidMount() {
         this.callApi()
             .then((res) => {
-                this.setState({ DATA: res })
-                this.setState({ isLoading: false })
+                this.setState({ DATA: res });
+                this.setState({ isLoading: false });
             })
-            .catch((err) => console.log(err))
+            .catch((err) => console.log(err));
     }
 
     callApi = async () => {
-        const response = await fetch("http://10.0.2.2:5000/api/getUser")
+        const response = await fetch("http://10.0.2.2:5000/api/getUser");
 
-        const body = await response.json()
-        if (response.status !== 200) throw Error(body.message)
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
 
-        return body
-    }
+        return body;
+    };
+
+    onSignOutPress = () => {
+        firebase.auth().signOut();
+    };
 
     render() {
         if (this.state.isLoading) {
             return (
-                <View style={styles.container}>
+                <View style={styles.container1}>
                     <Text>Loading</Text>
+                    <Button
+                        title='Sign out'
+                        onPress={this.onSignOutPress}
+                        style={{ fontSize: 18, paddingTop: "5%", color: "red" }}
+                    ></Button>
                 </View>
-            )
+            );
         } else {
             return (
                 <SafeAreaView style={styles.container}>
@@ -100,11 +109,11 @@ class Home extends Component {
                         <SettingBtn label='Log Out' icon='log-out-outline' />
                     </View>
                 </SafeAreaView>
-            )
+            );
         }
     }
 }
-export default Home
+export default Home;
 
 const styles = StyleSheet.create({
     container: {
@@ -127,4 +136,10 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
-})
+    container1: {
+        flex: 1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
+    },
+});

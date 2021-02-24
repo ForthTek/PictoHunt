@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import {
     Text,
     View,
@@ -6,98 +6,145 @@ import {
     StyleSheet,
     TextInput,
     Button,
-} from "react-native"
-import Image from "react-native-scalable-image"
+    Alert,
+} from "react-native";
+import Image from "react-native-scalable-image";
+import SignUp from "./signUp";
+import ForgotPass from "./forgotPass";
+import * as firebase from "firebase";
+// import firestore from "@react-native-firebase/firestore";
 
 export default function Home(props) {
-    const Pictohunt = "Pictohunt"
-    const byforthtek = "By ForthTek"
-    const logint = "Login"
-    const email = "Email:"
-    const password = "Password:"
-    const [value, onChangeText] = React.useState("")
-    const [value2, onChangeText2] = React.useState("")
-    const guest = "Proceed as Guest"
-    const forgot = "Forgot Password"
-    const create = "Create an Account"
+    const [signUp, onSignUp] = React.useState(false);
+    const [forgotPassword, onForgotPassword] = React.useState(false);
+    const [email, onChangeEmail] = React.useState("");
+    const [password, onChangePassword] = React.useState("");
 
-    const apiCall = () => {}
+    const onLoginPress = () => {
+        firebase
+            .auth()
+            .signInWithEmailAndPassword(email, password)
+            .then(
+                () => {},
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+    };
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <View
-                style={{
-                    flexDirection: "row",
-                    margin: "0%",
-                    marginLeft: "30%",
+    if (signUp) {
+        return (
+            <SignUp
+                back={() => {
+                    onSignUp(false);
                 }}
-            >
-                <Image source={require("../assets/ForthTek.png")} width={160} />
-            </View>
-            <View
-                style={{
-                    flexDirection: "row",
-                    paddingBottom: "5%",
-                    justifyContent: "space-between",
+            />
+        );
+    }
+    if (forgotPassword) {
+        return (
+            <ForgotPass
+                back={() => {
+                    onForgotPassword(false);
                 }}
-            ></View>
+            />
+        );
+    } else {
+        return (
+            <SafeAreaView style={styles.container}>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        margin: "0%",
+                        marginLeft: "30%",
+                    }}
+                >
+                    <Image
+                        source={require("../assets/ForthTek.png")}
+                        width={160}
+                    />
+                </View>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        paddingBottom: "5%",
+                        justifyContent: "space-between",
+                    }}
+                ></View>
 
-            <Text style={styles.Pictohunt}>{Pictohunt}</Text>
-            <Text style={styles.byforthtek}>{byforthtek}</Text>
-            <Text style={styles.logint}>{logint}</Text>
+                <Text style={styles.Pictohunt}>Pictohunt</Text>
+                <Text style={styles.byforthtek}>By ForthTek</Text>
+                <Text style={styles.logint}>Login</Text>
 
-            <View
-                style={{
-                    flexDirection: "row",
-                    paddingBottom: "5%",
-                    justifyContent: "space-between",
-                }}
-            >
-                <Text style={styles.email}>{email}</Text>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        paddingBottom: "5%",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Text style={styles.email}>Email:</Text>
 
-                <TextInput
-                    style={styles.input2}
-                    onChangeText={(text) => onChangeText(text)}
-                    value={value}
-                />
-            </View>
+                    <TextInput
+                        style={styles.input2}
+                        onChangeText={(text) => onChangeEmail(text)}
+                        value={email}
+                        placeholder='Email'
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                        keyboardType='email-address'
+                    />
+                </View>
 
-            <View
-                style={{
-                    flexDirection: "row",
-                    paddingBottom: "5%",
-                    justifyContent: "space-between",
-                }}
-            >
-                <Text style={styles.password}>{password}</Text>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        paddingBottom: "5%",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Text style={styles.password}>Password:</Text>
 
-                <TextInput
-                    style={styles.input2}
-                    onChangeText={(text) => onChangeText2(text)}
-                    value={value2}
-                />
-            </View>
+                    <TextInput
+                        style={styles.input2}
+                        onChangeText={(text) => onChangePassword(text)}
+                        value={password}
+                        placeholder='Password'
+                        secureTextEntry={true}
+                        autoCapitalize='none'
+                        autoCorrect={false}
+                    />
+                </View>
 
-            <Button
-                style={styles.button}
-                onPress={props.login}
-                title='Login'
-            ></Button>
+                <Button
+                    style={styles.button}
+                    onPress={onLoginPress}
+                    title='Login'
+                ></Button>
 
-            <Text style={styles.guest}>{guest}</Text>
+                <Text style={styles.guest}>Proceed as Guest</Text>
 
-            <View
-                style={{
-                    flexDirection: "row",
-                    paddingBottom: "5%",
-                    justifyContent: "space-between",
-                }}
-            >
-                <Text style={styles.forgot}>{forgot}</Text>
-                <Text style={styles.create}>{create}</Text>
-            </View>
-        </SafeAreaView>
-    )
+                <View
+                    style={{
+                        flexDirection: "row",
+                        paddingBottom: "5%",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Button
+                        style={styles.button}
+                        onPress={onForgotPassword}
+                        title='Forgot Password'
+                    />
+                    <Button
+                        style={styles.button}
+                        onPress={onSignUp}
+                        title='Create Account'
+                    />
+                </View>
+            </SafeAreaView>
+        );
+    }
 }
 const styles = StyleSheet.create({
     container: {
@@ -181,4 +228,4 @@ const styles = StyleSheet.create({
         paddingTop: "5%",
         textDecorationLine: "underline",
     },
-})
+});

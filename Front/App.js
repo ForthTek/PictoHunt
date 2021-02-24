@@ -1,126 +1,56 @@
-import React, { useState } from "react"
-import { StyleSheet, SafeAreaView, StatusBar, View } from "react-native"
-import { NavigationContainer } from "@react-navigation/native"
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
-import Ionicons from "react-native-vector-icons/Ionicons"
-import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs" // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
+import React, { useState, Component } from "react";
+import { StyleSheet, StatusBar } from "react-native";
 
-import Home from "./Components/home"
-import Browse from "./Components/browse"
-import Channels from "./Components/channels"
-import Upload from "./Components/UploadScreen"
-import Map from "./Components/map"
-import Login from "./Components/login"
+import Login from "./Components/login";
+import Nav from "./Components/nav";
 
-import Auth from './Auth';
+import Auth from "./Components/Auth";
+import * as firebase from "firebase";
 
 //auth = new Auth();
 
-
-const bButton = createMaterialBottomTabNavigator() // Create the bottom tab bar
-
-export default function App() {
+const config = {
+    apiKey: "AIzaSyCvQv_waR8vtFZIrmHlgVexp0VrrGNwGBE",
+    authDomain: "picto-hunt.firebaseapp.com",
+    projectId: "picto-hunt",
+    storageBucket: "picto-hunt.appspot.com",
+    messagingSenderId: "762056308518",
+    appId: "1:762056308518:web:ec820ae748f1191699b3e7",
+    measurementId: "G-HDTRBXWKV1",
+};
+export default class App extends Component {
     // Main app function
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
+    constructor(props) {
+        super(props);
+        this.state = {
+            isLoggedIn: false,
+            isAuthReady: false,
+        };
+        // auth = new Auth();
+        // console.log(auth);
+        if (!firebase.apps.length) {
+            firebase.initializeApp(config);
+        }
+        firebase.auth().onAuthStateChanged(this.onAuthStateChanged);
+    }
 
-    if (isLoggedIn) {
-        return (
-            <SafeAreaView style={styles.container}>
-                <NavigationContainer>
-                    <bButton.Navigator // Sets things about the bottom buttons
-                        initialRouteName='Browse'
-                    >
-                        <bButton.Screen
-                            name='Home'
-                            component={Home}
-                            options={{
-                                tabBarColor: "black",
-                                tabBarIcon: ({ color }) => (
-                                    <Ionicons
-                                        name='person-circle'
-                                        color={color}
-                                        size={22}
-                                    />
-                                ),
-                            }}
-                        />
-                        <bButton.Screen
-                            name='Channels'
-                            component={Channels}
-                            options={{
-                                tabBarColor: "tomato",
-                                tabBarIcon: ({ color }) => (
-                                    <Ionicons
-                                        name='albums'
-                                        color={color}
-                                        size={22}
-                                    />
-                                ),
-                            }}
-                        />
-                        <bButton.Screen
-                            name='Browse'
-                            component={Browse}
-                            options={{
-                                tabBarColor: "blue",
-                                tabBarIcon: ({ color }) => (
-                                    <Ionicons
-                                        name='home'
-                                        color={color}
-                                        size={22}
-                                    />
-                                ),
-                            }}
-                        />
-                        <bButton.Screen
-                            name='Upload'
-                            component={Upload}
-                            options={{
-                                tabBarColor: "brown",
-                                tabBarIcon: ({ color }) => (
-                                    <Ionicons
-                                        name='add-circle'
-                                        color={color}
-                                        size={22}
-                                    />
-                                ),
-                            }}
-                        />
-                        <bButton.Screen
-                            name='Map'
-                            component={Map}
-                            options={{
-                                tabBarColor: "orange",
-                                tabBarIcon: ({ color }) => (
-                                    <Ionicons
-                                        name='map'
-                                        color={color}
-                                        size={22}
-                                    />
-                                ),
-                            }}
-                        />
-                    </bButton.Navigator>
-                </NavigationContainer>
-            </SafeAreaView>
-            // Creates the buttons and sets which page function they call
-        ) // options={{tabBarBadge: 0} can be used to set notification nubers
-    } else {
-        return (
-            <Login
-                login={() => {
-                    setIsLoggedIn(true)
-                    console.log("login")
-                }}
-            />
-        )
+    onAuthStateChanged = (user) => {
+        console.log(firebase.auth().currentUser);
+        this.setState({ isAuthReady: true });
+        this.setState({ isLoggedIn: !!user });
+    };
+
+    render() {
+        if (this.state.isLoggedIn) {
+            return <Nav />;
+        } else {
+            return (
+                <Login
+                    login={() => {
+                        this.setState({ isLoggedIn: true });
+                    }}
+                />
+            );
+        }
     }
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        paddingTop: StatusBar.currentHeight + 12,
-    },
-})
