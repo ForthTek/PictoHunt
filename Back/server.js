@@ -10,13 +10,14 @@ const admin = require("firebase-admin");
 
 const auth = require("./serviceAccountKey.json");
 
+// Initialise the connection
 admin.initializeApp({
   credential: admin.credential.cert(auth),
-  /** FIND DB URL */
-  //databaseURL: "https://server-auth-41acc.firebaseio.com",
 });
 
-const csrfMiddleware = csrf({ cookie: true });
+// Reference to the database
+const db = admin.firestore();
+const storage = admin.storage();
 
 const PORT = process.env.PORT || 5000;
 const app = express();
@@ -27,70 +28,49 @@ app.use(express.static("static"));
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cookieParser());
-app.use(csrfMiddleware);
-
-app.all("*", (req, res, next) => {
-  res.cookie("XSRF-TOKEN", req.csrfToken());
-  next();
-});
-
-app.get("/profile", function (req, res) {
-  const sessionCookie = req.cookies.session || "";
-
-  // Check that the user has the required session cookie
-  admin
-    .auth()
-    .verifySessionCookie(sessionCookie, true /** checkRevoked */)
-    .then(() => {
-      res.render("profile.html");
-    })
-    // If not, force them to login
-    .catch((error) => {
-      res.redirect("/login");
-    });
-});
-
-app.get("/", function (req, res) {
-  res.redirect("/browse");
-});
 
 app.get("/browse", function (req, res) {
-  // Home screen
-});
-
-app.post("/sessionLogin", (req, res) => {
-  const idToken = req.body.idToken.toString();
-
-  // Cookie expires in 5 days
-  const expiresIn = 60 * 60 * 24 * 5 * 1000;
-
-  admin
-    .auth()
-    .createSessionCookie(idToken, { expiresIn })
-    // Create the session cookie for the user
-    .then(
-      (sessionCookie) => {
-        const options = { maxAge: expiresIn, httpOnly: true };
-        res.cookie("session", sessionCookie, options);
-        res.end(JSON.stringify({ status: "success" }));
-      },
-      (error) => {
-        res.status(401).send("UNAUTHORIZED REQUEST!");
-      }
-    );
-});
-
-app.get("/sessionLogout", (req, res) => {
-  res.clearCookie("session");
-  res.redirect("/login");
-});
-
-/** TODO */
-app.get("/api/getUser", (req, res) => {
   (async () => {
-    let value = await api.getUser(USERNAME);
-    console.log(value);
-    res.send(value);
+    const snapshot = await db.collection("Posts").get();
+
+    // Check that there are posts
+    if (snapshot._size > 0) {
+      let posts = [];
+
+      snapshot.forEach(async (doc) => {
+        // Get the tag names from the references
+        let tags = [];
+        for (let i = 0; i < doc.data().tags.length; i++) {
+          tags.push(await doc.data().tags[i].id);
+        }
+
+        // Return the data in a nice format
+        let post = {
+          title: doc.data().title,
+          GPS: doc.data().GPS,
+          channel: await doc.data().channel.id,
+          tags: tags,
+          photos: await doc.data().photos,
+          score: doc.data().score,
+          user: await doc.data().user.id,
+          time: doc._createTime.toDate(),
+        };
+
+        console.log("loaded post from the database:");
+        console.log(post);
+        res.send(post);
+        //posts.push(post);
+      });
+
+      //console.log(posts);
+      //res.send(all);
+    }
+    // Send an error if there are no posts
+    else {
+      const error = "No posts to display";
+      console.log(`ERROR: ${error}`);
+      res.send({ error: error });
+    }
   })();
 });
 

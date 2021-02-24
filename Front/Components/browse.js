@@ -23,7 +23,8 @@ export default class Browse extends Component {
     }
 
     callApi = async () => {
-        const response = await fetch("http://10.0.2.2:5000/api/getBrowse")
+        // http://10.0.2.2:5000/browse
+        const response = await fetch("localhost:5000/browse")
         const body = await response.json()
         if (response.status !== 200) throw Error(body.message)
         return body
