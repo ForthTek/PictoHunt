@@ -2,8 +2,6 @@
 // https://github.com/satansdeer/firebase-server-auth
 // https://www.youtube.com/watch?v=kX8by4eCyG4
 
-const cookieParser = require("cookie-parser");
-const csrf = require("csurf");
 const bodyParser = require("body-parser");
 const express = require("express");
 const admin = require("firebase-admin");
@@ -22,12 +20,10 @@ const storage = admin.storage();
 const PORT = process.env.PORT || 5000;
 const app = express();
 
-app.engine("html", require("ejs").renderFile);
 app.use(express.static("static"));
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(cookieParser());
 
 app.get("/browse", function (req, res) {
   (async () => {
@@ -56,7 +52,7 @@ app.get("/browse", function (req, res) {
           time: doc._createTime.toDate(),
         };
 
-        console.log("loaded post from the database:");
+        console.log("/browse loaded a post from the database:");
         console.log(post);
         res.send(post);
         //posts.push(post);
@@ -71,6 +67,31 @@ app.get("/browse", function (req, res) {
       console.log(`ERROR: ${error}`);
       res.send({ error: error });
     }
+  })();
+});
+
+app.get("/map", function (req, res) {
+  (async () => {
+    const snapshot = await db.collection("Posts").get();
+
+    let posts = [];
+
+    snapshot.forEach(async (doc) => {
+      // Return the data in a nice format
+      let mapPost = {
+        GPS: doc.data().GPS,
+        icon: await doc.data().photos[0],
+        ID: doc.id,
+      };
+
+      console.log("/map loaded a post from the database:");
+      console.log(mapPost);
+      res.send(mapPost);
+      //posts.push(post);
+    });
+
+    //console.log(posts);
+    //res.send(all);
   })();
 });
 
