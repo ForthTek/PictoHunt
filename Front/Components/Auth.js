@@ -10,32 +10,38 @@ const config = {
   measurementId: "G-HDTRBXWKV1",
 };
 
-export default class Auth {
+module.exports = class Auth {
+  #storage;
+
   constructor() {
     if (!firebase.apps.length) {
       firebase.initializeApp(config);
 
-      this.#database = firebase.firestore().ref();
+      // Set private reference to the cloud storage
       this.#storage = firebase.storage().ref();
 
-      console.log("created")
+      console.log("Created connection with firebase");
     }
   }
 
   uploadImages(photoPaths) {
-    /** Reference to the new post */
-    const newReference = this.#database.collection("Posts").doc();
-
+    let photos = [];
     for (let i = 0; i < photoPaths.length; i++) {
-      this.#uploadImage(newReference.id, i, photoPaths[i]);
+      this.#uploadImage(i, photoPaths[i]);
     }
 
     // Return the reference so we can create a post there
     return newReference;
   }
 
-  #uploadImage(newPostName, positionInPost, localPath) {
-    const ref = this.#storage.child(`/Posts/${newPostName}/${positionInPost}}`);
+  #uploadImage(positionInPost, localPath) {
+
+    // Need to somehow get the post id first
+
+    // We should store images in the format
+    // Posts/<random ID>/<position in post>
+    // This will avoid conflicts with names 
+    const ref = this.#storage.child(`/Posts/${}/${positionInPost}}`);
 
     // Don't use this for now
     const metadata = {
@@ -78,4 +84,4 @@ export default class Auth {
       }
     );
   }
-}
+};
