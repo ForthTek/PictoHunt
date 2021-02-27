@@ -56,7 +56,10 @@ module.exports = class API {
   }
 
   async map() {
-    const snapshot = await this.#database.collection("Posts").get();
+    const snapshot = await this.#database
+      .collection("Posts")
+      .where("GPS", "!=", null)
+      .get();
     let posts = [];
 
     // Check that there are posts
@@ -76,35 +79,55 @@ module.exports = class API {
     return posts;
   }
 
+  /**
+   *
+   * @param {string} title
+   * @param {string} channelName
+   * @param {string} username
+   * @param {GeoPoint} GPS
+   * @param {string[]} tags
+   * @param {string[]} photos
+   */
   async createPost(title, channelName, username, GPS, tags, photos) {
     /** Key for the new post */
     const ref = this.#database.collection("Posts").doc();
     const newKey = ref.id;
-    console.log(newKey);
+
+    //console.log(newKey);
     // Maybe we could pass this to the front end so the post photos can be uploaded?
 
-    const channelRef = this.#database.doc(`Channels/${channelName}`);
-    await channelRef.get().then((docSnapshot) => {
-      if (!docSnapshot.exists) {
-        return this.#error(`Channel "${channelRef.path}" does not exist`);
-      }
-    });
-
+    // Get a reference to the user posting this
     const userRef = this.#database.doc(`Users/${username}`);
-    await userRef.get().then((docSnapshot) => {
-      if (!docSnapshot.exists) {
-        return this.#error(`User "${userRef.path}" does not exist`);
-      }
-    });
+    // Throw an error if it does not exist
+    if (!(await userRef.get()).exists) {
+      return this.#error(`User "${userRef.path}" does not exist`);
+    }
 
-    // Tags should be refs as well
+    // Get a reference to the channel
+    const channelRef = this.#database.doc(`Channels/${channelName}`);
+    // Throw an error if it does not exist
+    if (!(await channelRef.get()).exists) {
+      return this.#error(`Channel "${channelRef.path}" does not exist`);
+    }
+
+    // Get refs to all the tags
+    let tagRefs = [];
+    for (let i = 0; i < tags.length; i++) {
+      const tagRef = this.#database.doc(`Tags/${tags[i]}`);
+      // Throw an error if it does not exist
+      if (!(await tagRef.get()).exists) {
+        return this.#error(`Tag "${tagRef.path}" does not exist`);
+      } else {
+        tagRefs.push(tagRef);
+      }
+    }
 
     // Do some input validation stuff here
     const postData = {
       title: title,
       GPS: GPS,
       channel: channelRef,
-      tags: tags,
+      tags: tagRefs,
       photos: photos,
       score: 0,
       user: userRef,
@@ -113,5 +136,38 @@ module.exports = class API {
     // Write the post data to the database
     const x = await ref.set(postData);
     return x;
+  }
+
+  async createTag(name, description, icon, similarTags = []) {
+    const ref = this.#database.doc(`Tags/${name}`);
+
+    // Tag already exists
+    if ((await ref.get()).exists) {
+      return this.#error(`Tag "${ref.path}" already exists`);
+    }
+    // Otherwise, create the tag
+    else {
+
+      let similarTagRefs = [];
+      for(let i = 0; i < similarTags.length; i++) {
+        const similarRef = this.#database.doc(`Tags/${similarTags[i]}`);
+
+        // Tag already exists
+        if (!(await similarRef.get()).exists) {
+          return this.#error(`Tag "${similarRef.path}" does not exist`);
+        }
+        else {
+          similarTagRefs.push(similarRef);
+        }
+      }
+
+      const tag = {
+        description: description,
+        icon: icon,
+        similarTags: similarTagRefs,
+      };
+
+      return await ref.set(tag);
+    }
   }
 };
