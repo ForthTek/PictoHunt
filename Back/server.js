@@ -19,7 +19,8 @@ app.get("/", function (req, res) {
 
 app.get("/browse", function (req, res) {
   (async () => {
-    let posts = await API.getBrowse();
+    // Just get all posts for now
+    let posts = await API.getAllPosts();
 
     console.log("/browse loaded the following posts from the database:");
     console.log(posts);

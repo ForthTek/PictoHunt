@@ -22,33 +22,54 @@ module.exports = class API {
     return { error: message };
   }
 
-  async getBrowse() {
+  #returnPost(doc) {
+    const data = doc.data();
+
+    // Get the tag names from the references
+    let tags = [];
+    for (let i = 0; i < data.tags.length; i++) {
+      tags.push(data.tags[i].id);
+    }
+
+    // Return the data in a nice format
+    let post = {
+      title: data.title,
+      GPS: data.GPS,
+      channel: data.channel.id,
+      tags: tags,
+      photos: data.photos,
+      score: data.score,
+      user: data.user.id,
+      time: doc._createTime.toDate(),
+      ID: doc.id,
+    };
+
+    return post;
+  }
+
+  async getAllPosts() {
     const snapshot = await this.#database.collection("Posts").get();
     let posts = [];
 
     // Check that there are posts
     if (snapshot._size > 0) {
       snapshot.forEach((doc) => {
-        // Get the tag names from the references
-        let tags = [];
-        for (let i = 0; i < doc.data().tags.length; i++) {
-          tags.push(doc.data().tags[i].id);
-        }
+        posts.push(this.#returnPost(doc));
+      });
+    }
 
-        // Return the data in a nice format
-        let post = {
-          title: doc.data().title,
-          GPS: doc.data().GPS,
-          channel: doc.data().channel.id,
-          tags: tags,
-          photos: doc.data().photos,
-          score: doc.data().score,
-          user: doc.data().user.id,
-          time: doc._createTime.toDate(),
-          ID: doc.id,
-        };
+    return posts;
+  }
 
-        posts.push(post);
+  
+  async getBrowse(users, channels, tags) {
+    const snapshot = await this.#database.collection("Posts").get();
+    let posts = [];
+
+    // Check that there are posts
+    if (snapshot._size > 0) {
+      snapshot.forEach((doc) => {
+        posts.push(this.#returnPost(doc));
       });
     }
 
@@ -80,9 +101,9 @@ module.exports = class API {
   }
 
   /**
-   * 
-   * @param {string} username 
-   * @param {boolean} loadFollowedFeeds 
+   *
+   * @param {string} username
+   * @param {boolean} loadFollowedFeeds
    */
   async getProfile(username, loadFollowedFeeds = true) {
     // Get the user with username
