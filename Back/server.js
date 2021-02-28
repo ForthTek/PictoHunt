@@ -19,7 +19,7 @@ app.get("/", function (req, res) {
 
 app.get("/browse", function (req, res) {
   (async () => {
-    let posts = await API.browse();
+    let posts = await API.getBrowse();
 
     console.log("/browse loaded the following posts from the database:");
     console.log(posts);
@@ -30,7 +30,7 @@ app.get("/browse", function (req, res) {
 
 app.get("/map", function (req, res) {
   (async () => {
-    let posts = await API.map();
+    let posts = await API.getMap();
 
     console.log("/map loaded the following posts from the database:");
     console.log(posts);
@@ -38,6 +38,22 @@ app.get("/map", function (req, res) {
     res.send(posts);
   })();
 });
+
+app.get("/profile/:username", function (req, res) {
+  (async () => {
+    const username = req.params.username;
+
+    let profile = await API.getProfile(username);
+
+    console.log(`/profile called with username: ${username}`);
+    console.log(profile);
+
+    res.send(profile);
+  })();
+});
+
+// /profile
+// filter stuff
 
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);

@@ -22,7 +22,7 @@ module.exports = class API {
     return { error: message };
   }
 
-  async browse() {
+  async getBrowse() {
     const snapshot = await this.#database.collection("Posts").get();
     let posts = [];
 
@@ -55,7 +55,7 @@ module.exports = class API {
     return posts;
   }
 
-  async map() {
+  async getMap() {
     const snapshot = await this.#database
       .collection("Posts")
       .where("GPS", "!=", null)
@@ -77,6 +77,64 @@ module.exports = class API {
     }
 
     return posts;
+  }
+
+  /**
+   * 
+   * @param {string} username 
+   * @param {boolean} loadFollowedFeeds 
+   */
+  async getProfile(username, loadFollowedFeeds = true) {
+    // Get the user with username
+    const userRef = this.#database.doc(`Users/${username}`);
+    const userData = await userRef.get();
+
+    // Process the data
+    if (userData.exists) {
+      const data = userData.data();
+
+      let users;
+      let channels;
+      let tags;
+
+      // Only load the followed channels/tags/users if we need to
+      if (loadFollowedFeeds) {
+        users = [];
+        channels = [];
+        tags = [];
+
+        for (let i = 0; i < data.followedUsers.length; i++) {
+          users.push(data.followedUsers[i].id);
+        }
+        for (let i = 0; i < data.followedChannels.length; i++) {
+          channels.push(data.followedChannels[i].id);
+        }
+        for (let i = 0; i < data.followedTags.length; i++) {
+          tags.push(data.followedTags[i].id);
+        }
+      }
+
+      let user = {
+        username: username,
+        email: data.email,
+        public: data.public,
+        score: data.score,
+        createdProfile: userData._createTime,
+        totalUsersFollowing: data.followedUsers.length,
+        totalChannelsFollowing: data.followedChannels.length,
+        totalTagsFollowing: data.followedTags.length,
+        loadedFollowedFeeds: loadFollowedFeeds,
+        followedUsers: users,
+        followedChannels: channels,
+        followedTags: tags,
+      };
+
+      return user;
+    }
+    // Throw an error if the user does not exist
+    else {
+      return this.#error(`User "${userRef.path}" does not exist`);
+    }
   }
 
   /**
@@ -147,16 +205,14 @@ module.exports = class API {
     }
     // Otherwise, create the tag
     else {
-
       let similarTagRefs = [];
-      for(let i = 0; i < similarTags.length; i++) {
+      for (let i = 0; i < similarTags.length; i++) {
         const similarRef = this.#database.doc(`Tags/${similarTags[i]}`);
 
         // Tag already exists
         if (!(await similarRef.get()).exists) {
           return this.#error(`Tag "${similarRef.path}" does not exist`);
-        }
-        else {
+        } else {
           similarTagRefs.push(similarRef);
         }
       }
