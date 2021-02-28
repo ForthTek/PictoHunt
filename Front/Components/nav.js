@@ -27,7 +27,7 @@ export default class Nav extends Component {
                             name='Home'
                             component={Home}
                             options={{
-                                tabBarColor: "black",
+                                tabBarColor: "purple",
                                 tabBarIcon: ({ color }) => (
                                     <Ionicons
                                         name='person-circle'

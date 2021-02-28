@@ -28,20 +28,14 @@ export default function ForgotPass(props) {
     };
 
     return (
-        <SafeAreaView style={{ paddingTop: "50%" }}>
-            <Text style={{ paddingBottom: "20%" }}>Forgot Password</Text>
+        <SafeAreaView style={styles.container}>
+            <Text style={{ fontSize: 30 }}>Forgot Password</Text>
 
-            <View
-                style={{
-                    flexDirection: "row",
-                    paddingBottom: "5%",
-                    justifyContent: "space-between",
-                }}
-            >
-                <Text style={styles.email}>Email:</Text>
+            <View style={styles.container0}>
+                <Text style={{ fontSize: 20 }}>Email:</Text>
 
                 <TextInput
-                    style={styles.input2}
+                    style={styles.input}
                     onChangeText={(text) => onChangeEmail(text)}
                     value={email}
                     placeholder='Email'
@@ -49,13 +43,16 @@ export default function ForgotPass(props) {
                     autoCorrect={false}
                     keyboardType='email-address'
                 />
+                <View style={styles.button}>
+                    <Button
+                        onPress={onResetPassword}
+                        title='Send Password Reset Email'
+                    ></Button>
+                </View>
             </View>
-            <Button
-                style={styles.button}
-                onPress={onResetPassword}
-                title='Send Password Reset Email'
-            ></Button>
-            <Button title='back' onPress={props.back} style={styles.button} />
+            <View style={styles.button0}>
+                <Button title='back' onPress={props.back} />
+            </View>
         </SafeAreaView>
     );
 }
@@ -63,27 +60,32 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        padding: "1%",
+        paddingTop: "10%",
+        justifyContent: "space-between",
+        alignContent: "space-around",
     },
-    email: {
-        fontSize: 20,
-        paddingBottom: "10%",
-        paddingRight: "16.6%",
-        paddingTop: "0%",
+    container0: {
+        flex: 1,
+        backgroundColor: "#fff",
+        paddingLeft: "10%",
+        justifyContent: "center",
+        maxWidth: "90%",
     },
-    input2: {
+    button: {
+        paddingTop: "5%",
+        paddingBottom: "5%",
+    },
+    button0: {
+        maxWidth: "90%",
+        paddingLeft: "10%",
+        paddingTop: "5%",
+        paddingBottom: "5%",
+    },
+    input: {
         height: 45,
         borderColor: "gray",
         borderWidth: 1,
-        marginBottom: "0%",
-        width: "70%",
         fontSize: 20,
         color: "gray",
-    },
-    button: {
-        fontSize: 18,
-        paddingTop: "5%",
-        paddingBottom: "10%",
-        color: "red",
     },
 });

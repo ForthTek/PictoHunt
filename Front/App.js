@@ -1,7 +1,7 @@
 import React, { useState, Component } from "react";
 import { StyleSheet, StatusBar } from "react-native";
 
-import Login from "./Components/login";
+import Login from "./Components/Login/login";
 import Nav from "./Components/nav";
 
 import Auth from "./Components/Auth";
@@ -35,7 +35,9 @@ export default class App extends Component {
     }
 
     onAuthStateChanged = (user) => {
-        console.log(firebase.auth().currentUser);
+        if (firebase.auth().currentUser) {
+            console.log(firebase.auth().currentUser.email);
+        }
         this.setState({ isAuthReady: true });
         this.setState({ isLoggedIn: !!user });
     };
