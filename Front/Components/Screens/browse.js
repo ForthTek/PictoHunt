@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native";
-import Post from "./post";
-import SinglePost from "./singlePost";
+import Post from "../post";
+import SinglePost from "../singlePost";
 
 export default class Browse extends Component {
     // Browse Page

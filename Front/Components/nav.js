@@ -7,11 +7,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs"; // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
 
-import Home from "./home";
-import Browse from "./browse";
-import Channels from "./channels";
-import Upload from "./UploadScreen";
-import Map from "./map";
+import Home from "./Screens/home";
+import Browse from "./Screens/browse";
+import Channels from "./Screens/channels";
+import Upload from "./Screens/UploadScreen";
+import Map from "./Screens/map";
 
 const bButton = createMaterialBottomTabNavigator(); // Create the bottom tab bar
 

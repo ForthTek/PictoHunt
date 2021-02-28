@@ -1,9 +1,7 @@
 import React from "react";
 import { View, StyleSheet, SafeAreaView, TextInput } from "react-native";
-import Upload from "./upload";
-export default function Map() {
-    // Map Page
-
+import Upload from "../upload";
+export default function UploadScreen() {
     const [value, onChangeText] = React.useState("Useless Placeholder");
 
     return (

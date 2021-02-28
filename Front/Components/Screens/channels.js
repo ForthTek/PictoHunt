@@ -1,6 +1,6 @@
-import React, { Component } from "react"
-import { FlatList, StyleSheet, SafeAreaView, View, Text } from "react-native"
-import Channel from "./channel"
+import React, { Component } from "react";
+import { FlatList, StyleSheet, SafeAreaView, View, Text } from "react-native";
+import Channel from "../channel";
 
 export default class Channels extends Component {
     // Channel Page
@@ -8,24 +8,24 @@ export default class Channels extends Component {
     state = {
         isLoading: true,
         DATA: "",
-    }
+    };
 
     componentDidMount() {
         this.callApi()
             .then((res) => {
-                this.setState({ DATA: res })
-                this.setState({ isLoading: false })
+                this.setState({ DATA: res });
+                this.setState({ isLoading: false });
             })
-            .catch((err) => console.log(err))
+            .catch((err) => console.log(err));
     }
 
     callApi = async () => {
-        const response = await fetch("http://10.0.2.2:5000/api/getChannels")
-        const body = await response.json()
-        if (response.status !== 200) throw Error(body.message)
+        const response = await fetch("http://10.0.2.2:5000/api/getChannels");
+        const body = await response.json();
+        if (response.status !== 200) throw Error(body.message);
 
-        return body
-    }
+        return body;
+    };
 
     render() {
         if (this.state.isLoading) {
@@ -33,7 +33,7 @@ export default class Channels extends Component {
                 <View style={styles.container}>
                     <Text>Loading</Text>
                 </View>
-            )
+            );
         } else {
             return (
                 <SafeAreaView style={styles.postCon}>
@@ -47,7 +47,7 @@ export default class Channels extends Component {
                         keyExtractor={(item) => item.name}
                     />
                 </SafeAreaView>
-            )
+            );
         }
     }
 }
@@ -68,4 +68,4 @@ const styles = StyleSheet.create({
         borderTopWidth: 1,
         borderBottomWidth: 1,
     },
-})
+});
