@@ -10,25 +10,30 @@ const config = {
   measurementId: "G-HDTRBXWKV1",
 };
 
-class Connection {
-  #database;
-  #storage;
+export default class Connection {
+  database;
+  storage;
 
   constructor() {
     // Initialise the connection
     firebase.initializeApp(config);
 
-    this.#storage = firebase.storage();
-    this.#database = firebase.firestore();
+    //this.storage = firebase.storage();
+    this.database = firebase.firestore();
 
-    console.log("Created connection to Firebase");
+    console.log("*Created connection to Firebase");
   }
 
-  #error(message) {
+  close() {
+    //firebase.off();
+    console.log("*Closed connection to Firebase");
+  }
+
+  error(message) {
     return { error: message };
   }
 
-  #returnPost(doc) {
+  returnPost(doc) {
     const data = doc.data();
 
     // Get the tag names from the references
@@ -54,13 +59,13 @@ class Connection {
   }
 
   async getAllPosts() {
-    const snapshot = await this.#database.collection("Posts").get();
+    const snapshot = await this.database.collection("Posts").get();
     let posts = [];
 
     // Check that there are posts
     if (snapshot._size > 0) {
       snapshot.forEach((doc) => {
-        posts.push(this.#returnPost(doc));
+        posts.push(this.returnPost(doc));
       });
     }
 
@@ -68,13 +73,13 @@ class Connection {
   }
 
   async getBrowse(users, channels, tags) {
-    const snapshot = await this.#database.collection("Posts").get();
+    const snapshot = await this.database.collection("Posts").get();
     let posts = [];
 
     // Check that there are posts
     if (snapshot._size > 0) {
       snapshot.forEach((doc) => {
-        posts.push(this.#returnPost(doc));
+        posts.push(this.returnPost(doc));
       });
     }
 
@@ -82,7 +87,7 @@ class Connection {
   }
 
   async getMap() {
-    const snapshot = await this.#database
+    const snapshot = await this.database
       .collection("Posts")
       .where("GPS", "!=", null)
       .get();
@@ -112,7 +117,7 @@ class Connection {
    */
   async getProfile(username, loadFollowedFeeds = true) {
     // Get the user with username
-    const userRef = this.#database.doc(`Users/${username}`);
+    const userRef = this.database.doc(`Users/${username}`);
     const userData = await userRef.get();
 
     // Process the data
@@ -159,7 +164,7 @@ class Connection {
     }
     // Throw an error if the user does not exist
     else {
-      return this.#error(`User "${userRef.path}" does not exist`);
+      return this.error(`User "${userRef.path}" does not exist`);
     }
   }
 
@@ -174,33 +179,33 @@ class Connection {
    */
   async createPost(title, channelName, username, GPS, tags, photos) {
     /** Key for the new post */
-    const ref = this.#database.collection("Posts").doc();
+    const ref = this.database.collection("Posts").doc();
     const newKey = ref.id;
 
     //console.log(newKey);
     // Maybe we could pass this to the front end so the post photos can be uploaded?
 
     // Get a reference to the user posting this
-    const userRef = this.#database.doc(`Users/${username}`);
+    const userRef = this.database.doc(`Users/${username}`);
     // Throw an error if it does not exist
     if (!(await userRef.get()).exists) {
-      return this.#error(`User "${userRef.path}" does not exist`);
+      return this.error(`User "${userRef.path}" does not exist`);
     }
 
     // Get a reference to the channel
-    const channelRef = this.#database.doc(`Channels/${channelName}`);
+    const channelRef = this.database.doc(`Channels/${channelName}`);
     // Throw an error if it does not exist
     if (!(await channelRef.get()).exists) {
-      return this.#error(`Channel "${channelRef.path}" does not exist`);
+      return this.error(`Channel "${channelRef.path}" does not exist`);
     }
 
     // Get refs to all the tags
     let tagRefs = [];
     for (let i = 0; i < tags.length; i++) {
-      const tagRef = this.#database.doc(`Tags/${tags[i]}`);
+      const tagRef = this.database.doc(`Tags/${tags[i]}`);
       // Throw an error if it does not exist
       if (!(await tagRef.get()).exists) {
-        return this.#error(`Tag "${tagRef.path}" does not exist`);
+        return this.error(`Tag "${tagRef.path}" does not exist`);
       } else {
         tagRefs.push(tagRef);
       }
@@ -223,21 +228,21 @@ class Connection {
   }
 
   async createTag(name, description, icon, similarTags = []) {
-    const ref = this.#database.doc(`Tags/${name}`);
+    const ref = this.database.doc(`Tags/${name}`);
 
     // Tag already exists
     if ((await ref.get()).exists) {
-      return this.#error(`Tag "${ref.path}" already exists`);
+      return this.error(`Tag "${ref.path}" already exists`);
     }
     // Otherwise, create the tag
     else {
       let similarTagRefs = [];
       for (let i = 0; i < similarTags.length; i++) {
-        const similarRef = this.#database.doc(`Tags/${similarTags[i]}`);
+        const similarRef = this.database.doc(`Tags/${similarTags[i]}`);
 
         // Tag already exists
         if (!(await similarRef.get()).exists) {
-          return this.#error(`Tag "${similarRef.path}" does not exist`);
+          return this.error(`Tag "${similarRef.path}" does not exist`);
         } else {
           similarTagRefs.push(similarRef);
         }
@@ -256,20 +261,20 @@ class Connection {
   uploadImages(photoPaths) {
     let photos = [];
     for (let i = 0; i < photoPaths.length; i++) {
-      this.#uploadImage(i, photoPaths[i]);
+      this.uploadImage(i, photoPaths[i]);
     }
 
     // Return the reference so we can create a post there
     return newReference;
   }
 
-  #uploadImage(positionInPost, localPath) {
+  uploadImage(positionInPost, localPath) {
     // Need to somehow get the post id first
 
     // We should store images in the format
     // Posts/<random ID>/<position in post>
     // This will avoid conflicts with names
-    const ref = this.#storage.child(`/Posts/${""}/${positionInPost}}`);
+    const ref = this.storage.child(`/Posts/${""}/${positionInPost}}`);
 
     // Don't use this for now
     const metadata = {
