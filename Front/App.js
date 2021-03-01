@@ -4,7 +4,6 @@ import { StyleSheet, StatusBar } from "react-native";
 import Login from "./Components/Login/login";
 import Nav from "./Components/nav";
 
-import Auth from "./Components/Auth";
 import * as firebase from "firebase";
 
 //auth = new Auth();

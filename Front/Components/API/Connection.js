@@ -10,7 +10,7 @@ const config = {
   measurementId: "G-HDTRBXWKV1",
 };
 
-module.exports = class Connection {
+class Connection {
   #database;
   #storage;
 

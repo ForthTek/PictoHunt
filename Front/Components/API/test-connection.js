@@ -1,21 +1,25 @@
-const APIClass = require("./API.js");
-const API = new APIClass();
+import Connection from "./Connection";
 
-(async () => {
-  console.log(await API.createTag("TestTag", "desc", null, ["TestTag2"]));
-})();
+function run() {
 
-(async () => {
-  console.log(
-    await API.createPost(
-      "test title",
-      "TestChannel",
-      "TestUser",
-      null,
-      ["TestTag", "TestTag0"],
-      ["photo1", "photo2"]
-    )
-  );
-})();
+  console.log("RUNNING API TEST");
 
+  const connection = new Connection();
 
+  (async () => {
+    console.log(
+      await connection.createTag("TestTag", "desc", null, ["TestTag2"])
+    );
+
+    console.log(
+      await connection.createPost(
+        "test title",
+        "TestChannel",
+        "TestUser",
+        null,
+        ["TestTag", "TestTag0"],
+        ["photo1", "photo2"]
+      )
+    );
+  })();
+}
