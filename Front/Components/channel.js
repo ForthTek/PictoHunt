@@ -1,13 +1,13 @@
-import React, { Component } from "react"
-import { Text, StyleSheet, View, Image } from "react-native"
+import React, { Component } from "react";
+import { Text, StyleSheet, View, Image } from "react-native";
 
-class Post extends Component {
+class Channel extends Component {
     constructor(props) {
-        super(props)
+        super(props);
         this.state = {
             name: this.props.item.name,
             description: this.props.item.description,
-        }
+        };
     }
 
     render() {
@@ -22,10 +22,10 @@ class Post extends Component {
                     <Text style={styles.info}>{this.state.description}</Text>
                 </View>
             </View>
-        )
+        );
     }
 }
-export default Post
+export default Channel;
 
 const styles = StyleSheet.create({
     container: {
@@ -51,4 +51,4 @@ const styles = StyleSheet.create({
         fontSize: 15,
         paddingBottom: "3%",
     },
-})
+});
