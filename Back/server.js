@@ -53,8 +53,17 @@ app.get("/profile/:username", function (req, res) {
   })();
 });
 
-// /profile
-// filter stuff
+app.get("/channel/:name", function (req, res) {
+  (async () => {})();
+});
+
+app.get("/tag/:name", function (req, res) {
+  (async () => {})();
+});
+
+app.get("/post/:ID", function (req, res) {
+  (async () => {})();
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on http://localhost:${PORT}`);
