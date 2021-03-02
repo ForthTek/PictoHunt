@@ -1,4 +1,8 @@
-import * as firebase from "firebase";
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+
+import Upload from "./Upload.js";
 
 const config = {
   apiKey: "AIzaSyCvQv_waR8vtFZIrmHlgVexp0VrrGNwGBE",
@@ -13,15 +17,15 @@ const config = {
 export default class Connection {
   database;
   auth;
-  storage;
+  upload;
 
   constructor() {
     // Initialise the connection
     firebase.initializeApp(config);
-
-    //this.storage = firebase.storage();
     this.database = firebase.firestore();
     this.auth = firebase.auth();
+
+    this.upload = new Upload(firebase);
 
     console.log("*Created connection to Firebase");
   }
@@ -106,25 +110,6 @@ export default class Connection {
     return { success: success, error: error };
   }
 
-  // Use this for personalisation
-  //   var user = firebase.auth().currentUser;
-
-  // if (user) {
-  //   // User is signed in.
-  // } else {
-  //   // No user is signed in.
-  // }
-
-  // if (user != null) {
-  //   name = user.displayName;
-  //   email = user.email;
-  //   photoUrl = user.photoURL;
-  //   emailVerified = user.emailVerified;
-  //   uid = user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
-  //                    // this value to authenticate with your backend server, if
-  //                    // you have one. Use User.getToken() instead.
-  // }
-
   returnPost(doc) {
     const data = doc.data();
 
@@ -178,8 +163,6 @@ export default class Connection {
       const username = await this.getUsernameForEmail(user.email);
       const profile = await this.getProfile(username, true);
       let dictionary = {};
-
-
     }
     // Not signed in
     else {
@@ -299,22 +282,21 @@ export default class Connection {
     return { success: success, error: error };
   }
 
-  /**
-   *
-   * @param {string} title
-   * @param {string} channelName
-   * @param {string} username
-   * @param {GeoPoint} GPS
-   * @param {string[]} tags
-   * @param {string[]} photos
-   */
-  async createPost(title, channelName, username, GPS, tags, photos) {
-    /** Key for the new post */
+
+
+// SHOULD TAKE ARRAY OF FILE OBJECTS FOR IMAGES
+// THESE CAN BE UPLOADED STRAIGHT AWAY TO STORAGE 
+// SHOULD HAVE THE FILE TYPE KNOWN
+
+  async createPost(title, channelName, GPS, tags, photos) {
+    const user = this.auth.currentUser;
+    const username = await this.getUsernameForEmail(user.email);
+
     const ref = this.database.collection("Posts").doc();
     const newKey = ref.id;
 
-    //console.log(newKey);
-    // Maybe we could pass this to the front end so the post photos can be uploaded?
+    // upload the images 
+    URLs = await this.upload.uploadImagesForPost(newKey, photos);
 
     // Get a reference to the user posting this
     const userRef = this.database.doc(`Users/${username}`);
@@ -348,14 +330,14 @@ export default class Connection {
       GPS: GPS,
       channel: channelRef,
       tags: tagRefs,
-      photos: photos,
+      photos: URLs,
       score: 0,
       user: userRef,
     };
 
     // Write the post data to the database
-    const x = await ref.set(postData);
-    return x;
+    await ref.set(postData);
+    return newKey;
   }
 
   async createTag(name, description, icon, similarTags = []) {
@@ -387,65 +369,5 @@ export default class Connection {
 
       return await ref.set(tag);
     }
-  }
-
-  uploadImages(photoPaths) {
-    let photos = [];
-    for (let i = 0; i < photoPaths.length; i++) {
-      this.uploadImage(i, photoPaths[i]);
-    }
-
-    // Return the reference so we can create a post there
-    return newReference;
-  }
-
-  uploadImage(positionInPost, localPath) {
-    // Need to somehow get the post id first
-
-    // We should store images in the format
-    // Posts/<random ID>/<position in post>
-    // This will avoid conflicts with names
-    const ref = this.storage.child(`/Posts/${""}/${positionInPost}}`);
-
-    // Don't use this for now
-    const metadata = {
-      contentType: "image/jpeg",
-    };
-
-    // Upload the file
-    var uploadTask = ref.put(localPath);
-
-    // Register three observers:
-    // 1. 'state_changed' observer, called any time the state changes
-    // 2. Error observer, called on failure
-    // 3. Completion observer, called on successful completion
-    uploadTask.on(
-      "state_changed",
-      (snapshot) => {
-        // Observe state change events such as progress, pause, and resume
-        // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        var progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log("Upload is " + progress + "% done");
-        switch (snapshot.state) {
-          case firebase.storage.TaskState.PAUSED: // or 'paused'
-            console.log("Upload is paused");
-            break;
-          case firebase.storage.TaskState.RUNNING: // or 'running'
-            console.log("Upload is running");
-            break;
-        }
-      },
-      (error) => {
-        // Handle unsuccessful uploads
-        console.log(error);
-      },
-      () => {
-        // Handle successful uploads on complete
-        // For instance, get the download URL: https://firebasestorage.googleapis.com/...
-        uploadTask.snapshot.ref.getDownloadURL().then((downloadURL) => {
-          console.log("File available at", downloadURL);
-        });
-      }
-    );
   }
 }

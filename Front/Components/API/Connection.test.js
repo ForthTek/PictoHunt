@@ -9,7 +9,12 @@ const connection = new Connection();
 
 describe("misc tests", () => {
   beforeAll(async () => {
-    await connection.createProfile(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD, false);
+    await connection.createProfile(
+      TEST_EMAIL,
+      TEST_USERNAME,
+      TEST_PASSWORD,
+      false
+    );
     await connection.logout();
   });
 
@@ -44,8 +49,13 @@ describe("auth tests", () => {
     await connection.logout();
 
     // Ensure that the account has been created
-    let x = await connection.createProfile(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD, false);
-    if(!x.success) {
+    let x = await connection.createProfile(
+      TEST_EMAIL,
+      TEST_USERNAME,
+      TEST_PASSWORD,
+      false
+    );
+    if (!x.success) {
       //console.log(x.error);
     }
   });
@@ -62,14 +72,22 @@ describe("auth tests", () => {
     expect(x.success).toBe(true);
   });
 
-  test("auth getAllPosts", async () => {
-    let x = await connection.getAllPosts();
-    expect(x.length).toBeGreaterThan(0);
-  });
-
   test("auth getBrowse", async () => {
     let x = await connection.getBrowse();
     expect(x.length).toBeGreaterThan(0);
+  });
+
+  test.only("auth createPost", async () => {
+    await connection.login(TEST_EMAIL, TEST_PASSWORD);
+    let postID = await connection.createPost(
+      "my new post",
+      "TestChannel",
+      null,
+      ["TestTag"],
+      ["./photos/dog1.jpg"]
+    );
+    console.log(`uploaded new post ${postID}`);
+    //expect(x.length).toBeGreaterThan(0);
   });
 
   test("auth logout", async () => {
