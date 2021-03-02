@@ -1,3 +1,4 @@
+// Imports all the stuff needed
 import React, {useState, useEffect, Component} from "react";
 import { Text, StyleSheet, SafeAreaView, View, Image , Alert } from "react-native";
 import MapView, { Marker } from 'react-native-maps';
@@ -5,24 +6,26 @@ import Geolocation from 'react-native-geolocation-service';
 import * as Location from 'expo-location';
 import * as Permissions from 'expo-permissions';
 import Geocoder from 'react-native-geocoding';
-
 import * as firebase from 'firebase/app';
 import 'firebase/firestore';
 
-Geocoder.init('AIzaSyBcGAtTu4TlPOaWcObIqQisYnvEvlAqH1Y', {language : "en"});
-
+// NOTE: internal commentary dosn't have spell check, sorry
 
 
 export default class Map extends Component{
-    // Map Page
+    // Constructor that inits some variables
     constructor() {
       super();
+      // Inits the state object
       this.state={
+        // Inits the users coords to default 0, 0 and as zoomed out as possible
         latitude: 0,
         longitude: 0,
         latitudeDelta: 200,
         longitudeDelta: 200,
+        // The location has not been set so this defaults to false
         locationset: false,
+        // Empty set for the map markers to be put in
         MarkerArray: [],
       }
     }
@@ -30,36 +33,51 @@ export default class Map extends Component{
   async componentDidMount() {
     console.log("Components mounted.");
     try {
+      // Asks the user for permission
       let { status } = await Location.requestPermissionsAsync();
-       if (status !== 'granted') {
-         console.log("Location Premission Refused!");
+      // If permission is not given an alert is given
+       if (status !== "granted") {
+         console.log("Location Premission Not Granted!");
          this.setState({ locationset: true })
          Alert.alert("Location Premission Not Granted!", "To have this screen default to your location please enable location services for this app.")
          return;
        }
+       // Gets the last known location of the user
        let location = await Location.getLastKnownPositionAsync();
+       // Saves it in the state varable
        this.setState({ latitude: location.coords.latitude })
        this.setState({ longitude: location.coords.longitude })
        this.setState({ latitudeDelta: 0.2 })
        this.setState({ longitudeDelta: 0.2 })
        this.setState({ locationset: true })
+       // If an error occurs, such as the emulator not have a location set it is caught and an alert is made.
     } catch (error) {
        console.log(error);
        Alert.alert("Error reading location!", "If using an Emulator please ensure a location is selected in the emulator options.")
        this.setState({ locationset: true })
     }
 
+      // Gets the array of markers with locations
+      // Converts to json
+      // Puts in the state variable MarkerArray
+      // Catches any arror with the marker obtaining and makes an alert
       fetch('http://10.0.2.2:5000/map')
       .then((response) => response.json())
       .then((response) => {
         this.setState({ MarkerArray: response })
       })
       .catch((error) => {
-       console.log("Error",error);
+        Alert.alert("Error loading pictures!", "Could not load the markers from the server.")
+       console.log("Error loading pictures!");
      });
   }
 
   render(){
+    // Unexplained thing, possibly due to the async being used above the app would ignore the componentDidMount() at first,
+    // it would be run later but this would result in the map being generated with defualt values, this stops it by not allowing the map to be
+    // genereated untill the users location has been atempted to be obtained, thats why this.state.locationset is used
+
+    // Generates the map using the user location as its inital region, then a function adds all the markers from the MarkerArray
     if(this.state.locationset == true){
       return(
           <SafeAreaView style={styles.container}>
@@ -88,10 +106,12 @@ export default class Map extends Component{
           </SafeAreaView>
       )
     } else {
+      // In case the program hasnt attempted to get the user location
       return(null)
     }
   }
 }
+// css style stuff
 const styles = StyleSheet.create({
     container: {
         flex: 1,
