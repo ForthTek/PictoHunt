@@ -1,6 +1,7 @@
 import Connection from "./Connection.js";
 
 const TEST_EMAIL = "forthtek1@gmail.com";
+const TEST_USERNAME = "Test";
 const TEST_PASSWORD = "password";
 
 // Create the connection at the start
@@ -16,12 +17,25 @@ describe("guest tests", () => {
     let x = await connection.getAllPosts();
     expect(x.length).toBeGreaterThan(0);
   });
+
+  test("guest getBrowse", async () => {
+    // A guest user viewing browse should see all posts
+    const numberOfAllPosts = (await connection.getAllPosts()).length;
+    const numberOfBrowse = (await connection.getBrowse()).length;
+    expect(numberOfBrowse).toBe(numberOfAllPosts);
+  });
 });
 
 // Tests when the user is authenticated
 describe("auth tests", () => {
   beforeAll(async () => {
     await connection.logout();
+
+    // Ensure that the account has been created
+    let x = await connection.createProfile(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD, false);
+    if(!x.success) {
+      //console.log(x.error);
+    }
   });
 
   test("auth login", async () => {
@@ -38,6 +52,11 @@ describe("auth tests", () => {
 
   test("auth getAllPosts", async () => {
     let x = await connection.getAllPosts();
+    expect(x.length).toBeGreaterThan(0);
+  });
+
+  test("auth getBrowse", async () => {
+    let x = await connection.getBrowse();
     expect(x.length).toBeGreaterThan(0);
   });
 

@@ -27,7 +27,7 @@ export default class Connection {
   }
 
   close() {
-    firebase.app().delete()
+    firebase.app().delete();
     console.log("*Closed connection to Firebase");
   }
 
@@ -40,8 +40,21 @@ export default class Connection {
 
     await this.auth
       .signInWithEmailAndPassword(email, password)
-      .then(() => {
-        success = true;
+      .then(async () => {
+        // Now we should check that the user has an account
+        await this.database
+          .collection("Users")
+          .where("email", "==", email)
+          .limit(1)
+          .get()
+          .then((snapshot) => {
+            // Use empty or size properties as this is a query not a reference
+            if (!snapshot.empty) {
+              success = true;
+            } else {
+              throw Error("Auth valid but account doesn't exist in database");
+            }
+          });
       })
       .catch((err) => {
         success = false;
@@ -132,17 +145,47 @@ export default class Connection {
   }
 
   async getBrowse() {
-    const snapshot = await this.database.collection("Posts").get();
-    let posts = [];
+    const user = this.auth.currentUser;
 
-    // Check that there are posts
-    if (snapshot._size > 0) {
-      snapshot.forEach((doc) => {
-        posts.push(this.returnPost(doc));
-      });
+    // User is signed in
+    if (user != null) {
+      return await this.getAllPosts();
+
+      let email = user.email;
+      let dictionary = {};
+
+      const profile = this.database
+        .collection("Users")
+        .where("email", "==", email);
+
+      if (!profile.exists) {
+        console.log("DOESNT EXIST");
+      }
+      console.log(profile);
+      return;
+
+      const userData = await userRef.get();
+
+      await this.database
+        .collection("Posts")
+        .get()
+        .then((querySnapshot) => {
+          querySnapshot.forEach((doc) => {
+            posts.push(this.returnPost(doc));
+          });
+        })
+        .catch((error) => {
+          console.log("Error getting documents: ", error);
+        });
+
+      let posts = [];
+
+      return posts;
     }
-
-    return posts;
+    // Not signed in
+    else {
+      return await this.getAllPosts();
+    }
   }
 
   async getMap() {
@@ -225,6 +268,36 @@ export default class Connection {
     else {
       return this.error(`User "${userRef.path}" does not exist`);
     }
+  }
+
+  async createProfile(email, username, password, isPublic = true) {
+    let success, error;
+
+    await this.auth
+      .createUserWithEmailAndPassword(email, password)
+      .then(async () => {
+        const userData = {
+          email: email,
+          public: isPublic,
+          score: 0,
+          followedUsers: [],
+          followedTags: [],
+          followedChannels: [],
+        };
+
+        // Now we should create the profile
+        const ref = await this.database.doc(`Users/${username}`);
+        ref.set(userData);
+
+        success = true;
+      })
+      .catch((err) => {
+        success = false;
+        error = err.message;
+      });
+
+    // Return the success status for tests and error message if there is one
+    return { success: success, error: error };
   }
 
   /**
