@@ -33,6 +33,38 @@ export default class Connection {
     return { error: message };
   }
 
+  async login(email, password) {
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
+      .then(
+        () => {},
+        (error) => {
+          Alert.alert(error.message);
+          console.log(error);
+        }
+      );
+  }
+
+  // Use this for personalisation
+  //   var user = firebase.auth().currentUser;
+
+  // if (user) {
+  //   // User is signed in.
+  // } else {
+  //   // No user is signed in.
+  // }
+
+  // if (user != null) {
+  //   name = user.displayName;
+  //   email = user.email;
+  //   photoUrl = user.photoURL;
+  //   emailVerified = user.emailVerified;
+  //   uid = user.uid;  // The user's ID, unique to the Firebase project. Do NOT use
+  //                    // this value to authenticate with your backend server, if
+  //                    // you have one. Use User.getToken() instead.
+  // }
+
   returnPost(doc) {
     const data = doc.data();
 
@@ -51,7 +83,7 @@ export default class Connection {
       photos: data.photos,
       score: data.score,
       user: data.user.id,
-      time: doc._createTime.toDate(),
+      //time: doc._createTime.toDate(),
       ID: doc.id,
     };
 
@@ -59,20 +91,24 @@ export default class Connection {
   }
 
   async getAllPosts() {
-    const snapshot = await this.database.collection("Posts").get();
     let posts = [];
 
-    // Check that there are posts
-    if (snapshot._size > 0) {
-      snapshot.forEach((doc) => {
-        posts.push(this.returnPost(doc));
+    await this.database
+      .collection("Posts")
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          posts.push(this.returnPost(doc));
+        });
+      })
+      .catch((error) => {
+        console.log("Error getting documents: ", error);
       });
-    }
 
     return posts;
   }
 
-  async getBrowse(users, channels, tags) {
+  async getBrowse() {
     const snapshot = await this.database.collection("Posts").get();
     let posts = [];
 
@@ -317,4 +353,4 @@ export default class Connection {
       }
     );
   }
-};
+}
