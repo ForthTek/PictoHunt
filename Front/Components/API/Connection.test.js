@@ -1,18 +1,20 @@
 import Connection from "./Connection.js";
 
+const TEST_EMAIL = "forthtek1@gmail.com";
+const TEST_PASSWORD = "password";
+
 const connection = new Connection();
 
 test("test login", async () => {
-  try {
-    await connection.login("test@test.test", "password");
-    expect(true).toBe(true);
-  } catch (error) {
-    console.log("FAILED TO SIGN IN");
-    console.log(error);
+  let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
 
-    // Fail if we can't sign in
-    expect(true).toBe(false);
+  // If this test fails, the test account could be locked/suspended
+  // Print the message if there is one
+  if (!x.success) {
+    console.log(x.error);
   }
+
+  expect(x.success).toBe(true);
 });
 
 test("test getAllPosts", async () => {

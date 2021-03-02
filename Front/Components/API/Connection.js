@@ -12,6 +12,7 @@ const config = {
 
 export default class Connection {
   database;
+  auth;
   storage;
 
   constructor() {
@@ -20,6 +21,7 @@ export default class Connection {
 
     //this.storage = firebase.storage();
     this.database = firebase.firestore();
+    this.auth = firebase.auth();
 
     console.log("*Created connection to Firebase");
   }
@@ -34,16 +36,20 @@ export default class Connection {
   }
 
   async login(email, password) {
-    firebase
-      .auth()
+    let success, error;
+
+    await this.auth
       .signInWithEmailAndPassword(email, password)
-      .then(
-        () => {},
-        (error) => {
-          Alert.alert(error.message);
-          console.log(error);
-        }
-      );
+      .then(() => {
+        success = true;
+      })
+      .catch((err) => {
+        success = false;
+        error = err.message;
+      });
+
+    // return the success status for tests and error message if there is one
+    return { success: success, error: error };
   }
 
   // Use this for personalisation
