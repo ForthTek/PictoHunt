@@ -35,6 +35,30 @@ export default class Connection {
     return { error: message };
   }
 
+  async getUsernameForEmail(email) {
+    let username;
+
+    // Now we should check that the user has an account
+    await this.database
+      .collection("Users")
+      .where("email", "==", email)
+      .limit(1)
+      .get()
+      .then((querySnapshot) => {
+        // Use empty or size properties as this is a query not a reference
+        if (querySnapshot.size == 1) {
+          username = querySnapshot.docs[0].ref.id;
+        } else {
+          throw Error(`Email ${email} does not have a profile`);
+        }
+      })
+      .catch((error) => {
+        throw error;
+      });
+
+    return username;
+  }
+
   async login(email, password) {
     let success, error;
 
@@ -148,39 +172,14 @@ export default class Connection {
     const user = this.auth.currentUser;
 
     // User is signed in
-    if (user != null) {
-      return await this.getAllPosts();
 
-      let email = user.email;
+    // user != null
+    if (false) {
+      const username = await this.getUsernameForEmail(user.email);
+      const profile = await this.getProfile(username, true);
       let dictionary = {};
 
-      const profile = this.database
-        .collection("Users")
-        .where("email", "==", email);
 
-      if (!profile.exists) {
-        console.log("DOESNT EXIST");
-      }
-      console.log(profile);
-      return;
-
-      const userData = await userRef.get();
-
-      await this.database
-        .collection("Posts")
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            posts.push(this.returnPost(doc));
-          });
-        })
-        .catch((error) => {
-          console.log("Error getting documents: ", error);
-        });
-
-      let posts = [];
-
-      return posts;
     }
     // Not signed in
     else {

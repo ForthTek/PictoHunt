@@ -7,6 +7,18 @@ const TEST_PASSWORD = "password";
 // Create the connection at the start
 const connection = new Connection();
 
+describe("misc tests", () => {
+  beforeAll(async () => {
+    await connection.createProfile(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD, false);
+    await connection.logout();
+  });
+
+  test("misc getUsernameForEmail", async () => {
+    let x = await connection.getUsernameForEmail(TEST_EMAIL);
+    expect(x).toBe(TEST_USERNAME);
+  });
+});
+
 // Tests when the user is a guest
 describe("guest tests", () => {
   beforeAll(async () => {
