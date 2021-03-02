@@ -3,23 +3,55 @@ import Connection from "./Connection.js";
 const TEST_EMAIL = "forthtek1@gmail.com";
 const TEST_PASSWORD = "password";
 
+// Create the connection at the start
 const connection = new Connection();
 
-test("test login", async () => {
-  let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
+// Tests when the user is a guest
+describe("guest tests", () => {
+  beforeAll(async () => {
+    await connection.logout();
+  });
 
-  // If this test fails, the test account could be locked/suspended
-  // Print the message if there is one
-  if (!x.success) {
-    console.log(x.error);
-  }
-
-  expect(x.success).toBe(true);
+  test("guest getAllPosts", async () => {
+    let x = await connection.getAllPosts();
+    expect(x.length).toBeGreaterThan(0);
+  });
 });
 
-test("test getAllPosts", async () => {
-  let x = await connection.getAllPosts();
-  expect(x.length).toBeGreaterThan(0);
+// Tests when the user is authenticated
+describe("auth tests", () => {
+  beforeAll(async () => {
+    await connection.logout();
+  });
+
+  test("auth login", async () => {
+    let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
+
+    // If this test fails, the test account could be locked/suspended
+    // Print the message if there is one
+    if (!x.success) {
+      console.log(x.error);
+    }
+
+    expect(x.success).toBe(true);
+  });
+
+  test("auth getAllPosts", async () => {
+    let x = await connection.getAllPosts();
+    expect(x.length).toBeGreaterThan(0);
+  });
+
+  test("auth logout", async () => {
+    let x = await connection.logout();
+
+    // If this test fails, the test account could be locked/suspended
+    // Print the message if there is one
+    if (!x.success) {
+      console.log(x.error);
+    }
+
+    expect(x.success).toBe(true);
+  });
 });
 
 // test("check create TestTag (already should exist)", () => {
@@ -38,5 +70,3 @@ test("test getAllPosts", async () => {
 //     ["photo1", "photo2"]
 //   )
 // );
-
-//connection.close();

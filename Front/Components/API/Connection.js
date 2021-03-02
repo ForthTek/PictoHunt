@@ -27,7 +27,7 @@ export default class Connection {
   }
 
   close() {
-    //firebase.off();
+    firebase.app().delete()
     console.log("*Closed connection to Firebase");
   }
 
@@ -40,6 +40,23 @@ export default class Connection {
 
     await this.auth
       .signInWithEmailAndPassword(email, password)
+      .then(() => {
+        success = true;
+      })
+      .catch((err) => {
+        success = false;
+        error = err.message;
+      });
+
+    // return the success status for tests and error message if there is one
+    return { success: success, error: error };
+  }
+
+  async logout() {
+    let success, error;
+
+    await this.auth
+      .signOut()
       .then(() => {
         success = true;
       })
