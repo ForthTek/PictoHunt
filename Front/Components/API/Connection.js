@@ -25,10 +25,46 @@ export default class Connection {
     this.database = firebase.firestore();
     this.auth = firebase.auth();
 
+    auth.onIdTokenChanged.addEventListener(this.onIdTokenChanged);
+
     this.upload = new Upload(firebase);
 
     console.log("*Created connection to Firebase");
   }
+
+  /**
+   * This is called when user signs in or out, and also whenever the token changes
+   * due to expiry or password change
+   *
+   * @param {*} user
+   */
+  onIdTokenChanged = (user) => {
+    console.log(`Auth ID token changed for user:`);
+    console.log(user);
+
+    // Still signed in
+    if (auth.currentUser) {
+      this.onSignedIn();
+    }
+    // Signed out
+    else {
+      this.onSignedOut();
+    }
+  };
+
+  onSignedOut = (user) => {
+    console.log(`*User ${user} signed out`);
+  };
+
+  onSignedIn = (user) => {
+    console.log(`*User ${user} signed in`);
+  };
+
+  currentUser = () => {
+    if(this.auth.currentUser) {
+      return this.auth.currentUser.email;
+    }
+  };
 
   close() {
     firebase.app().delete();
@@ -157,6 +193,7 @@ export default class Connection {
     const user = this.auth.currentUser;
 
     // User is signed in
+    // In this case we want to get posts from followed feeds
 
     // user != null
     if (false) {
@@ -282,11 +319,9 @@ export default class Connection {
     return { success: success, error: error };
   }
 
-
-
-// SHOULD TAKE ARRAY OF FILE OBJECTS FOR IMAGES
-// THESE CAN BE UPLOADED STRAIGHT AWAY TO STORAGE 
-// SHOULD HAVE THE FILE TYPE KNOWN
+  // SHOULD TAKE ARRAY OF FILE OBJECTS FOR IMAGES
+  // THESE CAN BE UPLOADED STRAIGHT AWAY TO STORAGE
+  // SHOULD HAVE THE FILE TYPE KNOWN
 
   async createPost(title, channelName, GPS, tags, photos) {
     const user = this.auth.currentUser;
@@ -295,7 +330,7 @@ export default class Connection {
     const ref = this.database.collection("Posts").doc();
     const newKey = ref.id;
 
-    // upload the images 
+    // upload the images
     URLs = await this.upload.uploadImagesForPost(newKey, photos);
 
     // Get a reference to the user posting this
