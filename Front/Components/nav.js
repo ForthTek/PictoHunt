@@ -42,6 +42,7 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
+                            initialParams={this.connection}
                         />
                         <bButton.Screen
                             name='Channels'
@@ -56,6 +57,7 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
+                            initialParams={this.connection}
                         />
                         <bButton.Screen
                             name='Browse'
@@ -85,6 +87,7 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
+                            initialParams={this.connection}
                         />
                         <bButton.Screen
                             name='Map'
@@ -99,6 +102,7 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
+                            initialParams={this.connection}
                         />
                     </bButton.Navigator>
                 </NavigationContainer>

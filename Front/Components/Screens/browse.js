@@ -7,8 +7,6 @@ export default class Browse extends Component {
     constructor(props) {
         super(props);
         this.connection = props.route.params;
-
-        //console.log(this.connection);
     }
 
     // Browse Page
@@ -20,26 +18,12 @@ export default class Browse extends Component {
     };
 
     componentDidMount() {
-        console.log(this.connection);
+        //console.log(this.connection);
         this.connection.getBrowse().then((posts) => {
             this.setState({ DATA: posts });
             this.setState({ isLoading: false });
         });
-        // this.callApi()
-        //   .then((res) => {
-        //     this.setState({ DATA: res });
-        //     this.setState({ isLoading: false });
-        //   })
-        //   .catch((err) => console.log(err));
     }
-
-    callApi = async () => {
-        // http://10.0.2.2:5000/browse
-        const response = await fetch("http://10.0.2.2:5000/browse");
-        const body = await response.json();
-        if (response.status !== 200) throw Error(body.message);
-        return body;
-    };
 
     getID = (id) => {
         let i = 0;
