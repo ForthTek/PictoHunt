@@ -151,6 +151,8 @@ export default class Connection {
       tags: tags,
       photos: data.photos,
       score: data.score,
+      likes: 0,
+      dislikes: 0,
       user: data.user.id,
       //time: doc._createTime.toDate(),
       ID: doc.id,
