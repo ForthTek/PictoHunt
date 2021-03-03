@@ -30,10 +30,10 @@ describe("guest tests", () => {
     await connection.logout();
   });
 
-  test("guest getAllPosts", async () => {
-    let x = await connection.getAllPosts();
-    expect(x.length).toBeGreaterThan(0);
-  });
+  // test("guest getAllPosts", async () => {
+  //   let x = await connection.getAllPosts();
+  //   expect(x.length).toBeGreaterThan(0);
+  // });
 
   test("guest getBrowse", async () => {
     // A guest user viewing browse should see all posts

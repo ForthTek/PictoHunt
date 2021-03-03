@@ -24,9 +24,7 @@ export default class Connection {
     firebase.initializeApp(config);
     this.#database = firebase.firestore();
     this.#auth = firebase.auth();
-
     this.#auth.onIdTokenChanged(this.onIdTokenChanged);
-
     this.#upload = new Upload(firebase);
 
     console.log("*Created connection to Firebase");
@@ -82,30 +80,28 @@ export default class Connection {
   async login(email, password) {
     let success, error;
 
+    // Sign in with auth
     await this.#auth
       .signInWithEmailAndPassword(email, password)
+      // Now we should check that the user has an account
       .then(async () => {
-        // Now we should check that the user has an account
-        await this.#database
-          .collection("Users")
-          .where("email", "==", email)
-          .limit(1)
-          .get()
-          .then((snapshot) => {
-            // Use empty or size properties as this is a query not a reference
-            if (!snapshot.empty) {
-              success = true;
-            } else {
-              throw Error("Auth valid but account doesn't exist in database");
-            }
-          });
+        const user = this.currentUser();
+        const profile = await this.#database
+          .doc(`Users/${user.username}`)
+          .get();
+
+        if (profile.exists) {
+          success = true;
+        } else {
+          throw Error("Auth valid but account doesn't exist in database");
+        }
       })
       .catch((err) => {
         success = false;
         error = err.message;
       });
 
-    // return the success status for tests and error message if there is one
+    // Return the success status for tests and error message if there is one
     return { success: success, error: error };
   }
 
@@ -122,7 +118,7 @@ export default class Connection {
         error = err.message;
       });
 
-    // return the success status for tests and error message if there is one
+    // Return the success status for tests and error message if there is one
     return { success: success, error: error };
   }
 
@@ -224,7 +220,6 @@ export default class Connection {
     // Process the data
     if (userData.exists) {
       const data = userData.data();
-
       let users;
       let channels;
       let tags;
