@@ -57,6 +57,13 @@ export default class Connection {
     console.log(`*User ${user.email} signed in`);
   };
 
+  isLoggedIn = () => {
+    const user = this.#auth.currentUser;
+    if (user) {
+      return true;
+    }
+  };
+
   /**
    * Returns JSON with .username and .email
    */

@@ -60,8 +60,13 @@ describe("auth tests", () => {
 
     expect(x.success).toBe(true);
   });
+  
+  test("auth isLoggedIn", async () => {
+    let x = connection.isLoggedIn();
+    expect(x).toBe(true);
+  });
 
-  test("misc currentUser", async () => {
+  test("auth currentUser", async () => {
     let x = connection.currentUser();
     expect(x.email).toBe(TEST_EMAIL);
     expect(x.username).toBe(TEST_USERNAME);
