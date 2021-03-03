@@ -4,8 +4,11 @@ import Post from "../post";
 import SinglePost from "../singlePost";
 
 export default class Browse extends Component {
-  constructor(connection) {
-    this.connection = connection;
+  constructor(props) {
+    super(props);
+    //this.connection = props.navigation.connection;
+
+    console.log(props.navigation);
   }
 
   // Browse Page
@@ -17,12 +20,19 @@ export default class Browse extends Component {
   };
 
   componentDidMount() {
-    this.callApi()
-      .then((res) => {
-        this.setState({ DATA: res });
-        this.setState({ isLoading: false });
-      })
-      .catch((err) => console.log(err));
+    this.#connection.getBrowse().then((posts) => {
+      this.setState({ DATA: posts });
+      this.setState({ isLoading: false });
+
+
+    });
+
+    // this.callApi()
+    //   .then((res) => {
+    //     this.setState({ DATA: res });
+    //     this.setState({ isLoading: false });
+    //   })
+    //   .catch((err) => console.log(err));
   }
 
   callApi = async () => {

@@ -15,7 +15,7 @@ export default class App extends Component {
       isAuthReady: false,
     };
 
-    this.connection = new Connection();
+    this.#connection = new Connection();
     // this.connection.onSignedOut.addEventListener();
     // this.connection.onSignedIn.addEventListener();
     // Need to do something like this to force the correct page
@@ -35,7 +35,7 @@ export default class App extends Component {
 
   render() {
     if (this.state.isLoggedIn) {
-      return <Nav />;
+      return <Nav connection={this.#connection} />;
     } else {
       return (
         <Login
