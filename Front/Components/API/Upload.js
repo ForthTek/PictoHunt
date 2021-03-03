@@ -1,26 +1,26 @@
 import "firebase/storage";
 
 export default class Upload {
-  storage;
+  #storage;
 
   constructor(firebase) {
-    this.storage = firebase.storage().ref();
+    this.#storage = firebase.storage().ref();
   }
 
-  async uploadImagesForPost(postID, photoPaths) {
-    let photos = [];
-    for (let i = 0; i < photoPaths.length; i++) {
-      photos.push(await this.uploadImageForPost(postID, i, photoPaths[i]));
+  async uploadImagesForPost(postID, photos) {
+    let URLs = [];
+    for (let i = 0; i < photos.length; i++) {
+      URLs.push(await this.uploadImageForPost(postID, i, photos[i]));
     }
 
-    return photos;
+    return URLs;
   }
 
   async uploadImageForPost(postID, positionInPost, image) {
     // We should store images in the format
     // Posts/<postID>/<positionInPost>
     // This will avoid all conflicts for filenames
-    const ref = this.storage.child(`/Posts/${postID}/${positionInPost}`);
+    const ref = this.#storage.child(`/Posts/${postID}/${positionInPost}`);
 
     // Don't use this for now
     const metadata = {
@@ -28,7 +28,7 @@ export default class Upload {
     };
 
     // Upload the file
-    let URL = ref.put(image).then((snapshot) => {
+    let URL = await ref.put(image).then((snapshot) => {
       return snapshot.ref.getDownloadURL().then(downloadURL);
     });
 

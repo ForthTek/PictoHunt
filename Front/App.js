@@ -16,11 +16,19 @@ export default class App extends Component {
     };
 
     this.connection = new Connection();
-    this.connection.onSignedOut.addEventListener();
-    this.connection.onSignedIn.addEventListener();
+    // this.connection.onSignedOut.addEventListener();
+    // this.connection.onSignedIn.addEventListener();
+    // Need to do something like this to force the correct page
+    // When log out should force sign in page
+    // User can then either sign in or continue as guest - if guest need to generate anonymous auth token TODO
   }
 
   signIn = () => {
+    this.setState({ isAuthReady: true });
+    this.setState({ isLoggedIn: !!user });
+  };
+
+  signOut = () => {
     this.setState({ isAuthReady: true });
     this.setState({ isLoggedIn: !!user });
   };

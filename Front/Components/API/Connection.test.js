@@ -7,21 +7,21 @@ const TEST_PASSWORD = "password";
 // Create the connection at the start
 const connection = new Connection();
 
-describe("misc tests", () => {
-  beforeAll(async () => {
-    await connection.createProfile(
-      TEST_EMAIL,
-      TEST_USERNAME,
-      TEST_PASSWORD,
-      false
-    );
-    await connection.logout();
-  });
+beforeAll(async () => {
+  // Ensure the account already exists
+  let result = await connection.createProfile(
+    TEST_EMAIL,
+    TEST_USERNAME,
+    TEST_PASSWORD,
+    false
+  );
 
-  test("misc getUsernameForEmail", async () => {
-    let x = await connection.getUsernameForEmail(TEST_EMAIL);
-    expect(x).toBe(TEST_USERNAME);
-  });
+  if(!result.success) {
+    //console.log(result.error);
+  }
+
+  // Then log out
+  await connection.logout();
 });
 
 // Tests when the user is a guest
@@ -47,17 +47,6 @@ describe("guest tests", () => {
 describe("auth tests", () => {
   beforeAll(async () => {
     await connection.logout();
-
-    // Ensure that the account has been created
-    let x = await connection.createProfile(
-      TEST_EMAIL,
-      TEST_USERNAME,
-      TEST_PASSWORD,
-      false
-    );
-    if (!x.success) {
-      //console.log(x.error);
-    }
   });
 
   test("auth login", async () => {
@@ -72,9 +61,10 @@ describe("auth tests", () => {
     expect(x.success).toBe(true);
   });
 
-  test("misc getCurrentUser", async () => {
+  test("misc currentUser", async () => {
     let x = connection.currentUser();
-    expect(x).toBe(TEST_EMAIL);
+    expect(x.email).toBe(TEST_EMAIL);
+    expect(x.username).toBe(TEST_USERNAME);
   });
 
   test("auth getBrowse", async () => {

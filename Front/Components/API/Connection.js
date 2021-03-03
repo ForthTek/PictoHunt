@@ -15,19 +15,19 @@ const config = {
 };
 
 export default class Connection {
-  database;
-  auth;
-  upload;
+  #database;
+  #auth;
+  #upload;
 
   constructor() {
     // Initialise the connection
     firebase.initializeApp(config);
-    this.database = firebase.firestore();
-    this.auth = firebase.auth();
+    this.#database = firebase.firestore();
+    this.#auth = firebase.auth();
 
-    this.auth.onIdTokenChanged(this.onIdTokenChanged);
+    this.#auth.onIdTokenChanged(this.onIdTokenChanged);
 
-    this.upload = new Upload(firebase);
+    this.#upload = new Upload(firebase);
 
     console.log("*Created connection to Firebase");
   }
@@ -39,10 +39,10 @@ export default class Connection {
    * @param {*} user
    */
   onIdTokenChanged = (user) => {
-    console.log(`Auth ID token changed for user`);
+    //console.log(`Auth ID token changed for user`);
 
     // Still signed in
-    if (this.auth.currentUser) {
+    if (this.#auth.currentUser) {
       this.onSignedIn(user);
     }
     // Signed out
@@ -59,9 +59,14 @@ export default class Connection {
     console.log(`*User ${user.email} signed in`);
   };
 
+  /**
+   * Returns JSON with .username and .email
+   */
   currentUser = () => {
-    if (this.auth.currentUser) {
-      return this.auth.currentUser.email;
+    const user = this.#auth.currentUser;
+
+    if (user) {
+      return { username: user.displayName, email: user.email };
     }
   };
 
@@ -74,38 +79,14 @@ export default class Connection {
     return { error: message };
   }
 
-  async getUsernameForEmail(email) {
-    let username;
-
-    // Now we should check that the user has an account
-    await this.database
-      .collection("Users")
-      .where("email", "==", email)
-      .limit(1)
-      .get()
-      .then((querySnapshot) => {
-        // Use empty or size properties as this is a query not a reference
-        if (querySnapshot.size == 1) {
-          username = querySnapshot.docs[0].ref.id;
-        } else {
-          throw Error(`Email ${email} does not have a profile`);
-        }
-      })
-      .catch((error) => {
-        throw error;
-      });
-
-    return username;
-  }
-
   async login(email, password) {
     let success, error;
 
-    await this.auth
+    await this.#auth
       .signInWithEmailAndPassword(email, password)
       .then(async () => {
         // Now we should check that the user has an account
-        await this.database
+        await this.#database
           .collection("Users")
           .where("email", "==", email)
           .limit(1)
@@ -131,7 +112,7 @@ export default class Connection {
   async logout() {
     let success, error;
 
-    await this.auth
+    await this.#auth
       .signOut()
       .then(() => {
         success = true;
@@ -173,7 +154,7 @@ export default class Connection {
   async getAllPosts() {
     let posts = [];
 
-    await this.database
+    await this.#database
       .collection("Posts")
       .get()
       .then((querySnapshot) => {
@@ -189,14 +170,14 @@ export default class Connection {
   }
 
   async getBrowse() {
-    const user = this.auth.currentUser;
+    const user = this.#auth.currentUser;
 
     // User is signed in
     // In this case we want to get posts from followed feeds
 
     // user != null
     if (false) {
-      const username = await this.getUsernameForEmail(user.email);
+      const user = this.currentUser();
       const profile = await this.getProfile(username, true);
       let dictionary = {};
     }
@@ -207,7 +188,7 @@ export default class Connection {
   }
 
   async getMap() {
-    const snapshot = await this.database
+    const snapshot = await this.#database
       .collection("Posts")
       .where("GPS", "!=", null)
       .get();
@@ -237,7 +218,7 @@ export default class Connection {
    */
   async getProfile(username, loadFollowedFeeds = true) {
     // Get the user with username
-    const userRef = this.database.doc(`Users/${username}`);
+    const userRef = this.#database.doc(`Users/${username}`);
     const userData = await userRef.get();
 
     // Process the data
@@ -291,8 +272,17 @@ export default class Connection {
   async createProfile(email, username, password, isPublic = true) {
     let success, error;
 
-    await this.auth
+    await this.#auth
+      // Create the user
       .createUserWithEmailAndPassword(email, password)
+      // Set their display name
+      .then(async () => {
+        var user = this.#auth.currentUser;
+        user.updateProfile({
+          displayName: username,
+        });
+      })
+      // Now create their profile in the database
       .then(async () => {
         const userData = {
           email: email,
@@ -304,11 +294,12 @@ export default class Connection {
         };
 
         // Now we should create the profile
-        const ref = await this.database.doc(`Users/${username}`);
-        ref.set(userData);
+        const ref = this.#database.doc(`Users/${username}`);
+        await ref.set(userData);
 
         success = true;
       })
+      // Catch any errors
       .catch((err) => {
         success = false;
         error = err.message;
@@ -323,24 +314,24 @@ export default class Connection {
   // SHOULD HAVE THE FILE TYPE KNOWN
 
   async createPost(title, channelName, GPS, tags, photos) {
-    const user = this.auth.currentUser;
-    const username = await this.getUsernameForEmail(user.email);
+    const user = this.#auth.currentUser;
+    const username = this.currentUser().username;
 
-    const ref = this.database.collection("Posts").doc();
+    const ref = this.#database.collection("Posts").doc();
     const newKey = ref.id;
 
     // upload the images
-    URLs = await this.upload.uploadImagesForPost(newKey, photos);
+    URLs = await this.#upload.uploadImagesForPost(newKey, photos);
 
     // Get a reference to the user posting this
-    const userRef = this.database.doc(`Users/${username}`);
+    const userRef = this.#database.doc(`Users/${username}`);
     // Throw an error if it does not exist
     if (!(await userRef.get()).exists) {
       return this.error(`User "${userRef.path}" does not exist`);
     }
 
     // Get a reference to the channel
-    const channelRef = this.database.doc(`Channels/${channelName}`);
+    const channelRef = this.#database.doc(`Channels/${channelName}`);
     // Throw an error if it does not exist
     if (!(await channelRef.get()).exists) {
       return this.error(`Channel "${channelRef.path}" does not exist`);
@@ -349,7 +340,7 @@ export default class Connection {
     // Get refs to all the tags
     let tagRefs = [];
     for (let i = 0; i < tags.length; i++) {
-      const tagRef = this.database.doc(`Tags/${tags[i]}`);
+      const tagRef = this.#database.doc(`Tags/${tags[i]}`);
       // Throw an error if it does not exist
       if (!(await tagRef.get()).exists) {
         return this.error(`Tag "${tagRef.path}" does not exist`);
@@ -375,7 +366,7 @@ export default class Connection {
   }
 
   async createTag(name, description, icon, similarTags = []) {
-    const ref = this.database.doc(`Tags/${name}`);
+    const ref = this.#database.doc(`Tags/${name}`);
 
     // Tag already exists
     if ((await ref.get()).exists) {
@@ -385,7 +376,7 @@ export default class Connection {
     else {
       let similarTagRefs = [];
       for (let i = 0; i < similarTags.length; i++) {
-        const similarRef = this.database.doc(`Tags/${similarTags[i]}`);
+        const similarRef = this.#database.doc(`Tags/${similarTags[i]}`);
 
         // Tag already exists
         if (!(await similarRef.get()).exists) {
