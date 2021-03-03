@@ -30,6 +30,11 @@ describe("guest tests", () => {
     await connection.logout();
   });
 
+  test("guest isLoggedIn", async () => {
+    let x = connection.isLoggedIn();
+    expect(x).toBe(false);
+  });
+
   // test("guest getAllPosts", async () => {
   //   let x = await connection.getAllPosts();
   //   expect(x.length).toBeGreaterThan(0);

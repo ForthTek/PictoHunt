@@ -21,7 +21,10 @@ export default class Connection {
 
   constructor() {
     // Initialise the connection
-    firebase.initializeApp(config);
+    if (firebase.apps.length === 0) {
+      firebase.initializeApp(config);
+    }
+
     this.#database = firebase.firestore();
     this.#auth = firebase.auth();
     this.#auth.onIdTokenChanged(this.onIdTokenChanged);
@@ -61,6 +64,8 @@ export default class Connection {
     const user = this.#auth.currentUser;
     if (user) {
       return true;
+    } else {
+      return false;
     }
   };
 
