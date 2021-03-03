@@ -72,23 +72,28 @@ describe("auth tests", () => {
     expect(x.success).toBe(true);
   });
 
+  test("misc getCurrentUser", async () => {
+    let x = connection.currentUser();
+    expect(x).toBe(TEST_EMAIL);
+  });
+
   test("auth getBrowse", async () => {
     let x = await connection.getBrowse();
     expect(x.length).toBeGreaterThan(0);
   });
 
-  test.only("auth createPost", async () => {
-    await connection.login(TEST_EMAIL, TEST_PASSWORD);
-    let postID = await connection.createPost(
-      "my new post",
-      "TestChannel",
-      null,
-      ["TestTag"],
-      ["./photos/dog1.jpg"]
-    );
-    console.log(`uploaded new post ${postID}`);
-    //expect(x.length).toBeGreaterThan(0);
-  });
+  // test("auth createPost", async () => {
+  //   await connection.login(TEST_EMAIL, TEST_PASSWORD);
+  //   let postID = await connection.createPost(
+  //     "my new post",
+  //     "TestChannel",
+  //     null,
+  //     ["TestTag"],
+  //     ["./photos/dog1.jpg"]
+  //   );
+  //   console.log(`uploaded new post ${postID}`);
+  //   //expect(x.length).toBeGreaterThan(0);
+  // });
 
   test("auth logout", async () => {
     let x = await connection.logout();

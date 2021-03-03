@@ -25,7 +25,7 @@ export default class Connection {
     this.database = firebase.firestore();
     this.auth = firebase.auth();
 
-    auth.onIdTokenChanged.addEventListener(this.onIdTokenChanged);
+    this.auth.onIdTokenChanged(this.onIdTokenChanged);
 
     this.upload = new Upload(firebase);
 
@@ -39,29 +39,28 @@ export default class Connection {
    * @param {*} user
    */
   onIdTokenChanged = (user) => {
-    console.log(`Auth ID token changed for user:`);
-    console.log(user);
+    console.log(`Auth ID token changed for user`);
 
     // Still signed in
-    if (auth.currentUser) {
-      this.onSignedIn();
+    if (this.auth.currentUser) {
+      this.onSignedIn(user);
     }
     // Signed out
     else {
-      this.onSignedOut();
+      this.onSignedOut(user);
     }
   };
 
   onSignedOut = (user) => {
-    console.log(`*User ${user} signed out`);
+    console.log(`*User signed out`);
   };
 
   onSignedIn = (user) => {
-    console.log(`*User ${user} signed in`);
+    console.log(`*User ${user.email} signed in`);
   };
 
   currentUser = () => {
-    if(this.auth.currentUser) {
+    if (this.auth.currentUser) {
       return this.auth.currentUser.email;
     }
   };
