@@ -115,8 +115,9 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        alignItems: "center",
+        paddingTop: "10%",
         justifyContent: "space-between",
+        alignContent: "space-around",
     },
     container0: {
         flex: 1,
@@ -143,7 +144,9 @@ const styles = StyleSheet.create({
         paddingTop: "5%",
     },
     button0: {
-        width: "90%",
+        maxWidth: "90%",
+        paddingLeft: "10%",
+        paddingTop: "5%",
         paddingBottom: "5%",
     },
     input: {
