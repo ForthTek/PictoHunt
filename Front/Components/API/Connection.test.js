@@ -8,17 +8,15 @@ const TEST_PASSWORD = "password";
 const connection = new Connection();
 
 beforeAll(async () => {
-  // Ensure the account already exists
-  let result = await connection.createProfile(
-    TEST_EMAIL,
-    TEST_USERNAME,
-    TEST_PASSWORD,
-    false
-  );
-
-  if(!result.success) {
-    //console.log(result.error);
-  }
+  try {
+    // Ensure the account already exists
+    await connection.createProfile(
+      TEST_EMAIL,
+      TEST_USERNAME,
+      TEST_PASSWORD,
+      false
+    );
+  } catch (error) {}
 
   // Then log out
   await connection.logout();
@@ -56,19 +54,12 @@ describe("auth tests", () => {
 
   test("auth login", async () => {
     let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
-
     // If this test fails, the test account could be locked/suspended
-    // Print the message if there is one
-    if (!x.success) {
-      console.log(x.error);
-    }
-
-    expect(x.success).toBe(true);
-  });
-  
-  test("auth isLoggedIn", async () => {
-    let x = connection.isLoggedIn();
     expect(x).toBe(true);
+  });
+
+  test("auth isLoggedIn", async () => {
+    expect(connection.isLoggedIn()).toBe(true);
   });
 
   test("auth currentUser", async () => {
@@ -97,14 +88,7 @@ describe("auth tests", () => {
 
   test("auth logout", async () => {
     let x = await connection.logout();
-
-    // If this test fails, the test account could be locked/suspended
-    // Print the message if there is one
-    if (!x.success) {
-      console.log(x.error);
-    }
-
-    expect(x.success).toBe(true);
+    expect(x).toBe(true);
   });
 });
 

@@ -11,12 +11,12 @@ export default class Channels extends Component {
     };
 
     componentDidMount() {
-        this.callApi()
-            .then((res) => {
-                this.setState({ DATA: res });
-                this.setState({ isLoading: false });
-            })
-            .catch((err) => console.log(err));
+        // this.callApi()
+        //     .then((res) => {
+        //         this.setState({ DATA: res });
+        //         this.setState({ isLoading: false });
+        //     })
+        //     .catch((err) => console.log(err));
     }
 
     callApi = async () => {
