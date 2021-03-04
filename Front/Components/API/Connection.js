@@ -52,8 +52,14 @@ export default class Connection {
       console.log(`*User signed out`);
     }
 
+    // Now invoke the callbacks
     for (let i = 0; i < this.#stateUpdateCallbacks.length; i++) {
-      this.#stateUpdateCallbacks[i]();
+      try {
+        this.#stateUpdateCallbacks[i]();
+      } catch (error) {
+        console.log("Couldn't invoke callback:");
+        console.log(error);
+      }
     }
   };
 
