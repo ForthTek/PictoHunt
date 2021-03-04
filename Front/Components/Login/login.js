@@ -11,8 +11,6 @@ import {
 import Image from "react-native-scalable-image";
 import SignUp from "./signUp";
 import ForgotPass from "./forgotPass";
-import * as firebase from "firebase";
-// import firestore from "@react-native-firebase/firestore";
 
 export default class Login extends Component {
   constructor(props) {
@@ -54,6 +52,7 @@ export default class Login extends Component {
           back={() => {
             this.onSignUp(false);
           }}
+          connection={this.connection}
         />
       );
     }
@@ -63,6 +62,7 @@ export default class Login extends Component {
           back={() => {
             this.onForgotPassword(false);
           }}
+          connection={this.connection}
         />
       );
     } else {
@@ -129,7 +129,7 @@ export default class Login extends Component {
             <Button
               style={styles.button}
               onPress={() => {
-                this.forgotPassword(false);
+                this.forgotPassword(true);
               }}
               title="Forgot Password"
             />

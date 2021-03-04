@@ -147,19 +147,19 @@ export default class Connection {
     return true;
   };
 
-  // const onResetPassword = () => {
-  //   firebase
-  //       .auth()
-  //       .sendPasswordResetEmail(email)
-  //       .then(
-  //           () => {
-  //               Alert.alert("Password reset email has been sent!");
-  //           },
-  //           (error) => {
-  //               Alert.alert(error.message);
-  //           }
-  //       );
-  //         }
+  /**
+   * 
+   * @param {string} email 
+   * @returns true if succesful
+   */
+  resetPassword = async (email) => {
+    // Send an email to the address
+    await this.#auth.sendPasswordResetEmail(email).catch((error) => {
+      throw error;
+    });
+
+    return true;
+  };
 
   /**
    *
