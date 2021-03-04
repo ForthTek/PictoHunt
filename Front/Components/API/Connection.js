@@ -18,19 +18,22 @@ export default class Connection {
   #database;
   #auth;
   #upload;
+  #stateUpdateCallbacks;
 
   constructor() {
     // Initialise the connection
     if (firebase.apps.length === 0) {
       firebase.initializeApp(config);
+      console.log("*Created connection to Firebase");
     }
 
     this.#database = firebase.firestore();
     this.#auth = firebase.auth();
     this.#auth.onIdTokenChanged(this.onIdTokenChanged);
+
     this.#upload = new Upload(firebase);
 
-    console.log("*Created connection to Firebase");
+    this.#stateUpdateCallbacks = [];
   }
 
   /**
@@ -40,24 +43,22 @@ export default class Connection {
    * @param {*} user
    */
   onIdTokenChanged = (user) => {
-    //console.log(`Auth ID token changed for user`);
-
     // Still signed in
     if (this.#auth.currentUser) {
-      this.onSignedIn(user);
+      console.log(`*User ${this.#auth.currentUser.email} signed in`);
     }
     // Signed out
     else {
-      this.onSignedOut(user);
+      console.log(`*User signed out`);
+    }
+
+    for (let i = 0; i < this.#stateUpdateCallbacks.length; i++) {
+      this.#stateUpdateCallbacks[i]();
     }
   };
 
-  onSignedOut = (user) => {
-    console.log(`*User signed out`);
-  };
-
-  onSignedIn = (user) => {
-    console.log(`*User ${user.email} signed in`);
+  addStateUpdateListener = (callback) => {
+    this.#stateUpdateCallbacks.push(callback);
   };
 
   isLoggedIn = () => {
@@ -80,10 +81,10 @@ export default class Connection {
     }
   };
 
-  close() {
+  close = () => {
     firebase.app().delete();
     console.log("*Closed connection to Firebase");
-  }
+  };
 
   error(message) {
     return { error: message };
@@ -125,6 +126,60 @@ export default class Connection {
       .then(() => {
         success = true;
       })
+      .catch((err) => {
+        success = false;
+        error = err.message;
+      });
+
+    // Return the success status for tests and error message if there is one
+    return { success: success, error: error };
+  }
+
+  // const onResetPassword = () => {
+  //   firebase
+  //       .auth()
+  //       .sendPasswordResetEmail(email)
+  //       .then(
+  //           () => {
+  //               Alert.alert("Password reset email has been sent!");
+  //           },
+  //           (error) => {
+  //               Alert.alert(error.message);
+  //           }
+  //       );
+  //         }
+
+  async createProfile(email, username, password, isPublic = true) {
+    let success, error;
+
+    await this.#auth
+      // Create the user
+      .createUserWithEmailAndPassword(email, password)
+      // Set their display name
+      .then(async () => {
+        var user = this.#auth.currentUser;
+        user.updateProfile({
+          displayName: username,
+        });
+      })
+      // Now create their profile in the database
+      .then(async () => {
+        const userData = {
+          email: email,
+          public: isPublic,
+          score: 0,
+          followedUsers: [],
+          followedTags: [],
+          followedChannels: [],
+        };
+
+        // Now we should create the profile
+        const ref = this.#database.doc(`Users/${username}`);
+        await ref.set(userData);
+
+        success = true;
+      })
+      // Catch any errors
       .catch((err) => {
         success = false;
         error = err.message;
@@ -281,46 +336,6 @@ export default class Connection {
     else {
       return this.error(`User "${userRef.path}" does not exist`);
     }
-  }
-
-  async createProfile(email, username, password, isPublic = true) {
-    let success, error;
-
-    await this.#auth
-      // Create the user
-      .createUserWithEmailAndPassword(email, password)
-      // Set their display name
-      .then(async () => {
-        var user = this.#auth.currentUser;
-        user.updateProfile({
-          displayName: username,
-        });
-      })
-      // Now create their profile in the database
-      .then(async () => {
-        const userData = {
-          email: email,
-          public: isPublic,
-          score: 0,
-          followedUsers: [],
-          followedTags: [],
-          followedChannels: [],
-        };
-
-        // Now we should create the profile
-        const ref = this.#database.doc(`Users/${username}`);
-        await ref.set(userData);
-
-        success = true;
-      })
-      // Catch any errors
-      .catch((err) => {
-        success = false;
-        error = err.message;
-      });
-
-    // Return the success status for tests and error message if there is one
-    return { success: success, error: error };
   }
 
   // SHOULD TAKE ARRAY OF FILE OBJECTS FOR IMAGES
