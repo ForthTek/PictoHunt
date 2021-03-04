@@ -22,6 +22,11 @@ export default class App extends Component {
         // User can then either sign in or continue as guest - if guest need to generate anonymous auth token TODO
     }
 
+    onSignOut = () => {
+        console.log("hi");
+        this.setState({ isLoggedIn: false });
+    };
+
     render() {
         if (this.state.isLoggedIn) {
             return <Nav connection={this.connection} />;

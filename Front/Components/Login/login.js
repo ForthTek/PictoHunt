@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
     Text,
     View,
@@ -14,16 +14,34 @@ import ForgotPass from "./forgotPass";
 import * as firebase from "firebase";
 // import firestore from "@react-native-firebase/firestore";
 
-export default function Home(props) {
-    const [signUp, onSignUp] = React.useState(false);
-    const [forgotPassword, onForgotPassword] = React.useState(false);
-    const [email, onChangeEmail] = React.useState("");
-    const [password, onChangePassword] = React.useState("");
+export default class Login extends Component {
+    constructor(props) {
+        super(props);
+    }
+    state = {
+        signUp: false,
+        forgotPassword: false,
+        email: "",
+        password: "",
+    };
 
-    const onLoginPress = () => {
+    onSignUp = (value) => {
+        this.setState({ signUp: value });
+    };
+    forgotPassword = (value) => {
+        this.setState({ forgotPassword: value });
+    };
+    onChangeEmail = (value) => {
+        this.setState({ email: value });
+    };
+    onChangePassword = (value) => {
+        this.setState({ password: value });
+    };
+
+    onLoginPress = () => {
         firebase
             .auth()
-            .signInWithEmailAndPassword(email, password)
+            .signInWithEmailAndPassword(this.state.email, this.state.password)
             .then(
                 () => {},
                 (error) => {
@@ -32,92 +50,101 @@ export default function Home(props) {
             );
     };
 
-    if (signUp) {
-        return (
-            <SignUp
-                back={() => {
-                    onSignUp(false);
-                }}
-            />
-        );
-    }
-    if (forgotPassword) {
-        return (
-            <ForgotPass
-                back={() => {
-                    onForgotPassword(false);
-                }}
-            />
-        );
-    } else {
-        return (
-            <SafeAreaView style={styles.container}>
-                <View style={styles.container0}>
-                    <Image
-                        source={require("../../assets/ForthTek.png")}
-                        width={160}
-                        style={{ width: 160, height: 160 }}
-                    />
-                    <Text style={{ fontSize: 35 }}>Pictohunt</Text>
-                    <Text style={{ fontSize: 18 }}>By ForthTek</Text>
-                </View>
+    render() {
+        if (this.statesignUp) {
+            return (
+                <SignUp
+                    back={() => {
+                        this.onSignUp(false);
+                    }}
+                />
+            );
+        }
+        if (this.state.forgotPassword) {
+            return (
+                <ForgotPass
+                    back={() => {
+                        this.onForgotPassword(false);
+                    }}
+                />
+            );
+        } else {
+            return (
+                <SafeAreaView style={styles.container}>
+                    <View style={styles.container0}>
+                        <Image
+                            source={require("../../assets/ForthTek.png")}
+                            width={160}
+                            style={{ width: 160, height: 160 }}
+                        />
+                        <Text style={{ fontSize: 35 }}>Pictohunt</Text>
+                        <Text style={{ fontSize: 18 }}>By ForthTek</Text>
+                    </View>
 
-                <View style={styles.container1}>
-                    <Text
-                        style={{
-                            fontSize: 30,
-                            textAlign: "center",
-                            fontWeight: "bold",
-                        }}
-                    >
-                        Login:
-                    </Text>
-                    <View style={styles.loginCon}>
-                        <Text style={{ fontSize: 20 }}>Email:</Text>
+                    <View style={styles.container1}>
+                        <Text
+                            style={{
+                                fontSize: 30,
+                                textAlign: "center",
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Login:
+                        </Text>
+                        <View style={styles.loginCon}>
+                            <Text style={{ fontSize: 20 }}>Email:</Text>
 
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={(text) => onChangeEmail(text)}
-                            value={email}
-                            placeholder='Email'
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                            keyboardType='email-address'
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(text) =>
+                                    this.onChangeEmail(text)
+                                }
+                                value={this.state.email}
+                                placeholder='Email'
+                                autoCapitalize='none'
+                                autoCorrect={false}
+                                keyboardType='email-address'
+                            />
+                        </View>
+
+                        <View style={styles.loginCon}>
+                            <Text style={{ fontSize: 20 }}>Password:</Text>
+
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(text) =>
+                                    this.onChangePassword(text)
+                                }
+                                value={this.state.password}
+                                placeholder='Password'
+                                secureTextEntry={true}
+                                autoCapitalize='none'
+                                autoCorrect={false}
+                            />
+                        </View>
+                        <View style={styles.button}>
+                            <Button
+                                onPress={this.onLoginPress}
+                                title='Login'
+                            ></Button>
+                        </View>
+                    </View>
+
+                    <View style={styles.container2}>
+                        <Button
+                            style={styles.button}
+                            onPress={this.onForgotPassword}
+                            title='Forgot Password'
+                        />
+                        <Button
+                            style={styles.button}
+                            onPress={this.onSignUp}
+                            title='Create Account'
                         />
                     </View>
-
-                    <View style={styles.loginCon}>
-                        <Text style={{ fontSize: 20 }}>Password:</Text>
-
-                        <TextInput
-                            style={styles.input}
-                            onChangeText={(text) => onChangePassword(text)}
-                            value={password}
-                            placeholder='Password'
-                            secureTextEntry={true}
-                            autoCapitalize='none'
-                            autoCorrect={false}
-                        />
-                    </View>
-                    <View style={styles.button}>
-                        <Button onPress={onLoginPress} title='Login'></Button>
-                    </View>
-                </View>
-
-                <View style={styles.container2}>
-                    <Button
-                        style={styles.button}
-                        onPress={onForgotPassword}
-                        title='Forgot Password'
-                    />
-                    <Button
-                        style={styles.button}
-                        onPress={onSignUp}
-                        title='Create Account'
-                    />
-                </View>
-            </SafeAreaView>
-        );
+                </SafeAreaView>
+            );
+        }
     }
 }
 const styles = StyleSheet.create({

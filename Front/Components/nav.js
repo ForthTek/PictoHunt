@@ -42,7 +42,9 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
-                            initialParams={this.connection}
+                            initialParams={{
+                                connect: this.connection,
+                            }}
                         />
                         <bButton.Screen
                             name='Channels'
