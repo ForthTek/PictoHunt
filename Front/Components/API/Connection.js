@@ -203,6 +203,23 @@ export default class Connection {
     return true;
   };
 
+  interactWithPost = async (postID, interaction) => {
+    const user = this.currentUser();
+    const userRef = this.#database.doc(`Users/${user.username}`);
+
+    let type = "Dislikes";
+    if(interaction) {
+      type = "Likes"
+    }
+
+    const ref = this.#database.doc(`Posts/${postID}/${type}/${user.username}`);
+    const data = {
+      user: userRef,
+    };
+
+    await ref.set(data);
+  };
+
   returnPost(doc) {
     const data = doc.data();
 
@@ -357,14 +374,14 @@ export default class Connection {
   // SHOULD HAVE THE FILE TYPE KNOWN
 
   async createPost(title, channelName, GPS, tags, photos) {
-    const user = this.#auth.currentUser;
     const username = this.currentUser().username;
 
     const ref = this.#database.collection("Posts").doc();
     const newKey = ref.id;
 
     // upload the images
-    URLs = await this.#upload.uploadImagesForPost(newKey, photos);
+    //let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
+    let URLs = null;
 
     // Get a reference to the user posting this
     const userRef = this.#database.doc(`Users/${username}`);

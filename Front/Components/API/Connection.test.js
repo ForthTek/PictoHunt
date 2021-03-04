@@ -49,10 +49,11 @@ describe("guest tests", () => {
 // Tests when the user is authenticated
 describe("auth tests", () => {
   beforeAll(async () => {
-    await connection.logout();
+    await connection.login(TEST_EMAIL, TEST_PASSWORD);
   });
 
   test("auth login", async () => {
+    await connection.logout();
     let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
     // If this test fails, the test account could be locked/suspended
     expect(x).toBe(true);
@@ -80,9 +81,14 @@ describe("auth tests", () => {
   //     "TestChannel",
   //     null,
   //     ["TestTag"],
-  //     ["./photos/dog1.jpg"]
+  //     []
   //   );
   //   console.log(`uploaded new post ${postID}`);
+  //   //expect(x.length).toBeGreaterThan(0);
+  // });
+
+  // test("auth interactWithPost", async () => {
+  //   let x = await connection.interactWithPost("PSIFLk7xHyKpK50HqTdh", false);
   //   //expect(x.length).toBeGreaterThan(0);
   // });
 
@@ -98,13 +104,3 @@ describe("auth tests", () => {
 //   });
 // });
 
-// console.log(
-//   await connection.createPost(
-//     "test title",
-//     "TestChannel",
-//     "TestUser",
-//     null,
-//     ["TestTag", "TestTag0"],
-//     ["photo1", "photo2"]
-//   )
-// );
