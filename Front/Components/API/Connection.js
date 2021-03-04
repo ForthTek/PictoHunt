@@ -148,8 +148,8 @@ export default class Connection {
   };
 
   /**
-   * 
-   * @param {string} email 
+   *
+   * @param {string} email
    * @returns true if succesful
    */
   resetPassword = async (email) => {
@@ -169,7 +169,7 @@ export default class Connection {
    * @param {boolean} isPublic
    * @returns true if succesful
    */
-  async createProfile(email, username, password, isPublic = true) {
+  createProfile = async (email, username, password, isPublic = true) => {
     await this.#auth
       // Create the user
       .createUserWithEmailAndPassword(email, password)
@@ -201,7 +201,7 @@ export default class Connection {
       });
 
     return true;
-  }
+  };
 
   returnPost(doc) {
     const data = doc.data();
@@ -266,7 +266,7 @@ export default class Connection {
     }
   };
 
-  async getMap() {
+  getMap = async () => {
     const snapshot = await this.#database
       .collection("Posts")
       .where("GPS", "!=", null)
@@ -288,7 +288,7 @@ export default class Connection {
     }
 
     return posts;
-  }
+  };
 
   getOurProfile = async () => {
     const user = this.currentUser();
@@ -300,7 +300,7 @@ export default class Connection {
    * @param {string} username
    * @param {boolean} loadFollowedFeeds
    */
-  async getProfile(username, loadFollowedFeeds = true) {
+  getProfile = async (username, loadFollowedFeeds = true) => {
     // Get the user with username
     const userRef = this.#database.doc(`Users/${username}`);
     const userData = await userRef.get();
@@ -350,7 +350,7 @@ export default class Connection {
     else {
       return this.error(`User "${userRef.path}" does not exist`);
     }
-  }
+  };
 
   // SHOULD TAKE ARRAY OF FILE OBJECTS FOR IMAGES
   // THESE CAN BE UPLOADED STRAIGHT AWAY TO STORAGE
