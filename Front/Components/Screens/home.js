@@ -7,7 +7,7 @@ import SettingBtn from "../settingBtn";
 class Home extends Component {
     constructor(props) {
         super(props);
-        console.log(props.route);
+        // console.log(props.route);
         this.connection = props.route.params.connect;
     }
 
@@ -19,7 +19,7 @@ class Home extends Component {
     };
 
     componentDidMount() {
-        console.log(this.connection);
+        // console.log(this.connection);
         // this.connection.getOurProfile().then((profile) => {
         //     this.setState({ DATA: profile });
         //     this.setState({ isLoading: false });

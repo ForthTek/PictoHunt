@@ -124,7 +124,9 @@ export default class Login extends Component {
                         </View>
                         <View style={styles.button}>
                             <Button
-                                onPress={this.onLoginPress}
+                                onPress={() => {
+                                    this.onLoginPress();
+                                }}
                                 title='Login'
                             ></Button>
                         </View>
@@ -133,12 +135,16 @@ export default class Login extends Component {
                     <View style={styles.container2}>
                         <Button
                             style={styles.button}
-                            onPress={this.onForgotPassword}
+                            onPress={() => {
+                                this.forgotPassword(false);
+                            }}
                             title='Forgot Password'
                         />
                         <Button
                             style={styles.button}
-                            onPress={this.onSignUp}
+                            onPress={() => {
+                                this.onSignUp(true);
+                            }}
                             title='Create Account'
                         />
                     </View>
