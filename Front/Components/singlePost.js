@@ -1,4 +1,4 @@
-import React, { Component } from "react"
+import React, { Component } from "react";
 import {
     Text,
     StyleSheet,
@@ -7,13 +7,13 @@ import {
     Pressable,
     Image,
     FlatList,
-} from "react-native"
-import Carousel from "react-native-snap-carousel"
-import Ionicon from "react-native-vector-icons/Ionicons"
-import LikeBtn from "./likeBtn"
-class SinglePost extends Component {
+} from "react-native";
+import Carousel from "react-native-snap-carousel";
+import Ionicon from "react-native-vector-icons/Ionicons";
+import LikeBtn from "./likeBtn";
+export default class SinglePost extends Component {
     constructor(props) {
-        super(props)
+        super(props);
 
         this.state = {
             title: this.props.item.title,
@@ -23,12 +23,13 @@ class SinglePost extends Component {
             photos: this.props.item.photos,
             activeIndex: 0,
             comments: this.props.item.comments,
-        }
-        //console.log(props)
+        };
+        this.connection = props.connection;
+        console.log(props);
     }
     handleBack = () => {
-        this.props.back()
-    }
+        this.props.back();
+    };
 
     _renderItem({ item, index }) {
         return (
@@ -43,7 +44,7 @@ class SinglePost extends Component {
             >
                 <Image style={styles.Image} source={{ uri: item }} />
             </View>
-        )
+        );
     }
 
     render() {
@@ -54,7 +55,7 @@ class SinglePost extends Component {
                 </Text>
                 <Text style={styles.postName}>{item.user}</Text>
             </View>
-        )
+        );
 
         return (
             <SafeAreaView style={styles.container}>
@@ -102,7 +103,11 @@ class SinglePost extends Component {
                                 </Text>
                             </View>
                             <View style={{ flexDirection: "row" }}>
-                                <LikeBtn icon='heart-outline' title='Like' />
+                                <LikeBtn
+                                    icon='heart-outline'
+                                    title='Like'
+                                    connection={this.connection}
+                                />
                                 <Text
                                     style={{ fontSize: 22, paddingRight: "1%" }}
                                 >
@@ -111,6 +116,7 @@ class SinglePost extends Component {
                                 <LikeBtn
                                     icon='heart-dislike-outline'
                                     title='Dis-Like'
+                                    connection={this.connection}
                                 />
                             </View>
                         </View>
@@ -124,10 +130,9 @@ class SinglePost extends Component {
                     </View>
                 </SafeAreaView>
             </SafeAreaView>
-        )
+        );
     }
 }
-export default SinglePost
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -161,4 +166,4 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff",
     },
-})
+});

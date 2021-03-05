@@ -52,6 +52,7 @@ export default class Browse extends Component {
                     <SinglePost
                         item={this.state.DATA[this.state.singlePostID]}
                         back={this.handleSinglePost}
+                        connection={this.connection}
                     />
                 </View>
             );
