@@ -14,7 +14,6 @@ import LikeBtn from "./likeBtn";
 export default class SinglePost extends Component {
     constructor(props) {
         super(props);
-
         this.state = {
             title: this.props.item.title,
             user: this.props.item.user,
@@ -23,9 +22,10 @@ export default class SinglePost extends Component {
             photos: this.props.item.photos,
             activeIndex: 0,
             comments: this.props.item.comments,
+            postID: this.props.item.ID,
         };
         this.connection = props.connection;
-        console.log(props);
+        console.log(this.state.postID);
     }
     handleBack = () => {
         this.props.back();
@@ -106,6 +106,7 @@ export default class SinglePost extends Component {
                                 <LikeBtn
                                     icon='heart-outline'
                                     title='Like'
+                                    postID={this.state.postID}
                                     connection={this.connection}
                                 />
                                 <Text
@@ -116,6 +117,7 @@ export default class SinglePost extends Component {
                                 <LikeBtn
                                     icon='heart-dislike-outline'
                                     title='Dis-Like'
+                                    postID={this.state.postID}
                                     connection={this.connection}
                                 />
                             </View>
