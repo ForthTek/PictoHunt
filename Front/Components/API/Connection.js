@@ -277,7 +277,7 @@ export default class Connection {
     }
 
     return {
-      score: likes + dislikes,
+      score: likes - dislikes,
       likes: likes,
       dislikes: dislikes,
       interactedWith: interaction,
@@ -302,7 +302,7 @@ export default class Connection {
       channel: data.channel.id,
       tags: tags,
       photos: data.photos,
-      score: interactions.likes + interactions.dislikes,
+      score: interactions.likes - interactions.dislikes,
       likes: interactions.likes,
       dislikes: interactions.dislikes,
       user: data.user.id,
