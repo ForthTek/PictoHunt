@@ -133,9 +133,7 @@ export default class Connection {
           .doc(`Users/${user.username}`)
           .get();
 
-        if (profile.exists) {
-          success = true;
-        } else {
+        if (!profile.exists) {
           throw Error("Auth valid but account doesn't exist in database");
         }
       })
@@ -214,8 +212,8 @@ export default class Connection {
   };
 
   /**
-   * 
-   * @param {string} postID 
+   *
+   * @param {string} postID
    * @param {number} interaction PostInteractionType enum, contains .remove, .like and .dislike
    */
   interactWithPost = async (postID, interaction) => {
@@ -225,6 +223,7 @@ export default class Connection {
       `Posts/${postID}/Dislikes/${username}`
     );
 
+    // Just set the data to be the timestamp as we have to use something
     const data = {
       timestamp: firebase.firestore.Timestamp.now(),
     };
@@ -237,10 +236,6 @@ export default class Connection {
       case this.PostInteractionType.like:
         await likeRef.set(data);
         await dislikeRef.delete();
-
-        // var removeCapital = cityRef.update({
-        //   capital: firebase.firestore.FieldValue.delete()
-        // });
         break;
       case this.PostInteractionType.dislike:
         await dislikeRef.set(data);
@@ -251,7 +246,7 @@ export default class Connection {
     }
   };
 
-  returnPost(doc) {
+  async returnPost(doc) {
     const data = doc.data();
 
     // Get the tag names from the references
@@ -259,6 +254,21 @@ export default class Connection {
     for (let i = 0; i < data.tags.length; i++) {
       tags.push(data.tags[i].id);
     }
+
+    const likes = await this.#database
+      .collection(`Posts/${doc.id}/Likes`)
+      .get()
+      .then((snap) => {
+        return snap.size;
+      });
+    const dislikes = await this.#database
+      .collection(`Posts/${doc.id}/Dislikes`)
+      .get()
+      .then((snap) => {
+        return snap.size;
+      });
+
+    console.log(`likes ${likes} dislikes ${dislikes}`)
 
     // Return the data in a nice format
     let post = {
@@ -268,8 +278,8 @@ export default class Connection {
       tags: tags,
       photos: data.photos,
       score: data.score,
-      likes: 0,
-      dislikes: 0,
+      likes: likes,
+      dislikes: dislikes,
       user: data.user.id,
       //time: doc._createTime.toDate(),
       ID: doc.id,
@@ -285,8 +295,9 @@ export default class Connection {
       .collection("Posts")
       .get()
       .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          posts.push(this.returnPost(doc));
+        querySnapshot.forEach(async (doc) => {
+          let x = await this.returnPost(doc);
+          posts.push(x);
         });
       })
       .catch((error) => {
