@@ -305,7 +305,7 @@ export default class Connection {
       ID: doc.id,
     };
 
-    console.log(post);
+    //console.log(post);
 
     return post;
   }
