@@ -63,7 +63,11 @@ export default class Browse extends Component {
                         data={this.state.DATA}
                         renderItem={({ item }) => (
                             <View style={styles.post}>
-                                <Post item={item} onpressable={this.getID} />
+                                <Post
+                                    item={item}
+                                    onpressable={this.getID}
+                                    connection={this.connection}
+                                />
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}

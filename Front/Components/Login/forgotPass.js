@@ -24,14 +24,14 @@ export default class ForgotPass extends Component {
     };
 
     onResetPassword = () => {
-        this.connection
-            .resetPassword(this.state.email)
-            .then(() => {
+        this.connection.resetPassword(this.state.email).then(
+            () => {
                 Alert.alert("Password reset email has been sent!");
-            })
-            .catch((error) => {
+            },
+            (error) => {
                 Alert.alert(error.message);
-            });
+            }
+        );
     };
 
     render() {
