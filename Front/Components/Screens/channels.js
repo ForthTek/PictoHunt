@@ -10,6 +10,11 @@ export default class Channels extends Component {
         DATA: "",
     };
 
+    constructor(props) {
+        super(props);
+        this.connection = props.connection;
+    }
+
     componentDidMount() {
         // this.callApi()
         //     .then((res) => {

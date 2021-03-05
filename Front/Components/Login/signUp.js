@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Component } from "react";
 import {
     Text,
     View,
@@ -11,8 +11,9 @@ import {
 } from "react-native";
 import * as firebase from "firebase";
 
-export default class SignUp {
+export default class SignUp extends Component {
     constructor(props) {
+        super(props);
         this.connection = props.connection;
     }
 
@@ -40,11 +41,19 @@ export default class SignUp {
     };
 
     onSignUp = () => {
-        if (password !== passwordCon) {
+        if (this.state.password !== this.state.passwordCon) {
             Alert.alert("Passwords do not match");
             return;
         }
-        return;
+        this.connection
+            .createProfile(
+                this.state.email,
+                this.state.username,
+                this.state.password
+            )
+            .catch((error) => {
+                Alert.alert(error.message);
+            });
     };
     render() {
         return (
@@ -78,7 +87,7 @@ export default class SignUp {
 
                         <TextInput
                             style={styles.input}
-                            onChangeText={(text) => this.onChangeName(text)}
+                            onChangeText={(text) => this.onChangeUsername(text)}
                             value={this.state.username}
                             placeholder='UserName'
                             autoCapitalize='none'
@@ -118,7 +127,9 @@ export default class SignUp {
 
                     <View style={styles.button}>
                         <Button
-                            onPress={this.onSignUp()}
+                            onPress={() => {
+                                this.onSignUp();
+                            }}
                             title='Sign Up'
                         ></Button>
                     </View>

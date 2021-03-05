@@ -31,7 +31,6 @@ export default class Nav extends Component {
                     >
                         <bButton.Screen
                             name='Home'
-                            component={Home}
                             options={{
                                 tabBarColor: "purple",
                                 tabBarIcon: ({ color }) => (
@@ -42,13 +41,13 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
-                            initialParams={{
-                                connect: this.connection,
-                            }}
-                        />
+                        >
+                            {(props) => (
+                                <Home {...props} connection={this.connection} />
+                            )}
+                        </bButton.Screen>
                         <bButton.Screen
                             name='Channels'
-                            component={Channels}
                             options={{
                                 tabBarColor: "tomato",
                                 tabBarIcon: ({ color }) => (
@@ -59,11 +58,16 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
-                            initialParams={this.connection}
-                        />
+                        >
+                            {(props) => (
+                                <Channels
+                                    {...props}
+                                    connection={this.connection}
+                                />
+                            )}
+                        </bButton.Screen>
                         <bButton.Screen
                             name='Browse'
-                            component={Browse}
                             options={{
                                 tabBarColor: "blue",
                                 tabBarIcon: ({ color }) => (
@@ -74,11 +78,16 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
-                            initialParams={this.connection}
-                        />
+                        >
+                            {(props) => (
+                                <Browse
+                                    {...props}
+                                    connection={this.connection}
+                                />
+                            )}
+                        </bButton.Screen>
                         <bButton.Screen
                             name='Upload'
-                            component={Upload}
                             options={{
                                 tabBarColor: "brown",
                                 tabBarIcon: ({ color }) => (
@@ -89,11 +98,16 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
-                            initialParams={this.connection}
-                        />
+                        >
+                            {(props) => (
+                                <Upload
+                                    {...props}
+                                    connection={this.connection}
+                                />
+                            )}
+                        </bButton.Screen>
                         <bButton.Screen
                             name='Map'
-                            component={Map}
                             options={{
                                 tabBarColor: "orange",
                                 tabBarIcon: ({ color }) => (
@@ -104,8 +118,11 @@ export default class Nav extends Component {
                                     />
                                 ),
                             }}
-                            initialParams={this.connection}
-                        />
+                        >
+                            {(props) => (
+                                <Map {...props} connection={this.connection} />
+                            )}
+                        </bButton.Screen>
                     </bButton.Navigator>
                 </NavigationContainer>
             </SafeAreaView>

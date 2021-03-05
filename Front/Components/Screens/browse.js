@@ -6,7 +6,7 @@ import SinglePost from "../singlePost";
 export default class Browse extends Component {
     constructor(props) {
         super(props);
-        this.connection = props.route.params;
+        this.connection = props.connection;
     }
 
     // Browse Page
