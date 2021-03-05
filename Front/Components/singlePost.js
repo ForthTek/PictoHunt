@@ -24,7 +24,7 @@ class SinglePost extends Component {
             activeIndex: 0,
             comments: this.props.item.comments,
         }
-        console.log(props)
+        //console.log(props)
     }
     handleBack = () => {
         this.props.back()
