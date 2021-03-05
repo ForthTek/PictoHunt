@@ -6,10 +6,19 @@ export default class LikeBtn extends Component {
     constructor(props) {
         super(props);
         this.connection = props.connection;
+        console.log(props.postID);
     }
 
     onLikeBtnPress = () => {
         alert("Pressed: " + this.props.title);
+        this.connection
+            .interactWithPost(
+                this.props.postID,
+                this.connection.PostInteractionType.like
+            )
+            .catch((error) => {
+                Alert.alert(error.message);
+            });
     };
 
     render() {
