@@ -18,7 +18,6 @@ export default class Browse extends Component {
     };
 
     componentDidMount() {
-        //console.log(this.connection);
         this.connection.getBrowse().then((posts) => {
             this.setState({ DATA: posts });
             this.setState({ isLoading: false });

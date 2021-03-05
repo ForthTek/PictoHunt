@@ -247,7 +247,7 @@ export default class Connection {
   };
 
   async returnPost(doc) {
-    const data = doc.data();
+    const data = await doc.data();
 
     // Get the tag names from the references
     let tags = [];
@@ -255,6 +255,7 @@ export default class Connection {
       tags.push(data.tags[i].id);
     }
 
+    // Count the likes and dislikes
     const likes = await this.#database
       .collection(`Posts/${doc.id}/Likes`)
       .get()
@@ -267,8 +268,6 @@ export default class Connection {
       .then((snap) => {
         return snap.size;
       });
-
-    console.log(`likes ${likes} dislikes ${dislikes}`)
 
     // Return the data in a nice format
     let post = {
@@ -294,11 +293,12 @@ export default class Connection {
     await this.#database
       .collection("Posts")
       .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach(async (doc) => {
+      .then(async (querySnapshot) => {
+        // Must use async foreach here
+        for await (let doc of querySnapshot.docs) {
           let x = await this.returnPost(doc);
           posts.push(x);
-        });
+        }
       })
       .catch((error) => {
         console.log("Error getting documents: ", error);
@@ -460,6 +460,7 @@ export default class Connection {
       photos: URLs,
       score: 0,
       user: userRef,
+      timestamp: firebase.firestore.Timestamp.now(),
     };
 
     // Write the post data to the database
@@ -492,6 +493,7 @@ export default class Connection {
         description: description,
         icon: icon,
         similarTags: similarTagRefs,
+        timestamp: firebase.firestore.Timestamp.now(),
       };
 
       return await ref.set(tag);

@@ -87,11 +87,11 @@ describe("auth tests", () => {
   //   //expect(x.length).toBeGreaterThan(0);
   // });
 
-  // test.only("auth interactWithPost", async () => {
-  //   const type = connection.PostInteractionType.remove;
-  //   let x = await connection.interactWithPost("PSIFLk7xHyKpK50HqTdh", type);
-  //   //expect(x.length).toBeGreaterThan(0);
-  // });
+  test("auth interactWithPost", async () => {
+    const type = connection.PostInteractionType.like;
+    let x = await connection.interactWithPost("PSIFLk7xHyKpK50HqTdh", type);
+    //expect(x.length).toBeGreaterThan(0);
+  });
 
   test("auth logout", async () => {
     let x = await connection.logout();
