@@ -19,6 +19,10 @@ export default class Connection {
   #auth;
   #upload;
   #stateUpdateCallbacks;
+  /**
+   * Enum used when calling interactWithPost(ID, type). Values: .remove, .like and .dislike
+   */
+  PostInteractionType;
 
   constructor() {
     // Initialise the connection
@@ -34,6 +38,12 @@ export default class Connection {
     this.#upload = new Upload(firebase);
 
     this.#stateUpdateCallbacks = [];
+
+    this.PostInteractionType = Object.freeze({
+      remove: 0,
+      like: 1,
+      dislike: 2,
+    });
   }
 
   /**
@@ -203,21 +213,42 @@ export default class Connection {
     return true;
   };
 
+  /**
+   * 
+   * @param {string} postID 
+   * @param {number} interaction PostInteractionType enum, contains .remove, .like and .dislike
+   */
   interactWithPost = async (postID, interaction) => {
-    const user = this.currentUser();
-    const userRef = this.#database.doc(`Users/${user.username}`);
+    const username = this.currentUser().username;
+    const likeRef = this.#database.doc(`Posts/${postID}/Likes/${username}`);
+    const dislikeRef = this.#database.doc(
+      `Posts/${postID}/Dislikes/${username}`
+    );
 
-    let type = "Dislikes";
-    if(interaction) {
-      type = "Likes"
-    }
-
-    const ref = this.#database.doc(`Posts/${postID}/${type}/${user.username}`);
     const data = {
-      user: userRef,
+      timestamp: firebase.firestore.Timestamp.now(),
     };
 
-    await ref.set(data);
+    switch (interaction) {
+      case this.PostInteractionType.remove:
+        await likeRef.delete();
+        await dislikeRef.delete();
+        break;
+      case this.PostInteractionType.like:
+        await likeRef.set(data);
+        await dislikeRef.delete();
+
+        // var removeCapital = cityRef.update({
+        //   capital: firebase.firestore.FieldValue.delete()
+        // });
+        break;
+      case this.PostInteractionType.dislike:
+        await dislikeRef.set(data);
+        await likeRef.delete();
+        break;
+      default:
+        throw Error("Invalid PostInteractionType");
+    }
   };
 
   returnPost(doc) {
@@ -381,7 +412,7 @@ export default class Connection {
 
     // upload the images
     //let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
-    let URLs = null;
+    let URLs = [];
 
     // Get a reference to the user posting this
     const userRef = this.#database.doc(`Users/${username}`);
