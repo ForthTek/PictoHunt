@@ -248,6 +248,7 @@ export default class Connection {
 
   async returnPost(doc) {
     const data = await doc.data();
+    const username = this.currentUser().username;
 
     // Get the tag names from the references
     let tags = [];
@@ -269,6 +270,20 @@ export default class Connection {
         return snap.size;
       });
 
+    let interaction = this.PostInteractionType.remove;
+    if (
+      await this.#database.doc(`Posts/${doc.id}/Likes/${username}`).get()
+        .exists
+    ) {
+      interaction = this.PostInteractionType.like;
+    } else if (
+      await this.#database
+        .doc(`Posts/${doc.id}/Dislikes/${username}`)
+        .get().exists
+    ) {
+      interaction = this.PostInteractionType.dislike;
+    }
+
     // Return the data in a nice format
     let post = {
       title: data.title,
@@ -281,6 +296,7 @@ export default class Connection {
       dislikes: dislikes,
       user: data.user.id,
       //time: doc._createTime.toDate(),
+      interactedWith: interaction,
       ID: doc.id,
     };
 
