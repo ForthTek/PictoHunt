@@ -25,7 +25,6 @@ export default class SinglePost extends Component {
             postID: this.props.item.ID,
         };
         this.connection = props.connection;
-        console.log(this.state.postID);
     }
     handleBack = () => {
         this.props.back();

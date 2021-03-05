@@ -1,24 +1,25 @@
-import React, { Component } from "react"
-import { Text, StyleSheet, View, Image, Pressable } from "react-native"
-import LikeBtn from "./likeBtn"
+import React, { Component } from "react";
+import { Text, StyleSheet, View, Image, Pressable } from "react-native";
+import LikeBtn from "./likeBtn";
 
 class Post extends Component {
     constructor(props) {
-        super(props)
-
+        super(props);
+        this.connection = props.connection;
         this.state = {
             title: this.props.item.title,
             user: this.props.item.user,
             likes: this.props.item.likes,
             dislikes: this.props.item.dislikes,
             photos: this.props.item.photos,
-        }
+            postID: this.props.item.ID,
+        };
     }
 
     handleSinglePost = () => {
-        let value = this.props.item.ID
-        this.props.onpressable(value)
-    }
+        let value = this.props.item.ID;
+        this.props.onpressable(value);
+    };
 
     render() {
         return (
@@ -37,21 +38,28 @@ class Post extends Component {
                     </Text>
                     <Text style={styles.postName}>{this.state.user}</Text>
                     <View style={styles.likeCon}>
-                        <LikeBtn icon='heart-outline' title='Like' />
+                        <LikeBtn
+                            icon='heart-outline'
+                            title='Like'
+                            postID={this.state.postID}
+                            connection={this.connection}
+                        />
                         <Text style={{ fontSize: 22, paddingRight: "2%" }}>
                             {this.state.likes + this.state.dislikes}
                         </Text>
                         <LikeBtn
                             icon='heart-dislike-outline'
                             title='Dis-Like'
+                            postID={this.state.postID}
+                            connection={this.connection}
                         />
                     </View>
                 </View>
             </View>
-        )
+        );
     }
 }
-export default Post
+export default Post;
 
 const styles = StyleSheet.create({
     container: {
@@ -83,4 +91,4 @@ const styles = StyleSheet.create({
         justifyContent: "center",
         flexDirection: "row",
     },
-})
+});
