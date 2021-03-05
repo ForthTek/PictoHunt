@@ -246,25 +246,18 @@ export default class Connection {
     }
   };
 
-  async returnPost(doc) {
-    const data = await doc.data();
+  async getInteractionsWithPost(postID) {
     const username = this.currentUser().username;
-
-    // Get the tag names from the references
-    let tags = [];
-    for (let i = 0; i < data.tags.length; i++) {
-      tags.push(data.tags[i].id);
-    }
 
     // Count the likes and dislikes
     const likes = await this.#database
-      .collection(`Posts/${doc.id}/Likes`)
+      .collection(`Posts/${postID}/Likes`)
       .get()
       .then((snap) => {
         return snap.size;
       });
     const dislikes = await this.#database
-      .collection(`Posts/${doc.id}/Dislikes`)
+      .collection(`Posts/${postID}/Dislikes`)
       .get()
       .then((snap) => {
         return snap.size;
@@ -272,17 +265,29 @@ export default class Connection {
 
     let interaction = this.PostInteractionType.remove;
     if (
-      await this.#database.doc(`Posts/${doc.id}/Likes/${username}`).get()
-        .exists
+      await this.#database.doc(`Posts/${doc.id}/Likes/${username}`).get().exists
     ) {
       interaction = this.PostInteractionType.like;
     } else if (
-      await this.#database
-        .doc(`Posts/${doc.id}/Dislikes/${username}`)
-        .get().exists
+      await this.#database.doc(`Posts/${doc.id}/Dislikes/${username}`).get()
+        .exists
     ) {
       interaction = this.PostInteractionType.dislike;
     }
+
+    return { likes: likes, dislikes: dislikes, interactedWith: interaction };
+  }
+
+  async returnPost(doc) {
+    const data = await doc.data();
+
+    // Get the tag names from the references
+    let tags = [];
+    for (let i = 0; i < data.tags.length; i++) {
+      tags.push(data.tags[i].id);
+    }
+
+    const interactions = await this.getInteractionsWithPost(doc.id);
 
     // Return the data in a nice format
     let post = {
@@ -292,13 +297,15 @@ export default class Connection {
       tags: tags,
       photos: data.photos,
       score: data.score,
-      likes: likes,
-      dislikes: dislikes,
+      likes: interactions.likes,
+      dislikes: interactions.dislikes,
       user: data.user.id,
       //time: doc._createTime.toDate(),
-      interactedWith: interaction,
+      interactedWith: interactions.interactedWith,
       ID: doc.id,
     };
+
+    console.log(post);
 
     return post;
   }
