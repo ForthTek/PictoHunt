@@ -276,7 +276,12 @@ export default class Connection {
       interaction = this.PostInteractionType.dislike;
     }
 
-    return { likes: likes, dislikes: dislikes, interactedWith: interaction };
+    return {
+      score: likes + dislikes,
+      likes: likes,
+      dislikes: dislikes,
+      interactedWith: interaction,
+    };
   };
 
   async returnPost(doc) {
@@ -297,7 +302,7 @@ export default class Connection {
       channel: data.channel.id,
       tags: tags,
       photos: data.photos,
-      score: data.score,
+      score: interactions.likes + interactions.dislikes,
       likes: interactions.likes,
       dislikes: interactions.dislikes,
       user: data.user.id,
