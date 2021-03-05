@@ -105,6 +105,7 @@ export default class SinglePost extends Component {
                                 <LikeBtn
                                     icon='heart-outline'
                                     title='Like'
+                                    type='like'
                                     postID={this.state.postID}
                                     connection={this.connection}
                                 />
@@ -116,6 +117,7 @@ export default class SinglePost extends Component {
                                 <LikeBtn
                                     icon='heart-dislike-outline'
                                     title='Dis-Like'
+                                    type='dislike'
                                     postID={this.state.postID}
                                     connection={this.connection}
                                 />
