@@ -53,7 +53,9 @@ export default class ForgotPass extends Component {
                     />
                     <View style={styles.button}>
                         <Button
-                            onPress={this.onResetPassword()}
+                            onPress={() => {
+                                this.onResetPassword();
+                            }}
                             title='Send Password Reset Email'
                         ></Button>
                     </View>

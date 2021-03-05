@@ -87,7 +87,7 @@ export default class SignUp extends Component {
 
                         <TextInput
                             style={styles.input}
-                            onChangeText={(text) => this.onChangeName(text)}
+                            onChangeText={(text) => this.onChangeUsername(text)}
                             value={this.state.username}
                             placeholder='UserName'
                             autoCapitalize='none'
@@ -127,7 +127,9 @@ export default class SignUp extends Component {
 
                     <View style={styles.button}>
                         <Button
-                            onPress={this.onSignUp()}
+                            onPress={() => {
+                                this.onSignUp();
+                            }}
                             title='Sign Up'
                         ></Button>
                     </View>
