@@ -265,11 +265,11 @@ export default class Connection {
 
     let interaction = this.PostInteractionType.remove;
     if (
-      await this.#database.doc(`Posts/${doc.id}/Likes/${username}`).get().exists
+      (await this.#database.doc(`Posts/${postID}/Likes/${username}`).get()).exists
     ) {
       interaction = this.PostInteractionType.like;
     } else if (
-      await this.#database.doc(`Posts/${doc.id}/Dislikes/${username}`).get()
+      (await this.#database.doc(`Posts/${postID}/Dislikes/${username}`).get())
         .exists
     ) {
       interaction = this.PostInteractionType.dislike;
