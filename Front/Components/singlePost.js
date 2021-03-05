@@ -22,6 +22,7 @@ export default class SinglePost extends Component {
             photos: this.props.item.photos,
             activeIndex: 0,
             comments: this.props.item.comments,
+            score: this.props.item.score,
             postID: this.props.item.ID,
         };
         this.connection = props.connection;
@@ -112,7 +113,7 @@ export default class SinglePost extends Component {
                                 <Text
                                     style={{ fontSize: 22, paddingRight: "1%" }}
                                 >
-                                    {this.state.likes + this.state.dislikes}
+                                    {this.state.score}
                                 </Text>
                                 <LikeBtn
                                     icon='heart-dislike-outline'

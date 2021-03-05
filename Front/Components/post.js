@@ -12,6 +12,7 @@ class Post extends Component {
             likes: this.props.item.likes,
             dislikes: this.props.item.dislikes,
             photos: this.props.item.photos,
+            score: this.props.item.score,
             postID: this.props.item.ID,
         };
     }
@@ -46,7 +47,7 @@ class Post extends Component {
                             connection={this.connection}
                         />
                         <Text style={{ fontSize: 22, paddingRight: "2%" }}>
-                            {this.state.likes + this.state.dislikes}
+                            {this.state.score}
                         </Text>
                         <LikeBtn
                             icon='heart-dislike-outline'
