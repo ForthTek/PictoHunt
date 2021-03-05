@@ -246,7 +246,7 @@ export default class Connection {
     }
   };
 
-  async getInteractionsWithPost(postID) {
+  getInteractionsWithPost = async (postID) => {
     const username = this.currentUser().username;
 
     // Count the likes and dislikes
@@ -265,7 +265,8 @@ export default class Connection {
 
     let interaction = this.PostInteractionType.remove;
     if (
-      (await this.#database.doc(`Posts/${postID}/Likes/${username}`).get()).exists
+      (await this.#database.doc(`Posts/${postID}/Likes/${username}`).get())
+        .exists
     ) {
       interaction = this.PostInteractionType.like;
     } else if (
@@ -276,7 +277,7 @@ export default class Connection {
     }
 
     return { likes: likes, dislikes: dislikes, interactedWith: interaction };
-  }
+  };
 
   async returnPost(doc) {
     const data = await doc.data();
