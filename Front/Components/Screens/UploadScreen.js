@@ -8,6 +8,7 @@ import {
     Text,
     Button,
     Pressable,
+    Alert,
 } from "react-native";
 import Upload from "../upload";
 import Ionicon from "react-native-vector-icons/Ionicons";
@@ -22,6 +23,7 @@ export default class UploadScreen extends Component {
         title: "",
         channel: "",
         image: null,
+        res: null,
     };
 
     onChangeTitle = (value) => {
@@ -33,12 +35,28 @@ export default class UploadScreen extends Component {
 
     newImage = (value) => {
         this.setState({ image: value });
-        console.log(this.state.image);
+        // console.log(this.state.image.base64);
         this.setState({ getImage: false });
     };
 
     handleBack = () => {
         this.setState({ image: null, getImage: true });
+    };
+
+    callConnection = async () => {
+        const res = await fetch(this.state.image.uri);
+        const blob = await res.blob();
+        console.log(this.state.image.uri);
+        this.connection
+            .createPost(this.state.title, this.state.channel, null, [], [blob])
+            .then(
+                (key) => {
+                    console.log(key);
+                },
+                (error) => {
+                    console.log(error.message);
+                }
+            );
     };
 
     render() {
@@ -98,13 +116,7 @@ export default class UploadScreen extends Component {
                         <Button
                             title='SUBMIT'
                             onPress={() => {
-                                this.connection.createPost(
-                                    this.state.title,
-                                    this.state.channel,
-                                    null,
-                                    [],
-                                    []
-                                );
+                                this.callConnection();
                             }}
                         />
                     </View>

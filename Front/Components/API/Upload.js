@@ -1,39 +1,39 @@
 import "firebase/storage";
 
 export default class Upload {
-  #storage;
+    #storage;
 
-  constructor(firebase) {
-    this.#storage = firebase.storage().ref();
-  }
-
-  async uploadImagesForPost(postID, photos) {
-    let URLs = [];
-    for (let i = 0; i < photos.length; i++) {
-      URLs.push(await this.uploadImageForPost(postID, i, photos[i]));
+    constructor(firebase) {
+        this.#storage = firebase.storage().ref();
     }
 
-    return URLs;
-  }
+    async uploadImagesForPost(postID, photos) {
+        let URLs = [];
+        for (let i = 0; i < photos.length; i++) {
+            URLs.push(await this.uploadImageForPost(postID, i, photos[i]));
+        }
 
-  async uploadImageForPost(postID, positionInPost, image) {
-    // We should store images in the format
-    // Posts/<postID>/<positionInPost>
-    // This will avoid all conflicts for filenames
-    const ref = this.#storage.child(`/Posts/${postID}/${positionInPost}`);
+        return URLs;
+    }
 
-    // Don't use this for now
-    const metadata = {
-      contentType: "image/jpeg",
-    };
+    async uploadImageForPost(postID, positionInPost, image) {
+        // We should store images in the format
+        // Posts/<postID>/<positionInPost>
+        // This will avoid all conflicts for filenames
+        const ref = this.#storage.child(`/Posts/${postID}/${positionInPost}`);
 
-    // Upload the file
-    let URL = await ref.put(image).then((snapshot) => {
-      return snapshot.ref.getDownloadURL().then(downloadURL);
-    });
+        // Don't use this for now
+        const metadata = {
+            contentType: "image/jpeg",
+        };
 
-    console.log(`Uploaded image with path ${ref.path} and DLL ${URL}`);
+        // Upload the file
+        let URL = await ref.put(image).then((snapshot) => {
+            return snapshot.ref.getDownloadURL();
+        });
 
-    return URL;
-  }
+        console.log(`Uploaded image with path ${ref.path} and DLL ${URL}`);
+
+        return URL;
+    }
 }

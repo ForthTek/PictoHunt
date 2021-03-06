@@ -459,8 +459,8 @@ export default class Connection {
         const newKey = ref.id;
 
         // upload the images
-        //let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
-        let URLs = [];
+        let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
+        //let URLs = [];
 
         // Get a reference to the user posting this
         const userRef = this.#database.doc(`Users/${username}`);
