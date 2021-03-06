@@ -1,32 +1,155 @@
-import React from "react";
-import { View, StyleSheet, SafeAreaView, TextInput } from "react-native";
+import React, { Component } from "react";
+import {
+    View,
+    StyleSheet,
+    SafeAreaView,
+    TextInput,
+    Image,
+    Text,
+    Button,
+    Pressable,
+} from "react-native";
 import Upload from "../upload";
-export default function UploadScreen() {
-    const [value, onChangeText] = React.useState("Useless Placeholder");
+import Ionicon from "react-native-vector-icons/Ionicons";
+export default class UploadScreen extends Component {
+    constructor(props) {
+        super(props);
+        this.connection = props.connection;
+    }
 
-    return (
-        <SafeAreaView style={styles.container}>
-            <View style={styles.container}>
-                <Upload />
-                <TextInput
-                    style={styles.input}
-                    onChangeText={(text) => onChangeText(text)}
-                    value={value}
-                />
-            </View>
-        </SafeAreaView>
-    );
+    state = {
+        getImage: true,
+        title: "",
+        channel: "",
+        image: null,
+    };
+
+    onChangeTitle = (value) => {
+        this.setState({ title: value });
+    };
+    onChangeChannel = (value) => {
+        this.setState({ channel: value });
+    };
+
+    newImage = (value) => {
+        this.setState({ image: value });
+        console.log(this.state.image);
+        this.setState({ getImage: false });
+    };
+
+    handleBack = () => {
+        this.setState({ image: null, getImage: true });
+    };
+
+    render() {
+        if (this.state.getImage) {
+            return (
+                <SafeAreaView style={styles.container}>
+                    <Upload
+                        newImage={(image) => {
+                            this.newImage(image);
+                        }}
+                    />
+                </SafeAreaView>
+            );
+        } else {
+            return (
+                <SafeAreaView style={styles.container}>
+                    <Pressable onPress={this.handleBack}>
+                        <Ionicon
+                            name='arrow-back-circle-outline'
+                            style={styles.icon}
+                        />
+                    </Pressable>
+
+                    <View style={styles.imageContainer}>
+                        <Image
+                            source={{ uri: this.state.image.uri }}
+                            style={{ width: 200, height: 200 }}
+                        />
+                    </View>
+                    <View style={styles.allInputContainer}>
+                        <View style={styles.textInputs}>
+                            <Text style={{ fontSize: 20 }}>Title:</Text>
+
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(value) =>
+                                    this.onChangeTitle(value)
+                                }
+                                value={this.state.text}
+                                placeholder='Post Title'
+                            />
+                        </View>
+                        <View style={styles.textInputs}>
+                            <Text style={{ fontSize: 20 }}>Channels:</Text>
+
+                            <TextInput
+                                style={styles.input}
+                                onChangeText={(value) =>
+                                    this.onChangeChannel(value)
+                                }
+                                value={this.state.text}
+                                placeholder='Channel'
+                            />
+                        </View>
+                    </View>
+                    <View style={styles.button}>
+                        <Button
+                            title='SUBMIT'
+                            onPress={() => {
+                                this.connection.createPost(
+                                    this.state.title,
+                                    this.state.channel,
+                                    null,
+                                    [],
+                                    []
+                                );
+                            }}
+                        />
+                    </View>
+                </SafeAreaView>
+            );
+        }
+    }
 }
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        paddingBottom: "5%",
+        justifyContent: "space-between",
+    },
+    imageContainer: {
+        flex: 1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+    },
+    allInputContainer: {
+        flex: 1,
+        backgroundColor: "#fff",
+    },
+    textInputs: {
+        flexDirection: "row",
+        padding: "1%",
+        justifyContent: "space-between",
+        alignItems: "center",
     },
     input: {
-        height: 40,
+        height: 45,
         borderColor: "gray",
         borderWidth: 1,
+        width: "70%",
+        fontSize: 20,
+        color: "gray",
+    },
+    button: {
+        maxWidth: "20%",
+        paddingLeft: "2%",
         paddingBottom: "5%",
+    },
+    icon: {
+        fontSize: 32,
+        paddingLeft: "2%",
+        paddingBottom: "2%",
     },
 });
