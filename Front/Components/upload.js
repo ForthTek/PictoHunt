@@ -24,12 +24,12 @@ export default function ImagePickerExample(props) {
         let result = await ImagePicker.launchImageLibraryAsync({
             mediaTypes: ImagePicker.MediaTypeOptions.All,
             allowsEditing: true,
+            allowsMultipleSelection: true,
             aspect: [4, 3],
             quality: 1,
-            base64: true,
         });
 
-        // console.log(result);
+        console.log(result);
 
         if (!result.cancelled) {
             setImage(result.uri);

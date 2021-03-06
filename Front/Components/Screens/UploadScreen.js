@@ -46,7 +46,7 @@ export default class UploadScreen extends Component {
     callConnection = async () => {
         const res = await fetch(this.state.image.uri);
         const blob = await res.blob();
-        console.log(this.state.image.uri);
+
         this.connection
             .createPost(this.state.title, this.state.channel, null, [], [blob])
             .then(
