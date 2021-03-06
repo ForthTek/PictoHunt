@@ -11,7 +11,8 @@ import {
     Alert,
 } from "react-native";
 import Upload from "../upload";
-import Ionicon from "react-native-vector-icons/Ionicons";
+import Ionicons from "react-native-vector-icons/Ionicons";
+import { AssetsSelector } from "expo-images-picker";
 export default class UploadScreen extends Component {
     constructor(props) {
         super(props);
@@ -63,9 +64,52 @@ export default class UploadScreen extends Component {
         if (this.state.getImage) {
             return (
                 <SafeAreaView style={styles.container}>
-                    <Upload
+                    {/* <Upload
                         newImage={(image) => {
                             this.newImage(image);
+                        }}
+                    /> */}
+                    <AssetsSelector
+                        options={{
+                            manipulate: {
+                                width: 512,
+                                compress: 0.7,
+                                base64: false,
+                                saveTo: "jpeg",
+                            },
+                            assetsType: ["photo"],
+                            maxSelections: 3,
+                            margin: 3,
+                            portraitCols: 4,
+                            landscapeCols: 5,
+                            widgetWidth: 100,
+                            widgetBgColor: bgColor,
+                            selectedBgColor: mainColor,
+                            spinnerColor: mainColor,
+                            videoIcon: {
+                                Component: Ionicons,
+                                iconName: "ios-videocam",
+                                color: "white",
+                                size: 20,
+                            },
+                            selectedIcon: {
+                                Component: Ionicons,
+                                iconName: "ios-checkmark-circle-outline",
+                                color: "white",
+                                bg: "white",
+                                size: 20,
+                            },
+                            defaultTopNavigator: {
+                                continueText: "Finish",
+                                goBackText: "Back",
+                                buttonStyle: validViewStyleObject,
+                                textStyle: validTextStyleObject,
+                                backFunction: goBack,
+                                doneFunction: (data) => onDone(data),
+                            },
+                            noAssets: {
+                                Component: CustomNoAssetsComponent,
+                            },
                         }}
                     />
                 </SafeAreaView>
