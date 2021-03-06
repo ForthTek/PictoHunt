@@ -383,74 +383,23 @@ export default class Connection {
             });
         }
 
-        return posts;
-    };
+  /**
+   * 
+   * @param {string} title 
+   * @param {string} channelName 
+   * @param {*} GPS 
+   * @param {string[]} tags 
+   * @param {} photos 
+   * @returns 
+   */
+  createPost = async (title, channelName, GPS, tags, photos) => {
+    const username = this.currentUser().username;
+    const ref = this.#database.collection("Posts").doc();
+    const newKey = ref.id;
 
-    getOurProfile = async () => {
-        const user = this.currentUser();
-        return await this.getProfile(user.username, true);
-    };
-
-    /**
-     *
-     * @param {string} username
-     * @param {boolean} loadFollowedFeeds
-     */
-    getProfile = async (username, loadFollowedFeeds = true) => {
-        // Get the user with username
-        const userRef = this.#database.doc(`Users/${username}`);
-        const userData = await userRef.get();
-
-        // Process the data
-        if (userData.exists) {
-            const data = userData.data();
-            let users;
-            let channels;
-            let tags;
-
-            // Only load the followed channels/tags/users if we need to
-            if (loadFollowedFeeds) {
-                users = [];
-                channels = [];
-                tags = [];
-
-                for (let i = 0; i < data.followedUsers.length; i++) {
-                    users.push(data.followedUsers[i].id);
-                }
-                for (let i = 0; i < data.followedChannels.length; i++) {
-                    channels.push(data.followedChannels[i].id);
-                }
-                for (let i = 0; i < data.followedTags.length; i++) {
-                    tags.push(data.followedTags[i].id);
-                }
-            }
-
-            let user = {
-                username: username,
-                email: data.email,
-                public: data.public,
-                score: data.score,
-                createdProfile: userData._createTime,
-                totalUsersFollowing: data.followedUsers.length,
-                totalChannelsFollowing: data.followedChannels.length,
-                totalTagsFollowing: data.followedTags.length,
-                loadedFollowedFeeds: loadFollowedFeeds,
-                followedUsers: users,
-                followedChannels: channels,
-                followedTags: tags,
-            };
-
-            return user;
-        }
-        // Throw an error if the user does not exist
-        else {
-            return this.error(`User "${userRef.path}" does not exist`);
-        }
-    };
-
-    // SHOULD TAKE ARRAY OF FILE OBJECTS FOR IMAGES
-    // THESE CAN BE UPLOADED STRAIGHT AWAY TO STORAGE
-    // SHOULD HAVE THE FILE TYPE KNOWN
+    // Upload the images
+    //let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
+    let URLs = [];
 
     createPost = async (title, channelName, GPS, tags, photos) => {
         const username = this.currentUser().username;
@@ -469,12 +418,10 @@ export default class Connection {
             return this.error(`User "${userRef.path}" does not exist`);
         }
 
-        // Get a reference to the channel
-        const channelRef = this.#database.doc(`Channels/${channelName}`);
-        // Throw an error if it does not exist
-        if (!(await channelRef.get()).exists) {
-            return this.error(`Channel "${channelRef.path}" does not exist`);
-        }
+    // Write the post data to the database
+    await ref.set(postData);
+    return newKey;
+  };
 
         // Get refs to all the tags
         let tagRefs = [];
