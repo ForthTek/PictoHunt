@@ -440,17 +440,21 @@ export default class Connection {
     }
   };
 
-  // SHOULD TAKE ARRAY OF FILE OBJECTS FOR IMAGES
-  // THESE CAN BE UPLOADED STRAIGHT AWAY TO STORAGE
-  // SHOULD HAVE THE FILE TYPE KNOWN
-
-  async createPost(title, channelName, GPS, tags, photos) {
+  /**
+   * 
+   * @param {string} title 
+   * @param {string} channelName 
+   * @param {*} GPS 
+   * @param {string[]} tags 
+   * @param {} photos 
+   * @returns 
+   */
+  createPost = async (title, channelName, GPS, tags, photos) => {
     const username = this.currentUser().username;
-
     const ref = this.#database.collection("Posts").doc();
     const newKey = ref.id;
 
-    // upload the images
+    // Upload the images
     //let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
     let URLs = [];
 
@@ -495,7 +499,7 @@ export default class Connection {
     // Write the post data to the database
     await ref.set(postData);
     return newKey;
-  }
+  };
 
   async createTag(name, description, icon, similarTags = []) {
     const ref = this.#database.doc(`Tags/${name}`);
