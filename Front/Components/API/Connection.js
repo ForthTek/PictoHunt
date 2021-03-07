@@ -451,7 +451,7 @@ export default class Connection {
 
   getOurProfile = async () => {
     const user = this.currentUser();
-    return await this.getProfile(user.username, true);
+    return await this.getProfile(user.username, false);
   };
 
   /**
@@ -459,7 +459,7 @@ export default class Connection {
    * @param {string} username
    * @param {boolean} loadFollowedFeeds
    */
-  getProfile = async (username, loadFollowedFeeds = true) => {
+  getProfile = async (username, loadFollowedFeeds = false) => {
     // Get the user with username
     const userRef = this.#database.doc(`Users/${username}`);
     const userData = await userRef.get();
