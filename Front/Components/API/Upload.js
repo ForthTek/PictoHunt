@@ -32,8 +32,6 @@ export default class Upload {
             return snapshot.ref.getDownloadURL();
         });
 
-        console.log(`Uploaded image with path ${ref.path} and DLL ${URL}`);
-
         return URL;
     }
 }

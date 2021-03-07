@@ -33,10 +33,20 @@ describe("guest tests", () => {
     expect(x).toBe(false);
   });
 
-  // test("guest getAllPosts", async () => {
-  //   let x = await connection.getAllPosts();
-  //   expect(x.length).toBeGreaterThan(0);
-  // });
+  test("guest getAllPosts", async () => {
+    let x = await connection.getAllPosts();
+    expect(x.length).toBeGreaterThan(0);
+  });
+
+  test("guest getAllPosts", async () => {
+    let x = await connection.getAllPosts();
+    expect(x.length).toBeGreaterThan(0);
+  });
+
+  test("guest getAllPosts", async () => {
+    let x = await connection.getAllPosts();
+    expect(x.length).toBeGreaterThan(0);
+  });
 
   test("guest getBrowse", async () => {
     // A guest user viewing browse should see all posts
@@ -74,6 +84,7 @@ describe("auth tests", () => {
     expect(x.length).toBeGreaterThan(0);
   });
 
+  // Dont test this as we cant upload images from here
   // test("auth createPost", async () => {
   //   await connection.login(TEST_EMAIL, TEST_PASSWORD);
   //   let postID = await connection.createPost(
@@ -99,8 +110,4 @@ describe("auth tests", () => {
   });
 });
 
-// test("check create TestTag (already should exist)", () => {
-//   return connection.createTag("TestTag", "desc", null, ["TestTag2"]).then(x => {
-//     expect(x).toBe(x.error);
-//   });
-// });
+
