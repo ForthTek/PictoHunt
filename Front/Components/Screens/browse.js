@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, SafeAreaView, View, FlatList } from "react-native";
+import {
+    Text,
+    StyleSheet,
+    SafeAreaView,
+    View,
+    FlatList,
+    Button,
+} from "react-native";
 import Post from "../post";
 import SinglePost from "../singlePost";
 
@@ -38,6 +45,8 @@ export default class Browse extends Component {
         this.setState({ isPost: !this.state.isPost });
     };
 
+    onRefresh = () => {};
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -59,6 +68,7 @@ export default class Browse extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.postCon}>
+                    <Button title='Refresh' onPress={this.onRefresh()} />
                     <FlatList
                         data={this.state.DATA}
                         renderItem={({ item }) => (
