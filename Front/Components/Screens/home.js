@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Text, View, SafeAreaView, StyleSheet, Button } from "react-native";
+import {
+    Text,
+    View,
+    SafeAreaView,
+    StyleSheet,
+    Button,
+    Alert,
+} from "react-native";
 import Image from "react-native-scalable-image";
 import Score from "../score";
 import SettingBtn from "../settingBtn";
@@ -16,11 +23,24 @@ class Home extends Component {
     state = {
         isLoading: true,
         DATA: "",
+        user: null,
     };
 
     onSignOutPress = () => {
         this.connection.logout();
     };
+
+    componentDidMount() {
+        this.connection.getOurProfile().then(
+            (res) => {
+                this.setState({ user: res, isLoading: false });
+                console.log(res);
+            },
+            (error) => {
+                Alert.alert(error.message);
+            }
+        );
+    }
 
     render() {
         if (this.state.isLoading) {
@@ -49,11 +69,10 @@ class Home extends Component {
                             }}
                         >
                             <Text style={styles.username}>
-                                {this.state.DATA.username}
+                                {this.state.user.username}
                             </Text>
                             <Text style={styles.info}>
-                                Joined:{" "}
-                                {this.state.DATA.joined.substring(0, 10)}
+                                Joined: {this.state.user.createdProfile}
                             </Text>
                         </View>
                     </View>
@@ -64,29 +83,53 @@ class Home extends Component {
                             justifyContent: "space-between",
                         }}
                     >
-                        <Score label='Score' number={this.state.DATA.score} />
-                        <Score
-                            label='Pics'
-                            number={this.state.DATA.posts.length}
-                        />
+                        <Score label='Score' number={this.state.user.score} />
+                        <Score label='Pics' number={5} />
                         <Score label='Rank' number={5} />
                     </View>
                     <View style={styles.container}>
                         <SettingBtn
                             label='Achievements/ Challenges'
                             icon='trophy-outline'
+                            onPress={() => {
+                                this.onSignOutPress();
+                            }}
                         />
                         <SettingBtn
                             label='Your Profile'
                             icon='person-outline'
+                            onPress={() => {
+                                this.onSignOutPress();
+                            }}
                         />
-                        <SettingBtn label='Following' icon='people-outline' />
+                        <SettingBtn
+                            label='Following'
+                            icon='people-outline'
+                            onPress={() => {
+                                this.onSignOutPress();
+                            }}
+                        />
                         <SettingBtn
                             label='Leader Board'
                             icon='bar-chart-outline'
+                            onPress={() => {
+                                this.onSignOutPress();
+                            }}
                         />
-                        <SettingBtn label='Settings' icon='settings-outline' />
-                        <SettingBtn label='Log Out' icon='log-out-outline' />
+                        <SettingBtn
+                            label='Settings'
+                            icon='settings-outline'
+                            onPress={() => {
+                                this.onSignOutPress();
+                            }}
+                        />
+                        <SettingBtn
+                            label='Log Out'
+                            icon='log-out-outline'
+                            onPress={() => {
+                                this.onSignOutPress();
+                            }}
+                        />
                     </View>
                 </SafeAreaView>
             );
