@@ -225,6 +225,8 @@ export default class Connection {
           followedUsers: [],
           followedTags: [],
           followedChannels: [],
+          posts: [],
+          timestamp: firebase.firestore.Timestamp.now(),
         };
 
         // Now we should create the profile
@@ -304,7 +306,7 @@ export default class Connection {
       }
       // Throw an error if it doesn't exist
       else {
-        throw new Error(`Post ${ref.path} does not exist`);
+        throw new Error(`Post ${postID} does not exist`);
       }
     }
 
@@ -480,7 +482,7 @@ export default class Connection {
 
   getOurProfile = async () => {
     const user = this.currentUser();
-    return await this.getProfile(user.username, false);
+    return await this.getProfile(user.username, true);
   };
 
   /**
@@ -522,7 +524,8 @@ export default class Connection {
         email: data.email,
         public: data.public,
         score: data.score,
-        createdProfile: userData._createTime,
+        posts: data.posts,
+        timestamp: data.timestamp,
         totalUsersFollowing: data.followedUsers.length,
         totalChannelsFollowing: data.followedChannels.length,
         totalTagsFollowing: data.followedTags.length,
