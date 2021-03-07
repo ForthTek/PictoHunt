@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, View, Image, Pressable } from "react-native";
+import { Text, StyleSheet, View, Image, Pressable, Alert } from "react-native";
 import LikeBtn from "./likeBtn";
 
 class Post extends Component {
@@ -60,6 +60,14 @@ class Post extends Component {
                     Alert.alert(error.message);
                 });
         }
+        this.connection.getPost(this.state.postID).then(
+            (res) => {
+                this.setState({ score: res.score });
+            },
+            (error) => {
+                Alert.alert(error.message);
+            }
+        );
     };
 
     render() {
