@@ -73,7 +73,7 @@ export default class Connection {
 
     this.#posts = {};
     this.#browse = [];
-    this.#browseFilters = [BrowseFilters.allPosts];
+    this.#browseFilters = [];
   }
 
   /**
@@ -283,64 +283,45 @@ export default class Connection {
    * @returns
    */
   getPost = async (postID) => {
-    // Post isn't stored locally so we need to load it from the database
-    if (!this.#posts[postID]) {
-      const ref = this.#database.doc(`Posts/${postID}`);
-      const document = await ref.get();
-
-      return await this.getPostFromDoc(document);
-    }
-
-    // Load it from local storage instead
-    return this.#posts[postID];
-  };
-
-  async getPostFromDoc(doc) {
-    const postID = doc.id;
-
-    // Post isn't stored locally so we need to load it
-    if (!this.#posts[postID]) {
-      if (doc.exists) {
-        // Save this post to the local storage
-        this.#posts[postID] = await this.returnPost(doc);
-      }
-      // Throw an error if it doesn't exist
-      else {
-        throw new Error(`Post ${postID} does not exist`);
-      }
-    }
-
-    return this.#posts[postID];
-  }
-
-  /**
-   * Loads the post from local memory and updates the values if it can, or gets it from the server if not.
-   *
-   * @param {string} postID
-   * @returns
-   */
-  getUpdatedPost = async (postID) => {
-    // Stored locally so we need to calculate the updated values of stuff
+    // Update the current version if there is one
     if (this.#posts[postID]) {
-      let updated = await this.getUpdatedPostValues(postID);
+      // Calculate the values we need to
+      let updated = await this.calculatePostValues(postID);
       this.#posts[postID].score = updated.score;
       this.#posts[postID].likes = updated.likes;
       this.#posts[postID].dislikes = updated.dislikes;
       this.#posts[postID].interactedWith = updated.interactedWith;
 
+      // Return the updated version
       return this.#posts[postID];
     }
-    // Post isn't stored locally so we just need to load it
+    // Post isn't stored locally so we need to load it from the database
     else {
-      return await this.getPost(postID);
+      const ref = this.#database.doc(`Posts/${postID}`);
+      const document = await ref.get();
+      return await this.getPostFromDoc(document);
     }
   };
 
-  async getUpdatedPostFromDoc(doc) {
-    // TODO
+  async getPostFromDoc(doc) {
+    if (doc.exists) {
+      const postID = doc.id;
+
+      // Load the post from the database if we don't have it
+      if (!this.#posts[postID]) {
+        this.#posts[postID] = await this.returnPost(doc);
+      }
+
+      // Now calculate the new values
+      return this.getPost(postID);
+    }
+    // Throw an error if it doesn't exist
+    else {
+      throw new Error(`Post ${postID} does not exist`);
+    }
   }
 
-  async getUpdatedPostValues(postID) {
+  async calculatePostValues(postID) {
     // Count the likes and dislikes
     const likes = await this.#database
       .collection(`Posts/${postID}/Likes`)
@@ -396,7 +377,7 @@ export default class Connection {
       tags.push(data.tags[i].id);
     }
 
-    const values = await this.getUpdatedPostValues(doc.id);
+    const values = await this.calculatePostValues(doc.id);
 
     // Return the data in a nice format
     let post = {
@@ -426,8 +407,7 @@ export default class Connection {
       .then(async (querySnapshot) => {
         // Must use async foreach here
         for await (let doc of querySnapshot.docs) {
-          // NEED TO OPTIMISE
-          let x = await this.getUpdatedPost(doc.id);
+          let x = await this.getPostFromDoc(doc);
           posts.push(x);
         }
       })
@@ -447,8 +427,6 @@ export default class Connection {
     // user != null
     if (false) {
       const user = this.currentUser();
-      const profile = await this.getProfile(username, true);
-      let dictionary = {};
     }
     // Not signed in
     else {
