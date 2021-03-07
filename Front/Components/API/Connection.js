@@ -221,11 +221,6 @@ export default class Connection {
         const userData = {
           email: email,
           public: isPublic,
-          score: 0,
-          followedUsers: [],
-          followedTags: [],
-          followedChannels: [],
-          posts: [],
           timestamp: firebase.firestore.Timestamp.now(),
         };
 
@@ -370,13 +365,6 @@ export default class Connection {
 
   async returnPost(doc) {
     const data = await doc.data();
-
-    // Get the tag names from the references
-    let tags = [];
-    for (let i = 0; i < data.tags.length; i++) {
-      tags.push(data.tags[i].id);
-    }
-
     const values = await this.calculatePostValues(doc.id);
 
     // Return the data in a nice format
@@ -384,7 +372,6 @@ export default class Connection {
       title: data.title,
       GPS: data.GPS,
       channel: data.channel.id,
-      tags: tags,
       photos: data.photos,
       score: values.score,
       likes: values.likes,
@@ -403,6 +390,7 @@ export default class Connection {
 
     await this.#database
       .collection("Posts")
+      .orderBy("timestamp", "desc")
       .get()
       .then(async (querySnapshot) => {
         // Must use async foreach here
@@ -460,7 +448,7 @@ export default class Connection {
 
   getOurProfile = async () => {
     const user = this.currentUser();
-    return await this.getProfile(user.username, true);
+    return await this.getProfile(user.username);
   };
 
   /**
@@ -468,7 +456,7 @@ export default class Connection {
    * @param {string} username
    * @param {boolean} loadFollowedFeeds
    */
-  getProfile = async (username, loadFollowedFeeds = false) => {
+  getProfile = async (username) => {
     // Get the user with username
     const userRef = this.#database.doc(`Users/${username}`);
     const userData = await userRef.get();
@@ -476,52 +464,76 @@ export default class Connection {
     // Process the data
     if (userData.exists) {
       const data = userData.data();
-      let users;
-      let channels;
-      let tags;
 
-      // Only load the followed channels/tags/users if we need to
-      if (loadFollowedFeeds) {
-        users = [];
-        channels = [];
-        tags = [];
+      let posts = [];
+      let users = [];
+      let channels = [];
+      let score = 0;
 
-        for (let i = 0; i < data.followedUsers.length; i++) {
-          users.push(data.followedUsers[i].id);
-        }
-        for (let i = 0; i < data.followedChannels.length; i++) {
-          channels.push(data.followedChannels[i].id);
-        }
-        for (let i = 0; i < data.followedTags.length; i++) {
-          tags.push(data.followedTags[i].id);
-        }
-      }
+      await this.#database
+        .collection(`Users/${username}/Posts`)
+        .orderBy("timestamp", "desc")
+        .get()
+        .then(async (querySnapshot) => {
+          // Must use async foreach here
+          for await (let doc of querySnapshot.docs) {
+            let post = await this.getPost(doc.id);
+            posts.push(post);
+            score += post.score;
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+
+      await this.#database
+        .collection(`Users/${username}/FollowedUsers`)
+        .get()
+        .then(async (querySnapshot) => {
+          // Must use async foreach here
+          for await (let doc of querySnapshot.docs) {
+            const username = doc.id;
+            users.push(username);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
+      await this.#database
+        .collection(`Users/${username}/FollowedChannels`)
+        .get()
+        .then(async (querySnapshot) => {
+          // Must use async foreach here
+          for await (let doc of querySnapshot.docs) {
+            const channel = doc.id;
+            channels.push(channel);
+          }
+        })
+        .catch((error) => {
+          console.log(error);
+        });
 
       let user = {
         username: username,
         email: data.email,
         public: data.public,
-        score: data.score,
+        score: score,
         posts: data.posts,
         timestamp: data.timestamp,
-        totalUsersFollowing: data.followedUsers.length,
-        totalChannelsFollowing: data.followedChannels.length,
-        totalTagsFollowing: data.followedTags.length,
-        loadedFollowedFeeds: loadFollowedFeeds,
+        posts: posts,
         followedUsers: users,
         followedChannels: channels,
-        followedTags: tags,
       };
 
       return user;
     }
     // Throw an error if the user does not exist
     else {
-      throw new Error(`User "${userRef.path}" does not exist`);
+      throw new Error(`User "${username}" does not exist`);
     }
   };
 
-  createPost = async (title, channelName, GPS, tags, photos) => {
+  createPost = async (title, channelName, GPS, photos) => {
     const username = this.currentUser().username;
 
     const ref = this.#database.collection("Posts").doc();
@@ -541,18 +553,6 @@ export default class Connection {
       throw new Error(`Channel "${channelRef.path}" does not exist`);
     }
 
-    // Get refs to all the tags
-    let tagRefs = [];
-    for (let i = 0; i < tags.length; i++) {
-      const tagRef = this.#database.doc(`Tags/${tags[i]}`);
-      // Throw an error if it does not exist
-      if (!(await tagRef.get()).exists) {
-        throw new Error(`Tag "${tagRef.path}" does not exist`);
-      } else {
-        tagRefs.push(tagRef);
-      }
-    }
-
     // Upload the images
     let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
 
@@ -561,7 +561,6 @@ export default class Connection {
       title: title,
       GPS: GPS,
       channel: channelRef,
-      tags: tagRefs,
       photos: URLs,
       score: 0,
       user: userRef,
@@ -570,38 +569,13 @@ export default class Connection {
 
     // Write the post data to the database
     await ref.set(postData);
+
+    // Add a ref to this post in the user's posts
+    const profilePosts = this.#database.doc(
+      `Users/${username}/Posts/${newKey}`
+    );
+    profilePosts.set({ timestamp: postData.timestamp });
+
     return newKey;
   };
-
-  async createTag(name, description, icon, similarTags = []) {
-    const ref = this.#database.doc(`Tags/${name}`);
-
-    // Tag already exists
-    if ((await ref.get()).exists) {
-      throw new Error(`Tag "${ref.path}" already exists`);
-    }
-    // Otherwise, create the tag
-    else {
-      let similarTagRefs = [];
-      for (let i = 0; i < similarTags.length; i++) {
-        const similarRef = this.#database.doc(`Tags/${similarTags[i]}`);
-
-        // Tag already exists
-        if (!(await similarRef.get()).exists) {
-          throw new Error(`Tag "${similarRef.path}" does not exist`);
-        } else {
-          similarTagRefs.push(similarRef);
-        }
-      }
-
-      const tag = {
-        description: description,
-        icon: icon,
-        similarTags: similarTagRefs,
-        timestamp: firebase.firestore.Timestamp.now(),
-      };
-
-      return await ref.set(tag);
-    }
-  }
 }
