@@ -23,6 +23,10 @@ export default class Connection {
    * Enum used when calling interactWithPost(ID, type). Values: .remove, .like and .dislike
    */
   PostInteractionType;
+  /**
+   * Dictionary for storing loaded posts locally. We should check a post isn't here before loading it from the server
+   */
+  #posts;
 
   constructor() {
     // Initialise the connection
@@ -38,6 +42,8 @@ export default class Connection {
     this.#upload = new Upload(firebase);
 
     this.#stateUpdateCallbacks = [];
+
+    this.#posts = {};
 
     this.PostInteractionType = Object.freeze({
       remove: 0,
@@ -113,10 +119,6 @@ export default class Connection {
     firebase.app().delete();
     console.log("*Closed connection to Firebase");
   };
-
-  error(message) {
-    return { error: message };
-  }
 
   /**
    *
@@ -248,7 +250,67 @@ export default class Connection {
     }
   };
 
-  getInteractionsWithPost = async (postID) => {
+  /**
+   * Loads the post from local memory if it has been loaded before, or gets it from the server if not.
+   *
+   * @param {string} postID
+   * @returns
+   */
+  getPost = async (postID) => {
+    // Post isn't stored locally so we need to load it from the database
+    if (!this.#posts[postID]) {
+      const ref = this.#database.doc(`Posts/${postID}`);
+      const document = await ref.get();
+
+      return await this.getPostFromDoc(document);
+    }
+
+    // Load it from local storage instead
+    return this.#posts[postID];
+  };
+
+  async getPostFromDoc(doc) {
+    const postID = doc.id;
+
+    // Post isn't stored locally so we need to load it
+    if (!this.#posts[postID]) {
+      if (doc.exists) {
+        // Save this post to the local storage
+        this.#posts[postID] = await this.returnPost(doc);
+      }
+      // Throw an error if it doesn't exist
+      else {
+        throw new Error(`Post ${ref.path} does not exist`);
+      }
+    }
+
+    return this.#posts[postID];
+  }
+
+  /**
+   * Loads the post from local memory and updates the values if it can, or gets it from the server if not.
+   *
+   * @param {string} postID
+   * @returns
+   */
+  getUpdatedPost = async (postID) => {
+    // Stored locally so we need to calculate the updated values of stuff
+    if (this.#posts[postID]) {
+      let updated = await this.getUpdatedPostValues(postID);
+      this.#posts[postID].score = updated.score;
+      this.#posts[postID].likes = updated.likes;
+      this.#posts[postID].dislikes = upload.dislikes;
+      this.#posts[postID].interactedWith = upload.interactedWith;
+
+      return this.#posts[postID];
+    }
+    // Post isn't stored locally so we just need to load it
+    else {
+      return await this.getPost(postID);
+    }
+  };
+
+  async getUpdatedPostValues(postID) {
     // Count the likes and dislikes
     const likes = await this.#database
       .collection(`Posts/${postID}/Likes`)
@@ -269,13 +331,19 @@ export default class Connection {
     const user = this.currentUser();
     if (user) {
       if (
-        (await this.#database.doc(`Posts/${postID}/Likes/${user.username}`).get())
-          .exists
+        (
+          await this.#database
+            .doc(`Posts/${postID}/Likes/${user.username}`)
+            .get()
+        ).exists
       ) {
         interaction = this.PostInteractionType.like;
       } else if (
-        (await this.#database.doc(`Posts/${postID}/Dislikes/${user.username}`).get())
-          .exists
+        (
+          await this.#database
+            .doc(`Posts/${postID}/Dislikes/${user.username}`)
+            .get()
+        ).exists
       ) {
         interaction = this.PostInteractionType.dislike;
       }
@@ -287,7 +355,7 @@ export default class Connection {
       dislikes: dislikes,
       interactedWith: interaction,
     };
-  };
+  }
 
   async returnPost(doc) {
     const data = await doc.data();
@@ -298,7 +366,7 @@ export default class Connection {
       tags.push(data.tags[i].id);
     }
 
-    const interactions = await this.getInteractionsWithPost(doc.id);
+    const values = await this.getUpdatedPostValues(doc.id);
 
     // Return the data in a nice format
     let post = {
@@ -307,16 +375,14 @@ export default class Connection {
       channel: data.channel.id,
       tags: tags,
       photos: data.photos,
-      score: interactions.likes - interactions.dislikes,
-      likes: interactions.likes,
-      dislikes: interactions.dislikes,
+      score: values.score,
+      likes: values.likes,
+      dislikes: values.dislikes,
       user: data.user.id,
-      //time: doc._createTime.toDate(),
-      interactedWith: interactions.interactedWith,
+      time: data.timestamp,
+      interactedWith: values.interactedWith,
       ID: doc.id,
     };
-
-    //console.log(post);
 
     return post;
   }
@@ -330,7 +396,7 @@ export default class Connection {
       .then(async (querySnapshot) => {
         // Must use async foreach here
         for await (let doc of querySnapshot.docs) {
-          let x = await this.returnPost(doc);
+          let x = await this.getPostFromDoc(doc);
           posts.push(x);
         }
       })
@@ -441,7 +507,7 @@ export default class Connection {
     }
     // Throw an error if the user does not exist
     else {
-      return this.error(`User "${userRef.path}" does not exist`);
+      throw new Error(`User "${userRef.path}" does not exist`);
     }
   };
 
@@ -451,21 +517,18 @@ export default class Connection {
     const ref = this.#database.collection("Posts").doc();
     const newKey = ref.id;
 
-    // upload the images
-    let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
-
     // Get a reference to the user posting this
     const userRef = this.#database.doc(`Users/${username}`);
     // Throw an error if it does not exist
     if (!(await userRef.get()).exists) {
-      return this.error(`User "${userRef.path}" does not exist`);
+      throw new Error(`User "${userRef.path}" does not exist`);
     }
 
     // Get a reference to the channel
     const channelRef = this.#database.doc(`Channels/${channelName}`);
     // Throw an error if it does not exist
     if (!(await channelRef.get()).exists) {
-      return this.error(`Channel "${channelRef.path}" does not exist`);
+      throw new Error(`Channel "${channelRef.path}" does not exist`);
     }
 
     // Get refs to all the tags
@@ -474,11 +537,14 @@ export default class Connection {
       const tagRef = this.#database.doc(`Tags/${tags[i]}`);
       // Throw an error if it does not exist
       if (!(await tagRef.get()).exists) {
-        return this.error(`Tag "${tagRef.path}" does not exist`);
+        throw new Error(`Tag "${tagRef.path}" does not exist`);
       } else {
         tagRefs.push(tagRef);
       }
     }
+
+    // Upload the images
+    let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
 
     // Do some input validation stuff here
     const postData = {
@@ -502,7 +568,7 @@ export default class Connection {
 
     // Tag already exists
     if ((await ref.get()).exists) {
-      return this.error(`Tag "${ref.path}" already exists`);
+      throw new Error(`Tag "${ref.path}" already exists`);
     }
     // Otherwise, create the tag
     else {
@@ -512,7 +578,7 @@ export default class Connection {
 
         // Tag already exists
         if (!(await similarRef.get()).exists) {
-          return this.error(`Tag "${similarRef.path}" does not exist`);
+          throw new Error(`Tag "${similarRef.path}" does not exist`);
         } else {
           similarTagRefs.push(similarRef);
         }
