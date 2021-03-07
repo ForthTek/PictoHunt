@@ -8,48 +8,12 @@ export default class LikeBtn extends Component {
         this.connection = props.connection;
     }
 
-    onLikeBtnPress = () => {
-        if (this.props.type === "like") {
-            alert("Pressed: " + this.props.type);
-            this.connection
-                .interactWithPost(
-                    this.props.postID,
-                    this.connection.PostInteractionType.like
-                )
-                .catch((error) => {
-                    Alert.alert(error.message);
-                });
-        }
-        if (this.props.type === "dislike") {
-            alert("Pressed: " + this.props.type);
-            this.connection
-                .interactWithPost(
-                    this.props.postID,
-                    this.connection.PostInteractionType.dislike
-                )
-                .catch((error) => {
-                    Alert.alert(error.message);
-                });
-        }
-        if (this.props.type === "remove") {
-            alert("Pressed: " + this.props.type);
-            this.connection
-                .interactWithPost(
-                    this.props.postID,
-                    this.connection.PostInteractionType.remove
-                )
-                .catch((error) => {
-                    Alert.alert(error.message);
-                });
-        }
-    };
-
     render() {
         return (
             <View>
                 <Pressable
                     style={styles.container}
-                    onPress={() => this.onLikeBtnPress()}
+                    onPress={() => this.props.onLikeBtnPress(this.props.type)}
                 >
                     <Ionicon name={this.props.icon} style={styles.icon} />
                 </Pressable>

@@ -14,6 +14,7 @@ class Post extends Component {
             photos: this.props.item.photos,
             score: this.props.item.score,
             postID: this.props.item.ID,
+            type: "",
         };
     }
 
@@ -23,6 +24,42 @@ class Post extends Component {
     handleSinglePost = () => {
         let value = this.props.item.ID;
         this.props.onpressable(value);
+    };
+
+    onLikeBtnPress = (type) => {
+        if (type === "like") {
+            alert("Pressed: " + type);
+            this.connection
+                .interactWithPost(
+                    this.state.postID,
+                    this.connection.PostInteractionType.like
+                )
+                .catch((error) => {
+                    Alert.alert(error.message);
+                });
+        }
+        if (type === "dislike") {
+            alert("Pressed: " + type);
+            this.connection
+                .interactWithPost(
+                    this.state.postID,
+                    this.connection.PostInteractionType.dislike
+                )
+                .catch((error) => {
+                    Alert.alert(error.message);
+                });
+        }
+        if (type === "remove") {
+            alert("Pressed: " + type);
+            this.connection
+                .interactWithPost(
+                    this.state.postID,
+                    this.connection.PostInteractionType.remove
+                )
+                .catch((error) => {
+                    Alert.alert(error.message);
+                });
+        }
     };
 
     render() {
@@ -47,6 +84,7 @@ class Post extends Component {
                             title='Like'
                             type='like'
                             postID={this.state.postID}
+                            onLikeBtnPress={this.onLikeBtnPress}
                             connection={this.connection}
                         />
                         <Text style={{ fontSize: 22, paddingRight: "2%" }}>
@@ -57,6 +95,7 @@ class Post extends Component {
                             title='Dis-Like'
                             type='dislike'
                             postID={this.state.postID}
+                            onLikeBtnPress={this.onLikeBtnPress}
                             connection={this.connection}
                         />
                     </View>

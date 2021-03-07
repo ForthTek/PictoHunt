@@ -50,17 +50,10 @@ export default class Browse extends Component {
 
     onRefresh = async () => {
         this.setState({ refresh: true, DATA: "" });
-        // let data = this.state.DATA;
-        // let newstate = [{ ID: "LOADING" }].concat(data);
-        // this.setState({ DATA: newstate });
         await this.connection.getBrowse().then(
             (res) => {
-                console.log(this.state.refresh);
-                console.log(res[0]);
                 this.setState({ DATA: res });
                 this.setState({ refresh: false });
-                console.log(this.state.refresh);
-                //this.setState({ isLoading: false });
             },
             (error) => {
                 Alert.alert(error.message);
