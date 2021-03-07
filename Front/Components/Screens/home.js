@@ -37,6 +37,7 @@ class Home extends Component {
                 console.log(res);
             },
             (error) => {
+                console.log(error)
                 Alert.alert(error.message);
             }
         );
@@ -72,7 +73,7 @@ class Home extends Component {
                                 {this.state.user.username}
                             </Text>
                             <Text style={styles.info}>
-                                Joined: {this.state.user.createdProfile}
+                                Joined: {this.state.user.timestamp.toDate().toString()}
                             </Text>
                         </View>
                     </View>
@@ -84,7 +85,7 @@ class Home extends Component {
                         }}
                     >
                         <Score label='Score' number={this.state.user.score} />
-                        <Score label='Pics' number={5} />
+                        <Score label='Pics' number={this.state.user.posts.length} />
                         <Score label='Rank' number={5} />
                     </View>
                     <View style={styles.container}>
