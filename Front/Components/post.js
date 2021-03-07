@@ -9,8 +9,6 @@ class Post extends Component {
         this.state = {
             title: this.props.item.title,
             user: this.props.item.user,
-            likes: this.props.item.likes,
-            dislikes: this.props.item.dislikes,
             photos: this.props.item.photos,
             score: this.props.item.score,
             postID: this.props.item.ID,
@@ -18,9 +16,6 @@ class Post extends Component {
         };
     }
 
-    componentDidMount() {
-        this.setState({ score: this.props.item.score });
-    }
     handleSinglePost = () => {
         let value = this.props.item.ID;
         this.props.onpressable(value);
@@ -63,6 +58,7 @@ class Post extends Component {
         this.connection.getPost(this.state.postID).then(
             (res) => {
                 this.setState({ score: res.score });
+                console.log(res.score);
             },
             (error) => {
                 Alert.alert(error.message);
