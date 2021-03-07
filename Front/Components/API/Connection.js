@@ -19,14 +19,27 @@ export default class Connection {
   #auth;
   #upload;
   #stateUpdateCallbacks;
+
+  /**
+   * Dictionary for storing loaded posts locally. We should check a post isn't here before loading it from the server
+   */
+  #posts;
+
+  #browseFilters;
+  #browse;
+
   /**
    * Enum used when calling interactWithPost(ID, type). Values: .remove, .like and .dislike
    */
   PostInteractionType;
   /**
-   * Dictionary for storing loaded posts locally. We should check a post isn't here before loading it from the server
+   * Filters for the browse screen
    */
-  #posts;
+  BrowseFilters;
+  /**
+   * Filters for ordering posts
+   */
+  OrderBy;
 
   constructor() {
     // Initialise the connection
@@ -43,13 +56,24 @@ export default class Connection {
 
     this.#stateUpdateCallbacks = [];
 
-    this.#posts = {};
-
     this.PostInteractionType = Object.freeze({
       remove: 0,
       like: 1,
       dislike: 2,
     });
+    this.BrowseFilters = Object.freeze({
+      allPosts: 0,
+      followedUsers: 1,
+      followedChannels: 2,
+    });
+    this.OrderBy = Object.freeze({
+      mostRecent: 0,
+      highestScore: 1,
+    });
+
+    this.#posts = {};
+    this.#browse = [];
+    this.#browseFilters = [BrowseFilters.allPosts];
   }
 
   /**
@@ -299,8 +323,8 @@ export default class Connection {
       let updated = await this.getUpdatedPostValues(postID);
       this.#posts[postID].score = updated.score;
       this.#posts[postID].likes = updated.likes;
-      this.#posts[postID].dislikes = upload.dislikes;
-      this.#posts[postID].interactedWith = upload.interactedWith;
+      this.#posts[postID].dislikes = updated.dislikes;
+      this.#posts[postID].interactedWith = updated.interactedWith;
 
       return this.#posts[postID];
     }
@@ -309,6 +333,10 @@ export default class Connection {
       return await this.getPost(postID);
     }
   };
+
+  async getUpdatedPostFromDoc(doc) {
+    // TODO
+  }
 
   async getUpdatedPostValues(postID) {
     // Count the likes and dislikes
@@ -396,7 +424,8 @@ export default class Connection {
       .then(async (querySnapshot) => {
         // Must use async foreach here
         for await (let doc of querySnapshot.docs) {
-          let x = await this.getPostFromDoc(doc);
+          // NEED TO OPTIMISE
+          let x = await this.getUpdatedPost(doc.id);
           posts.push(x);
         }
       })
