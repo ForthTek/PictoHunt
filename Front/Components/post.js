@@ -17,6 +17,9 @@ class Post extends Component {
         };
     }
 
+    componentDidMount() {
+        this.setState({ score: this.props.item.score });
+    }
     handleSinglePost = () => {
         let value = this.props.item.ID;
         this.props.onpressable(value);
