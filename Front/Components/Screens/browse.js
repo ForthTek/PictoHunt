@@ -6,6 +6,8 @@ import {
     View,
     FlatList,
     Button,
+    Alert,
+    RefreshControl,
 } from "react-native";
 import Post from "../post";
 import SinglePost from "../singlePost";
@@ -22,6 +24,7 @@ export default class Browse extends Component {
         isPost: false,
         singlePostID: "",
         DATA: "",
+        refresh: false,
     };
 
     componentDidMount() {
@@ -45,7 +48,26 @@ export default class Browse extends Component {
         this.setState({ isPost: !this.state.isPost });
     };
 
-    onRefresh = () => {};
+    onRefresh = async () => {
+        this.setState({ refresh: true, DATA: "" });
+        // let data = this.state.DATA;
+        // let newstate = [{ ID: "LOADING" }].concat(data);
+        // this.setState({ DATA: newstate });
+        await this.connection.getBrowse().then(
+            (res) => {
+                console.log(this.state.refresh);
+                console.log(res[0]);
+                this.setState({ DATA: res });
+                this.setState({ refresh: false });
+                console.log(this.state.refresh);
+                //this.setState({ isLoading: false });
+            },
+            (error) => {
+                Alert.alert(error.message);
+                this.setState({ refresh: false });
+            }
+        );
+    };
 
     render() {
         if (this.state.isLoading) {
@@ -68,9 +90,10 @@ export default class Browse extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.postCon}>
-                    <Button title='Refresh' onPress={this.onRefresh()} />
+                    {/* <Button title='Refresh' onPress={this.onRefresh} /> */}
                     <FlatList
                         data={this.state.DATA}
+                        extraData={this.state.didRefresh}
                         renderItem={({ item }) => (
                             <View style={styles.post}>
                                 <Post
@@ -81,6 +104,8 @@ export default class Browse extends Component {
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}
+                        onRefresh={this.onRefresh}
+                        refreshing={this.state.refresh}
                     />
                 </SafeAreaView>
             );
