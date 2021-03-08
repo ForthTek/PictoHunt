@@ -38,15 +38,15 @@ describe("guest tests", () => {
     expect(x.length).toBeGreaterThan(0);
   });
 
-  test("guest getAllPosts", async () => {
-    let x = await connection.getAllPosts();
-    expect(x.length).toBeGreaterThan(0);
-  });
+  // test("guest getAllPosts", async () => {
+  //   let x = await connection.getAllPosts();
+  //   expect(x.length).toBeGreaterThan(0);
+  // });
 
-  test("guest getAllPosts", async () => {
-    let x = await connection.getAllPosts();
-    expect(x.length).toBeGreaterThan(0);
-  });
+  // test("guest getAllPosts", async () => {
+  //   let x = await connection.getAllPosts();
+  //   expect(x.length).toBeGreaterThan(0);
+  // });
 
   test("guest getBrowse", async () => {
     // A guest user viewing browse should see all posts
@@ -54,8 +54,6 @@ describe("guest tests", () => {
     const numberOfBrowse = (await connection.getBrowse()).length;
     expect(numberOfBrowse).toBe(numberOfAllPosts);
   });
-
-
 });
 
 // Tests when the user is authenticated
@@ -100,11 +98,13 @@ describe("auth tests", () => {
   //   //expect(x.length).toBeGreaterThan(0);
   // });
 
-  test.only("auth getChannel", async () => {
-    //let y = await connection.createChannel("Test", "just a test channel");
-    //console.log(y);
-    let x = await connection.getChannel("Test");
-    console.log(x)
+  test("auth test channel", async () => {
+    try {
+      await connection.createChannel("Test", "just a test channel");
+    } catch (error) {}
+
+    let channel = await connection.getChannel("Test");
+    //console.log(channel)
   });
 
   test("auth interactWithPost", async () => {
@@ -118,5 +118,3 @@ describe("auth tests", () => {
     expect(x).toBe(true);
   });
 });
-
-
