@@ -429,8 +429,7 @@ export default class Connection {
       .get();
     let posts = [];
 
-    // Check that there are posts
-    if (snapshot._size > 0) {
+
       snapshot.forEach((doc) => {
         // Return the data in a nice format
         let mapPost = {
@@ -441,7 +440,7 @@ export default class Connection {
 
         posts.push(mapPost);
       });
-    }
+    
 
     return posts;
   };

@@ -13,8 +13,6 @@ import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Geocoder from "react-native-geocoding";
-import * as firebase from "firebase/app";
-import "firebase/firestore";
 
 // NOTE: internal commentary dosn't have spell check, sorry
 
@@ -39,7 +37,7 @@ export default class Map extends Component {
     }
 
     async componentDidMount() {
-        console.log("Components mounted.");
+        //console.log("Components mounted.");
         try {
             // Asks the user for permission
             let { status } = await Location.requestPermissionsAsync();
@@ -75,9 +73,10 @@ export default class Map extends Component {
         // Converts to json
         // Puts in the state variable MarkerArray
         // Catches any arror with the marker obtaining and makes an alert
-        fetch("http://10.0.2.2:5000/map")
-            .then((response) => response.json())
+        this.connection.getMap()
+            //.then((response) => response.json())
             .then((response) => {
+                //console.log(response);
                 this.setState({ MarkerArray: response });
             })
             .catch((error) => {
@@ -113,8 +112,8 @@ export default class Map extends Component {
                             return (
                                 <MapView.Marker
                                     coordinate={{
-                                        latitude: m.GPS._latitude,
-                                        longitude: m.GPS._longitude,
+                                        latitude: m.GPS.latitude,
+                                        longitude: m.GPS.longitude,
                                     }}
                                     key={m.ID}
                                 >
