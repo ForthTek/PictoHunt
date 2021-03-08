@@ -54,6 +54,13 @@ describe("guest tests", () => {
     const numberOfBrowse = (await connection.getBrowse()).length;
     expect(numberOfBrowse).toBe(numberOfAllPosts);
   });
+
+  test.only("guest getChannel", async () => {
+    let y = await connection.createChannel("Test", "just a test channel");
+    let x = await connection.getChannel("Test");
+    //expect(x.length).toBeGreaterThan(0);
+    console.log(x)
+  });
 });
 
 // Tests when the user is authenticated

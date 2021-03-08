@@ -400,7 +400,8 @@ export default class Connection {
         }
       })
       .catch((error) => {
-        console.log("Error getting documents: ", error);
+        console.log(error);
+        throw Error("Couldn't load all posts");
       });
 
     return posts;
@@ -578,4 +579,51 @@ export default class Connection {
 
     return newKey;
   };
+
+  createChannel = async (name, description) => {
+    const username = this.currentUser().username;
+    const ref = this.#database.doc(`Channels/${name}`);
+    const channel = await ref.get();
+    const userRef = this.#database.doc(`Users/${username}`);
+
+    if (channel.exists) {
+      throw new Error(`Channel ${name} already exists`);
+    } else {
+      const data = {
+        description: description,
+        timestamp: firebase.firestore.Timestamp.now(),
+        createdBy: userRef,
+      };
+
+      await ref.set(data);
+
+      return true;
+    }
+  };
+
+  getChannel = async (name) => {
+    const ref = this.#database.doc(`Channels/${name}`);
+    const channel = await ref.get();
+
+    if (channel.exists) {
+      throw new Error(`Channel ${name} does not exist`);
+    } else {
+      return await this.returnChannel(channel);
+    }
+  };
+
+  async returnChannel(doc) {
+    const data = await doc.data();
+    const username = data.createdBy.get().id;
+
+    // Return the data in a nice format
+    let channel = {
+      name: doc.id,
+      description: data.description,
+      timestamp: data.timestamp,
+      createdBy: username,
+    };
+
+    return channel;
+  }
 }
