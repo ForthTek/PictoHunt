@@ -55,12 +55,7 @@ describe("guest tests", () => {
     expect(numberOfBrowse).toBe(numberOfAllPosts);
   });
 
-  test.only("guest getChannel", async () => {
-    let y = await connection.createChannel("Test", "just a test channel");
-    let x = await connection.getChannel("Test");
-    //expect(x.length).toBeGreaterThan(0);
-    console.log(x)
-  });
+
 });
 
 // Tests when the user is authenticated
@@ -104,6 +99,13 @@ describe("auth tests", () => {
   //   console.log(`uploaded new post ${postID}`);
   //   //expect(x.length).toBeGreaterThan(0);
   // });
+
+  test.only("auth getChannel", async () => {
+    //let y = await connection.createChannel("Test", "just a test channel");
+    //console.log(y);
+    let x = await connection.getChannel("Test");
+    console.log(x)
+  });
 
   test("auth interactWithPost", async () => {
     const type = connection.PostInteractionType.like;

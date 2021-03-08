@@ -604,7 +604,7 @@ export default class Connection {
     const ref = this.#database.doc(`Channels/${name}`);
     const channel = await ref.get();
 
-    if (channel.exists) {
+    if (!channel.exists) {
       throw new Error(`Channel ${name} does not exist`);
     } else {
       return await this.returnChannel(channel);
@@ -613,7 +613,7 @@ export default class Connection {
 
   async returnChannel(doc) {
     const data = await doc.data();
-    const username = data.createdBy.get().id;
+    const username = data.createdBy.id;
 
     // Return the data in a nice format
     let channel = {
