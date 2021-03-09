@@ -11,7 +11,6 @@ export default class App extends Component {
   constructor(props) {
     super(props);
 
-    
     this.connection = new Connection();
     this.state = {
       isLoggedIn: this.connection.isLoggedIn(),

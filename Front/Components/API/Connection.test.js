@@ -4,6 +4,10 @@ const TEST_EMAIL = "forthtek1@gmail.com";
 const TEST_USERNAME = "Test";
 const TEST_PASSWORD = "password";
 
+const TEST_CHANNEL = "Test";
+
+const TEST_POST = "PSIFLk7xHyKpK50HqTdh";
+
 // Create the connection at the start
 const connection = new Connection();
 
@@ -100,16 +104,16 @@ describe("auth tests", () => {
 
   test("auth test channel", async () => {
     try {
-      await connection.createChannel("Test", "just a test channel");
+      await connection.createChannel(TEST_CHANNEL, "just a test channel");
     } catch (error) {}
 
-    let channel = await connection.getChannel("Test");
+    let channel = await connection.getChannel(TEST_CHANNEL);
     //console.log(channel)
   });
 
   test("auth interactWithPost", async () => {
     const type = connection.PostInteractionType.like;
-    let x = await connection.interactWithPost("PSIFLk7xHyKpK50HqTdh", type);
+    let x = await connection.interactWithPost(TEST_POST, type);
     //expect(x.length).toBeGreaterThan(0);
   });
 

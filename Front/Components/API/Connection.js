@@ -430,18 +430,16 @@ export default class Connection {
       .get();
     let posts = [];
 
+    snapshot.forEach((doc) => {
+      // Return the data in a nice format
+      let mapPost = {
+        GPS: doc.data().GPS,
+        icon: doc.data().photos[0],
+        ID: doc.id,
+      };
 
-      snapshot.forEach((doc) => {
-        // Return the data in a nice format
-        let mapPost = {
-          GPS: doc.data().GPS,
-          icon: doc.data().photos[0],
-          ID: doc.id,
-        };
-
-        posts.push(mapPost);
-      });
-    
+      posts.push(mapPost);
+    });
 
     return posts;
   };
@@ -574,7 +572,15 @@ export default class Connection {
     const profilePosts = this.#database.doc(
       `Users/${username}/Posts/${newKey}`
     );
-    profilePosts.set({ timestamp: postData.timestamp });
+    const channelPosts = this.#database.doc(
+      `Channels/${channelName}/Posts/${newKey}`
+    );
+
+    const refData = { timestamp: postData.timestamp, score: postData.score };
+
+    // Add a reference to this post in the channel and user page
+    profilePosts.set(refData);
+    channelPosts.set(refData);
 
     return newKey;
   };
