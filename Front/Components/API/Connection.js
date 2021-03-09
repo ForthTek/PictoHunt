@@ -631,4 +631,62 @@ export default class Connection {
 
     return channel;
   }
+
+  /**
+   *
+   * @param {string} usernameToFollow
+   * @param {boolean} value
+   */
+  followUser = async (usernameToFollow, value) => {
+    // Get the user with username
+    const followRef = this.#database.doc(`Users/${usernameToFollow}`);
+    const userData = await followRef.get();
+
+    if (!userData.exists) {
+      throw new Error(`User ${usernameToFollow} does not exist`);
+    }
+
+    const username = this.currentUser().username;
+    const ref = this.#database.doc(
+      `Users/${username}/FollowedUsers/${usernameToFollow}`
+    );
+
+    // Follow this user
+    if (value) {
+      await ref.set({ timestamp: firebase.firestore.Timestamp.now() });
+    }
+    // Unfollow this user
+    else {
+      await ref.delete();
+    }
+  };
+
+    /**
+   *
+   * @param {string} channelNameToFollow
+   * @param {boolean} value
+   */
+     followChannel = async (channelNameToFollow, value) => {
+      // Get the user with username
+      const followRef = this.#database.doc(`Channels/${channelNameToFollow}`);
+      const channelData = await followRef.get();
+  
+      if (!channelData.exists) {
+        throw new Error(`Channel ${channelNameToFollow} does not exist`);
+      }
+  
+      const username = this.currentUser().username;
+      const ref = this.#database.doc(
+        `Users/${username}/FollowedChannels/${channelNameToFollow}`
+      );
+  
+      // Follow this user
+      if (value) {
+        await ref.set({ timestamp: firebase.firestore.Timestamp.now() });
+      }
+      // Unfollow this user
+      else {
+        await ref.delete();
+      }
+    };
 }

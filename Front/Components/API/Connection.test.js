@@ -117,6 +117,14 @@ describe("auth tests", () => {
     //expect(x.length).toBeGreaterThan(0);
   });
 
+  test("auth followUser", async () => {
+    await connection.followUser(TEST_USERNAME, true);
+  });
+
+  test("auth followChannel", async () => {
+    await connection.followChannel(TEST_CHANNEL, true);
+  });
+
   test("auth logout", async () => {
     let x = await connection.logout();
     expect(x).toBe(true);
