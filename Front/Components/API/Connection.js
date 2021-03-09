@@ -14,6 +14,11 @@ const config = {
   measurementId: "G-HDTRBXWKV1",
 };
 
+const SORT_BY_TIME = "timestamp";
+const SORT_BY_SCORE = "score";
+const ORDER_BY_ASC = "asc";
+const ORDER_BY_DESC = "desc";
+
 export default class Connection {
   #database;
   #auth;
@@ -24,22 +29,6 @@ export default class Connection {
    * Dictionary for storing loaded posts locally. We should check a post isn't here before loading it from the server
    */
   #posts;
-
-  #browseFilters;
-  #browse;
-
-  /**
-   * Enum used when calling interactWithPost(ID, type). Values: .remove, .like and .dislike
-   */
-  PostInteractionType;
-  /**
-   * Filters for the browse screen
-   */
-  BrowseFilters;
-  /**
-   * Filters for ordering posts
-   */
-  OrderBy;
 
   constructor() {
     // Initialise the connection
@@ -61,19 +50,8 @@ export default class Connection {
       like: 1,
       dislike: 2,
     });
-    this.BrowseFilters = Object.freeze({
-      allPosts: 0,
-      followedUsers: 1,
-      followedChannels: 2,
-    });
-    this.OrderBy = Object.freeze({
-      mostRecent: 0,
-      highestScore: 1,
-    });
 
     this.#posts = {};
-    this.#browse = [];
-    this.#browseFilters = [];
   }
 
   /**
@@ -385,7 +363,12 @@ export default class Connection {
     return post;
   }
 
-  async getAllPosts() {
+  async getAllPosts(
+    filters = {
+      sortBy: "time",
+      orderBy: "asc",
+    }
+  ) {
     let posts = [];
 
     await this.#database
@@ -407,17 +390,93 @@ export default class Connection {
     return posts;
   }
 
-  getBrowse = async () => {
-    const user = this.#auth.currentUser;
+  async getFollowedUserRefs(username) {
+    let users = [];
+    await this.#database
+      .collection(`Users/${username}/FollowedUsers`)
+      .get()
+      .then(async (querySnapshot) => {
+        // Must use async foreach here
+        for await (let doc of querySnapshot.docs) {
+          const followedUsername = doc.id;
+          const ref = this.#database.doc(`Users/${followedUsername}`);
+          users.push(ref);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return users;
+  }
 
-    // User is signed in
-    // In this case we want to get posts from followed feeds
+  async getFollowedChannelRefs(username) {
+    let channels = [];
+    await this.#database
+      .collection(`Users/${username}/FollowedChannels`)
+      .get()
+      .then(async (querySnapshot) => {
+        // Must use async foreach here
+        for await (let doc of querySnapshot.docs) {
+          const followedChannelName = doc.id;
+          const ref = this.#database.doc(`Channels/${followedChannelName}`);
+          channels.push(ref);
+        }
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+    return channels;
+  }
 
-    // user != null
-    if (false) {
-      const user = this.currentUser();
+  /**
+   *
+   * @param {object} filters contains { followedUsers: bool, followedChannels: bool, sortBy: string, orderBy: string }
+   * @returns
+   */
+  getBrowse = async (
+    filters = {
+      followedUsers: true,
+      followedChannels: true,
+      sortBy: SORT_BY_TIME,
+      orderBy: ORDER_BY_ASC,
     }
-    // Not signed in
+  ) => {
+    // User is signed in and we want to filter for specific posts
+    if (
+      this.#auth.currentUser != null &&
+      (filters.followedUsers || filters.followedChannels)
+    ) {
+
+      let allFollowedUsers = await this.getFollowedUserRefs("Test");
+      let allFollowedChannels = await this.getFollowedChannelRefs("Test");
+      console.log(
+        `User Test is following ${allFollowedUsers.length} users and ${allFollowedChannels.length} channels`
+      );
+      //console.log(allFollowedUsers)
+
+      let allPosts = [];
+
+      await this.#database
+      .collection("Posts")
+      .where("user", "in", allFollowedUsers)
+      .orderBy(filters.orderBy, filters.sortBy)
+      .get()
+      .then(async (querySnapshot) => {
+        // Must use async foreach here
+        for await (let doc of querySnapshot.docs) {
+          let x = await this.getPostFromDoc(doc);
+          allPosts.push(x);
+        }
+      })
+
+
+
+
+      console.log(allPosts);
+
+      return allPosts;
+    }
+    // Not signed in, just return all posts
     else {
       return await this.getAllPosts();
     }
@@ -661,32 +720,32 @@ export default class Connection {
     }
   };
 
-    /**
+  /**
    *
    * @param {string} channelNameToFollow
    * @param {boolean} value
    */
-     followChannel = async (channelNameToFollow, value) => {
-      // Get the user with username
-      const followRef = this.#database.doc(`Channels/${channelNameToFollow}`);
-      const channelData = await followRef.get();
-  
-      if (!channelData.exists) {
-        throw new Error(`Channel ${channelNameToFollow} does not exist`);
-      }
-  
-      const username = this.currentUser().username;
-      const ref = this.#database.doc(
-        `Users/${username}/FollowedChannels/${channelNameToFollow}`
-      );
-  
-      // Follow this user
-      if (value) {
-        await ref.set({ timestamp: firebase.firestore.Timestamp.now() });
-      }
-      // Unfollow this user
-      else {
-        await ref.delete();
-      }
-    };
+  followChannel = async (channelNameToFollow, value) => {
+    // Get the user with username
+    const followRef = this.#database.doc(`Channels/${channelNameToFollow}`);
+    const channelData = await followRef.get();
+
+    if (!channelData.exists) {
+      throw new Error(`Channel ${channelNameToFollow} does not exist`);
+    }
+
+    const username = this.currentUser().username;
+    const ref = this.#database.doc(
+      `Users/${username}/FollowedChannels/${channelNameToFollow}`
+    );
+
+    // Follow this user
+    if (value) {
+      await ref.set({ timestamp: firebase.firestore.Timestamp.now() });
+    }
+    // Unfollow this user
+    else {
+      await ref.delete();
+    }
+  };
 }
