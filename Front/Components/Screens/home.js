@@ -73,7 +73,7 @@ class Home extends Component {
                                 {this.state.user.username}
                             </Text>
                             <Text style={styles.info}>
-                                Joined: {this.state.user.timestamp.toDate().toString()}
+                                Joined: {this.state.user.timestamp.toString()}
                             </Text>
                         </View>
                     </View>

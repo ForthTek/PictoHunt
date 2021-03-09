@@ -355,7 +355,7 @@ export default class Connection {
       likes: values.likes,
       dislikes: values.dislikes,
       user: data.user.id,
-      time: data.timestamp,
+      time: data.timestamp.toDate(),
       interactedWith: values.interactedWith,
       ID: doc.id,
     };
@@ -469,10 +469,6 @@ export default class Connection {
           allPosts.push(x);
         }
       })
-
-
-
-
       console.log(allPosts);
 
       return allPosts;
@@ -577,7 +573,7 @@ export default class Connection {
         public: data.public,
         score: score,
         posts: data.posts,
-        timestamp: data.timestamp,
+        timestamp: data.timestamp.toDate(),
         posts: posts,
         followedUsers: users,
         followedChannels: channels,
@@ -685,7 +681,7 @@ export default class Connection {
     let channel = {
       name: doc.id,
       description: data.description,
-      timestamp: data.timestamp,
+      timestamp: data.timestamp.toDate(),
       createdBy: username,
     };
 
