@@ -443,8 +443,9 @@ export default class Connection {
   ) => {
     // User is signed in and we want to filter for specific posts
     if (
-      this.#auth.currentUser != null &&
-      (filters.followedUsers || filters.followedChannels)
+      false
+      // this.#auth.currentUser != null &&
+      // (filters.followedUsers || filters.followedChannels)
     ) {
 
       let allFollowedUsers = await this.getFollowedUserRefs("Test");
