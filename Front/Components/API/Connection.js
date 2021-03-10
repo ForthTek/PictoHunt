@@ -14,6 +14,7 @@ const config = {
   measurementId: "G-HDTRBXWKV1",
 };
 
+
 export default class Connection {
   #database;
   #auth;
