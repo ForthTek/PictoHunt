@@ -249,12 +249,16 @@ export default class Firebase {
   getPost = async (postID) => {
     // Update the current version if there is one
     if (this.#posts[postID]) {
+      const doc = await this.#database.doc(`Posts/${postID}`).get();
+      const data = doc.data();
+
       // Calculate the values we need to
-      let updated = await this.calculatePostValues(postID);
-      this.#posts[postID].score = updated.score;
-      this.#posts[postID].likes = updated.likes;
-      this.#posts[postID].dislikes = updated.dislikes;
-      this.#posts[postID].interactedWith = updated.interactedWith;
+      this.#posts[postID].score = data.score;
+      this.#posts[postID].likes = data.likes;
+      this.#posts[postID].dislikes = data.dislikes;
+      this.#posts[postID].interactedWith = await this.calculateInteractedWith(
+        postID
+      );
 
       // Return the updated version
       return this.#posts[postID];
@@ -285,21 +289,7 @@ export default class Firebase {
     }
   }
 
-  async calculatePostValues(postID) {
-    // Count the likes and dislikes
-    const likes = await this.#database
-      .collection(`Posts/${postID}/Likes`)
-      .get()
-      .then((snap) => {
-        return snap.size;
-      });
-    const dislikes = await this.#database
-      .collection(`Posts/${postID}/Dislikes`)
-      .get()
-      .then((snap) => {
-        return snap.size;
-      });
-
+  async calculateInteractedWith(postID) {
     // See if the user has interacted with the post
     let interaction = this.PostInteractionType.remove;
 
@@ -324,17 +314,12 @@ export default class Firebase {
       }
     }
 
-    return {
-      score: likes - dislikes,
-      likes: likes,
-      dislikes: dislikes,
-      interactedWith: interaction,
-    };
+    return interaction;
   }
 
   async returnPost(doc) {
     const data = await doc.data();
-    const values = await this.calculatePostValues(doc.id);
+    const interaction = await this.calculateInteractedWith(doc.id);
 
     // Return the data in a nice format
     let post = {
@@ -342,12 +327,12 @@ export default class Firebase {
       GPS: data.GPS,
       channel: data.channel.id,
       photos: data.photos,
-      score: values.score,
-      likes: values.likes,
-      dislikes: values.dislikes,
+      score: data.score,
+      likes: data.likes,
+      dislikes: data.dislikes,
       user: data.user.id,
       time: data.timestamp.toDate(),
-      interactedWith: values.interactedWith,
+      interactedWith: interaction,
       ID: doc.id,
     };
 

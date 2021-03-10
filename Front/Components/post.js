@@ -24,6 +24,7 @@ class Post extends Component {
     onLikeBtnPress = (type) => {
         if (type === "like") {
             alert("Pressed: " + type);
+            // Change to await pls
             this.connection
                 .likePost(
                     this.state.postID,

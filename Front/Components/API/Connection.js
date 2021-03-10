@@ -77,15 +77,45 @@ export default class Connection {
   };
 
   likePost = async (postID) => {
-    return await this.#firebase.interactWithPost(postID, this.#firebase.PostInteractionType.like);
+    return await this.#firebase
+      .interactWithPost(postID, this.#firebase.PostInteractionType.like)
+      .then(
+        async () => {
+          return await this.#server.updatePostValues(postID);
+        },
+        (error) => {
+          console.log(error);
+          throw new Error(`Server failed to update post ${postID}`);
+        }
+      );
   };
 
   dislikePost = async (postID) => {
-    return await this.#firebase.interactWithPost(postID, this.#firebase.PostInteractionType.dislike);
+    return await this.#firebase
+      .interactWithPost(postID, this.#firebase.PostInteractionType.dislike)
+      .then(
+        async () => {
+          return await this.#server.updatePostValues(postID);
+        },
+        (error) => {
+          console.log(error);
+          throw new Error(`Server failed to update post ${postID}`);
+        }
+      );
   };
 
   removeInteractionFromPost = async (postID) => {
-    return await this.#firebase.interactWithPost(postID, this.#firebase.PostInteractionType.remove);
+    return await this.#firebase
+      .interactWithPost(postID, this.#firebase.PostInteractionType.remove)
+      .then(
+        async () => {
+          return await this.#server.updatePostValues(postID);
+        },
+        (error) => {
+          console.log(error);
+          throw new Error(`Server failed to update post ${postID}`);
+        }
+      );
   };
 
   /**
@@ -107,6 +137,10 @@ export default class Connection {
     return await this.#firebase.getBrowse();
   };
 
+  getAllPosts = async () => {
+    return await this.#firebase.getAllPosts();
+  };
+
   getMap = async () => {
     return await this.#firebase.getMap();
   };
@@ -126,7 +160,20 @@ export default class Connection {
   };
 
   createPost = async (title, channelName, GPS, photos) => {
-    return await this.#firebase.createPost(title, channelName, GPS, photos);
+    return await this.#firebase
+      // Create the post
+      .createPost(title, channelName, GPS, photos)
+      .then(
+        async (newKey) => {
+          // Then update the number of likes etc
+          await this.#server.updatePostValues(newKey);
+          return newKey;
+        },
+        (error) => {
+          console.log(error);
+          throw new Error(`Server failed to update post ${postID}`);
+        }
+      );
   };
 
   createChannel = async (name, description) => {

@@ -1,3 +1,5 @@
+import "isomorphic-fetch"
+
 const ADDRESS = "https://pictohunt-server.herokuapp.com";
 
 export default class Server {
@@ -15,5 +17,19 @@ export default class Server {
         console.log(`Failed pinging the server with error:`);
         console.log(error);
       });
+  }
+
+  async updatePostValues(postID) {
+    return await fetch(`${ADDRESS}/api/updatePost/${postID}`)
+      .then((res) => res.text())
+      .then(
+        (text) => {
+          return true;
+        },
+        (error) => {
+          console.log(error);
+          throw new Error(`Server failed to update post ${postID}`);
+        }
+      );
   }
 }

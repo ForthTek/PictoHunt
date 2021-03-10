@@ -83,7 +83,7 @@ describe("auth tests", () => {
     expect(x.username).toBe(TEST_USERNAME);
   });
 
-  test.only("auth getBrowse", async () => {
+  test("auth getBrowse", async () => {
     let x = await connection.getBrowse();
     expect(x.length).toBeGreaterThan(0);
   });
@@ -111,10 +111,9 @@ describe("auth tests", () => {
     //console.log(channel)
   });
 
-  test("auth interactWithPost", async () => {
-    const type = connection.PostInteractionType.like;
-    let x = await connection.interactWithPost(TEST_POST, type);
-    //expect(x.length).toBeGreaterThan(0);
+  test("auth like", async () => {
+    let x = await connection.likePost(TEST_POST);
+    // Like, dislike and remove interaction
   });
 
   test("auth followUser", async () => {
