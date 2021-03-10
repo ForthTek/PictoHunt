@@ -14,6 +14,9 @@ const config = {
   measurementId: "G-HDTRBXWKV1",
 };
 
+const SERVER_ADDRESS = "https://pictohunt-server.herokuapp.com";
+const API = `${SERVER_ADDRESS}/api`;
+
 const SORT_BY_TIME = "timestamp";
 const SORT_BY_SCORE = "score";
 const ORDER_BY_ASC = "asc";
@@ -52,7 +55,21 @@ export default class Connection {
     });
 
     this.#posts = {};
+
+    this.pingServer();
   }
+
+  pingServer = async () => {
+    fetch(`${API}/uptime`)
+      .then((res) => res.text())
+      .then((text) => {
+        console.log(`Server is online with an uptime of ${text}`);
+      })
+      .catch((error) => {
+        console.log(`Failed pinging the server with error:`);
+        console.log(error);
+      });
+  };
 
   /**
    * This is called when user signs in or out, and also whenever the token changes
@@ -447,7 +464,6 @@ export default class Connection {
       // this.#auth.currentUser != null &&
       // (filters.followedUsers || filters.followedChannels)
     ) {
-
       let allFollowedUsers = await this.getFollowedUserRefs("Test");
       let allFollowedChannels = await this.getFollowedChannelRefs("Test");
       console.log(
@@ -458,17 +474,17 @@ export default class Connection {
       let allPosts = [];
 
       await this.#database
-      .collection("Posts")
-      .where("user", "in", allFollowedUsers)
-      .orderBy(filters.orderBy, filters.sortBy)
-      .get()
-      .then(async (querySnapshot) => {
-        // Must use async foreach here
-        for await (let doc of querySnapshot.docs) {
-          let x = await this.getPostFromDoc(doc);
-          allPosts.push(x);
-        }
-      })
+        .collection("Posts")
+        .where("user", "in", allFollowedUsers)
+        .orderBy(filters.orderBy, filters.sortBy)
+        .get()
+        .then(async (querySnapshot) => {
+          // Must use async foreach here
+          for await (let doc of querySnapshot.docs) {
+            let x = await this.getPostFromDoc(doc);
+            allPosts.push(x);
+          }
+        });
       console.log(allPosts);
 
       return allPosts;
