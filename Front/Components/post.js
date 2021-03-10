@@ -25,9 +25,8 @@ class Post extends Component {
         if (type === "like") {
             alert("Pressed: " + type);
             this.connection
-                .interactWithPost(
+                .likePost(
                     this.state.postID,
-                    this.connection.PostInteractionType.like
                 )
                 .catch((error) => {
                     Alert.alert(error.message);
@@ -36,9 +35,8 @@ class Post extends Component {
         if (type === "dislike") {
             alert("Pressed: " + type);
             this.connection
-                .interactWithPost(
+                .dislikePost(
                     this.state.postID,
-                    this.connection.PostInteractionType.dislike
                 )
                 .catch((error) => {
                     Alert.alert(error.message);
@@ -47,9 +45,8 @@ class Post extends Component {
         if (type === "remove") {
             alert("Pressed: " + type);
             this.connection
-                .interactWithPost(
+                .removeInteractionFromPost(
                     this.state.postID,
-                    this.connection.PostInteractionType.remove
                 )
                 .catch((error) => {
                     Alert.alert(error.message);

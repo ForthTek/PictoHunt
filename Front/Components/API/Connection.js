@@ -8,12 +8,6 @@ export default class Connection {
   constructor() {
     this.#firebase = new Firebase();
     this.#server = new Server();
-
-    this.PostInteractionType = Object.freeze({
-      remove: 0,
-      like: 1,
-      dislike: 2,
-    });
   }
 
   /**
@@ -82,13 +76,16 @@ export default class Connection {
     );
   };
 
-  /**
-   *
-   * @param {string} postID
-   * @param {number} interaction PostInteractionType enum, contains .remove, .like and .dislike
-   */
-  interactWithPost = async (postID, interaction) => {
-    return await this.#firebase.interactWithPost(postID, interaction);
+  likePost = async (postID) => {
+    return await this.#firebase.interactWithPost(postID, this.#firebase.PostInteractionType.like);
+  };
+
+  dislikePost = async (postID) => {
+    return await this.#firebase.interactWithPost(postID, this.#firebase.PostInteractionType.dislike);
+  };
+
+  removeInteractionFromPost = async (postID) => {
+    return await this.#firebase.interactWithPost(postID, this.#firebase.PostInteractionType.remove);
   };
 
   /**
