@@ -87,7 +87,10 @@ export default class Connection {
           console.log(error);
           throw new Error(`Server failed to update post ${postID}`);
         }
-      );
+      )
+      .then(async (res) => {
+        return this.#firebase.getPost(postID);
+      });
   };
 
   dislikePost = async (postID) => {
@@ -101,7 +104,10 @@ export default class Connection {
           console.log(error);
           throw new Error(`Server failed to update post ${postID}`);
         }
-      );
+      )
+      .then(async (res) => {
+        return this.#firebase.getPost(postID);
+      });
   };
 
   removeInteractionFromPost = async (postID) => {
@@ -115,7 +121,10 @@ export default class Connection {
           console.log(error);
           throw new Error(`Server failed to update post ${postID}`);
         }
-      );
+      )
+      .then(async (res) => {
+        return this.#firebase.getPost(postID);
+      });
   };
 
   /**
