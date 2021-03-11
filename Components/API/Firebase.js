@@ -279,13 +279,23 @@ export default class Firebase {
       if (!this.#posts[postID]) {
         this.#posts[postID] = await this.returnPost(doc);
       }
+      // Otherwise just update the values on it
+      else {
+        // Calculate the values we need to
+        this.#posts[postID].score = data.score;
+        this.#posts[postID].likes = data.likes;
+        this.#posts[postID].dislikes = data.dislikes;
+        this.#posts[postID].interactedWith = await this.calculateInteractedWith(
+          postID
+        );
+      }
 
-      // Now calculate the new values
-      return this.getPost(postID);
+      // Return the updated version
+      return this.#posts[postID];
     }
     // Throw an error if it doesn't exist
     else {
-      throw new Error(`Post ${postID} does not exist`);
+      throw new Error(`Doc does not exist`);
     }
   }
 
@@ -341,15 +351,15 @@ export default class Firebase {
 
   async getAllPosts(
     filters = {
-      sortBy: "time",
-      orderBy: "asc",
+      sortBy: SORT_BY_TIME,
+      orderBy: ORDER_BY_DESC,
     }
   ) {
     let posts = [];
 
     await this.#database
       .collection("Posts")
-      .orderBy("timestamp", "desc")
+      .orderBy(filters.sortBy, filters.orderBy)
       .get()
       .then(async (querySnapshot) => {
         // Must use async foreach here
@@ -417,12 +427,12 @@ export default class Firebase {
       orderBy: ORDER_BY_ASC,
     }
   ) => {
-    // User is signed in and we want to filter for specific posts
-    if (
-      false
-      // this.#auth.currentUser != null &&
-      // (filters.followedUsers || filters.followedChannels)
-    ) {
+    // Not signed in, just return all posts
+    // this.#auth.currentUser != null &&
+    // (filters.followedUsers || filters.followedChannels)
+    if (true) {
+      return await this.getAllPosts();
+    } else {
       let allFollowedUsers = await this.getFollowedUserRefs("Test");
       let allFollowedChannels = await this.getFollowedChannelRefs("Test");
       console.log(
@@ -447,10 +457,6 @@ export default class Firebase {
       console.log(allPosts);
 
       return allPosts;
-    }
-    // Not signed in, just return all posts
-    else {
-      return await this.getAllPosts();
     }
   };
 

@@ -1,4 +1,4 @@
-import "isomorphic-fetch"
+import "isomorphic-fetch";
 
 const ADDRESS = "https://pictohunt-server.herokuapp.com";
 
