@@ -138,18 +138,13 @@ export default class Connection {
     return await this.#firebase.getPost(postID);
   };
 
-  /**
-   *
-   * @param {object} filters contains { followedUsers: bool, followedChannels: bool, sortBy: string, orderBy: string }
-   * @returns
-   */
-  getBrowse = async (filter) => {
-    console.log(filter);
+
+  getBrowse = async (filter = new Filter()) => {
     return await this.#firebase.getBrowse(filter);
   };
 
-  getAllPosts = async () => {
-    return await this.#firebase.getAllPosts();
+  getAllPosts = async (filter = new Filter()) => {
+    return await this.#firebase.getAllPosts(filter);
   };
 
   getMap = async () => {

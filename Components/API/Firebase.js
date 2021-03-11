@@ -348,10 +348,6 @@ export default class Firebase {
   getPostsFromCollection = async (collectionPath, filter) => {
     let allPosts = [];
 
-    console.log(
-      `getting collection ${collectionPath} with filters ${filter.orderBy} ${filter.direction}`
-    );
-
     await this.#database
       .collection(collectionPath)
       .orderBy(filter.orderBy, filter.direction)
@@ -418,25 +414,28 @@ export default class Firebase {
    * @returns
    */
   getBrowse = async (filter) => {
-    // Not signed in, just return all posts
-    // this.#auth.currentUser != null &&
-    // (filters.followedUsers || filters.followedChannels)
+    const user = this.currentUser();
+
+    // If there is no user, or filter specifies to load all posts
+    // !user || !(filter.followedUsers && filter.followedChannel)
     if (true) {
       return await this.getAllPosts(filter);
-    } else {
+    }
+    // Otherwise load following
+    else {
       let allFollowedUsers = await this.getFollowedUserRefs("Test");
       let allFollowedChannels = await this.getFollowedChannelRefs("Test");
       console.log(
         `User Test is following ${allFollowedUsers.length} users and ${allFollowedChannels.length} channels`
       );
-      //console.log(allFollowedUsers)
-
+      
       let allPosts = [];
 
       await this.#database
         .collection("Posts")
         .where("user", "in", allFollowedUsers)
-        .orderBy(filters.orderBy, filters.sortBy)
+        //.orderBy(filter.orderBy, filter.sortBy)
+        .orderBy("timestamp", "desc")
         .get()
         .then(async (querySnapshot) => {
           // Must use async foreach here
@@ -445,6 +444,8 @@ export default class Firebase {
             allPosts.push(x);
           }
         });
+
+      console.log("LOADED BROWSE WITH POSTS:")
       console.log(allPosts);
 
       return allPosts;

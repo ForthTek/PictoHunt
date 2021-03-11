@@ -1,4 +1,5 @@
 import Connection from "./Connection.js";
+import Filter from "./Filter.js";
 
 const TEST_EMAIL = "forthtek1@gmail.com";
 const TEST_USERNAME = "Test";
@@ -38,7 +39,7 @@ describe("guest tests", () => {
   });
 
   test("guest getAllPosts", async () => {
-    let x = await connection.getAllPosts();
+    let x = await connection.getAllPosts(new Filter());
     expect(x.length).toBeGreaterThan(0);
   });
 
@@ -54,8 +55,8 @@ describe("guest tests", () => {
 
   test("guest getBrowse", async () => {
     // A guest user viewing browse should see all posts
-    const numberOfAllPosts = (await connection.getAllPosts()).length;
-    const numberOfBrowse = (await connection.getBrowse()).length;
+    const numberOfAllPosts = (await connection.getAllPosts(new Filter())).length;
+    const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
     expect(numberOfBrowse).toBe(numberOfAllPosts);
   });
 });
@@ -83,8 +84,8 @@ describe("auth tests", () => {
     expect(x.username).toBe(TEST_USERNAME);
   });
 
-  test("auth getBrowse", async () => {
-    let x = await connection.getBrowse();
+  test.only("auth getBrowse", async () => {
+    let x = await connection.getBrowse(new Filter());
     expect(x.length).toBeGreaterThan(0);
   });
 
