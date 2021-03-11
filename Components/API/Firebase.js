@@ -419,7 +419,7 @@ export default class Firebase {
 
     // If there is no user, or filter specifies to load all posts
     // !user || !(filter.followedUsers && filter.followedChannel)
-    if (!user || !filterFollowing) {
+    if (true) {
       return await this.getAllPosts(filter);
     }
     // Otherwise load following
@@ -430,7 +430,7 @@ export default class Firebase {
         throw new Error("Not following any users or channels");
       }
 
-      console.log(filter);
+      //console.log(filter);
 
       let alreadyAdded = {};
       let posts = [];
@@ -482,7 +482,7 @@ export default class Firebase {
       }
 
       // console.log("LOADED BROWSE WITH POSTS:");
-      console.log(posts);
+      //console.log(posts);
 
       return posts;
     }
