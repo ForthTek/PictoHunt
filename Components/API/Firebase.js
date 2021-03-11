@@ -415,42 +415,87 @@ export default class Firebase {
    */
   getBrowse = async (filter) => {
     const user = this.currentUser();
+    const filterFollowing = filter.followedUsers || filter.followedChannels;
 
     // If there is no user, or filter specifies to load all posts
     // !user || !(filter.followedUsers && filter.followedChannel)
-    if (true) {
+    if (!user || !filterFollowing) {
       return await this.getAllPosts(filter);
     }
     // Otherwise load following
     else {
       let allFollowedUsers = await this.getFollowedUserRefs("Test");
       let allFollowedChannels = await this.getFollowedChannelRefs("Test");
-      console.log(
-        `User Test is following ${allFollowedUsers.length} users and ${allFollowedChannels.length} channels`
-      );
-      
-      let allPosts = [];
+      if (allFollowedUsers.length === 0 && allFollowedChannels.length === 0) {
+        throw new Error("Not following any users or channels");
+      }
 
-      await this.#database
-        .collection("Posts")
-        .where("user", "in", allFollowedUsers)
-        //.orderBy(filter.orderBy, filter.sortBy)
-        .orderBy("timestamp", "desc")
-        .get()
-        .then(async (querySnapshot) => {
-          // Must use async foreach here
-          for await (let doc of querySnapshot.docs) {
-            let x = await this.getPostFromDoc(doc);
-            allPosts.push(x);
-          }
-        });
+      console.log(filter);
 
-      console.log("LOADED BROWSE WITH POSTS:")
-      console.log(allPosts);
+      let alreadyAdded = {};
+      let posts = [];
 
-      return allPosts;
+      if (filter.followedUsers) {
+        await this.#database
+          .collection("Posts")
+          .where("user", "in", allFollowedUsers)
+          .orderBy(filter.orderBy, filter.direction)
+          .get()
+          .then(async (querySnapshot) => {
+            // Must use async foreach here
+            for await (let doc of querySnapshot.docs) {
+              const key = doc.id;
+              // Only add the post if its not already been added
+              if (!alreadyAdded[key]) {
+                let x = await this.getPostFromDoc(doc);
+                posts.push(x);
+                alreadyAdded[key] = true;
+              }
+            }
+          });
+      }
+
+      if (filter.followedChannels) {
+        await this.#database
+          .collection("Posts")
+          .where("channel", "in", allFollowedChannels)
+          .orderBy(filter.orderBy, filter.direction)
+          .get()
+          .then(async (querySnapshot) => {
+            // Must use async foreach here
+            for await (let doc of querySnapshot.docs) {
+              const key = doc.id;
+              // Only add the post if its not already been added
+              if (!alreadyAdded[key]) {
+                let x = await this.getPostFromDoc(doc);
+                posts.push(x);
+                alreadyAdded[key] = true;
+              }
+            }
+          });
+      }
+
+      // Need to sort the list again if we filtered by both channel and user
+      if (filter.followedUsers && filter.followedChannels) {
+        // TODO *******************************************************************************************
+        //posts.sort();
+      }
+
+      // console.log("LOADED BROWSE WITH POSTS:");
+      console.log(posts);
+
+      return posts;
     }
   };
+
+  comparePost(post1, post2, filter) {
+    switch (filter.orderBy) {
+      case "timestamp":
+        break;
+      case "score":
+        break;
+    }
+  }
 
   getMap = async () => {
     const snapshot = await this.#database

@@ -84,7 +84,7 @@ describe("auth tests", () => {
     expect(x.username).toBe(TEST_USERNAME);
   });
 
-  test.only("auth getBrowse", async () => {
+  test("auth getBrowse", async () => {
     let x = await connection.getBrowse(new Filter());
     expect(x.length).toBeGreaterThan(0);
   });
