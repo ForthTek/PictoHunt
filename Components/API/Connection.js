@@ -1,3 +1,4 @@
+import Filter from "./Filter.js";
 import Firebase from "./Firebase.js";
 import Server from "./Server.js";
 
@@ -142,8 +143,9 @@ export default class Connection {
    * @param {object} filters contains { followedUsers: bool, followedChannels: bool, sortBy: string, orderBy: string }
    * @returns
    */
-  getBrowse = async () => {
-    return await this.#firebase.getBrowse();
+  getBrowse = async (filter) => {
+    console.log(filter);
+    return await this.#firebase.getBrowse(filter);
   };
 
   getAllPosts = async () => {

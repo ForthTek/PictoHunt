@@ -4,6 +4,8 @@ import "firebase/firestore";
 
 import Upload from "./Upload.js";
 
+import Filter from "./Filter.js";
+
 const config = {
   apiKey: "AIzaSyCvQv_waR8vtFZIrmHlgVexp0VrrGNwGBE",
   authDomain: "picto-hunt.firebaseapp.com",
@@ -13,11 +15,6 @@ const config = {
   appId: "1:762056308518:web:ec820ae748f1191699b3e7",
   measurementId: "G-HDTRBXWKV1",
 };
-
-const SORT_BY_TIME = "timestamp";
-const SORT_BY_SCORE = "score";
-const ORDER_BY_ASC = "asc";
-const ORDER_BY_DESC = "desc";
 
 export default class Firebase {
   #database;
@@ -252,13 +249,14 @@ export default class Firebase {
       const doc = await this.#database.doc(`Posts/${postID}`).get();
       const data = doc.data();
 
+      let interaction = await this.calculateInteractedWith(postID);
+
       // Calculate the values we need to
       this.#posts[postID].score = data.score;
       this.#posts[postID].likes = data.likes;
       this.#posts[postID].dislikes = data.dislikes;
-      this.#posts[postID].interactedWith = await this.calculateInteractedWith(
-        postID
-      );
+      this.#posts[postID].liked = interaction.liked;
+      this.#posts[postID].disliked = interaction.disliked;
 
       // Return the updated version
       return this.#posts[postID];
@@ -281,13 +279,15 @@ export default class Firebase {
       }
       // Otherwise just update the values on it
       else {
+        let interaction = await this.calculateInteractedWith(postID);
+        const data = await doc.data();
+
         // Calculate the values we need to
         this.#posts[postID].score = data.score;
         this.#posts[postID].likes = data.likes;
         this.#posts[postID].dislikes = data.dislikes;
-        this.#posts[postID].interactedWith = await this.calculateInteractedWith(
-          postID
-        );
+        this.#posts[postID].liked = interaction.liked;
+        this.#posts[postID].disliked = interaction.disliked;
       }
 
       // Return the updated version
@@ -301,30 +301,25 @@ export default class Firebase {
 
   async calculateInteractedWith(postID) {
     // See if the user has interacted with the post
-    let interaction = this.PostInteractionType.remove;
+    let liked = false;
+    let disliked = false;
 
     const user = this.currentUser();
     if (user) {
-      if (
-        (
-          await this.#database
-            .doc(`Posts/${postID}/Likes/${user.username}`)
-            .get()
-        ).exists
-      ) {
-        interaction = this.PostInteractionType.like;
-      } else if (
-        (
+      liked = (
+        await this.#database.doc(`Posts/${postID}/Likes/${user.username}`).get()
+      ).exists;
+
+      if (!liked) {
+        disliked = (
           await this.#database
             .doc(`Posts/${postID}/Dislikes/${user.username}`)
             .get()
-        ).exists
-      ) {
-        interaction = this.PostInteractionType.dislike;
+        ).exists;
       }
     }
 
-    return interaction;
+    return { liked: liked, disliked: disliked };
   }
 
   async returnPost(doc) {
@@ -342,38 +337,41 @@ export default class Firebase {
       dislikes: data.dislikes,
       user: data.user.id,
       time: data.timestamp.toDate(),
-      interactedWith: interaction,
+      liked: interaction.liked,
+      disliked: interaction.disliked,
       ID: doc.id,
     };
 
     return post;
   }
 
-  async getAllPosts(
-    filters = {
-      sortBy: SORT_BY_TIME,
-      orderBy: ORDER_BY_DESC,
-    }
-  ) {
-    let posts = [];
+  getPostsFromCollection = async (collectionPath, filter) => {
+    let allPosts = [];
+
+    console.log(
+      `getting collection ${collectionPath} with filters ${filter.orderBy} ${filter.direction}`
+    );
 
     await this.#database
-      .collection("Posts")
-      .orderBy(filters.sortBy, filters.orderBy)
+      .collection(collectionPath)
+      .orderBy(filter.orderBy, filter.direction)
       .get()
       .then(async (querySnapshot) => {
         // Must use async foreach here
         for await (let doc of querySnapshot.docs) {
-          let x = await this.getPostFromDoc(doc);
-          posts.push(x);
+          allPosts.push(await this.getPostFromDoc(doc));
         }
       })
       .catch((error) => {
         console.log(error);
-        throw Error("Couldn't load all posts");
+        throw Error(`Failed to load posts from collection ${collectionPath}`);
       });
 
-    return posts;
+    return allPosts;
+  };
+
+  async getAllPosts(filter) {
+    return await this.getPostsFromCollection("Posts", filter);
   }
 
   async getFollowedUserRefs(username) {
@@ -419,19 +417,12 @@ export default class Firebase {
    * @param {object} filters contains { followedUsers: bool, followedChannels: bool, sortBy: string, orderBy: string }
    * @returns
    */
-  getBrowse = async (
-    filters = {
-      followedUsers: true,
-      followedChannels: true,
-      sortBy: SORT_BY_TIME,
-      orderBy: ORDER_BY_ASC,
-    }
-  ) => {
+  getBrowse = async (filter) => {
     // Not signed in, just return all posts
     // this.#auth.currentUser != null &&
     // (filters.followedUsers || filters.followedChannels)
     if (true) {
-      return await this.getAllPosts();
+      return await this.getAllPosts(filter);
     } else {
       let allFollowedUsers = await this.getFollowedUserRefs("Test");
       let allFollowedChannels = await this.getFollowedChannelRefs("Test");
@@ -502,7 +493,7 @@ export default class Firebase {
 
       await this.#database
         .collection(`Users/${username}/Posts`)
-        .orderBy("timestamp", "desc")
+        .orderBy(SORT_BY_TIME, ORDER_BY_DESC)
         .get()
         .then(async (querySnapshot) => {
           // Must use async foreach here

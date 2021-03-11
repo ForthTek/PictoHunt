@@ -22,6 +22,11 @@ class Post extends Component {
   };
 
   onLikeBtnPress = (type) => {
+
+    // TODO
+    // use .liked and .disliked to display graphic 
+
+
     if (type === "like") {
       alert("Pressed: " + type);
 
