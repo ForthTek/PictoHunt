@@ -165,10 +165,10 @@ export default class Connection {
     return await this.#firebase.getProfile(username);
   };
 
-  createPost = async (title, channelName, GPS, photos) => {
+  createPost = async (title, channelName, latitude, longitude, photos) => {
     return await this.#firebase
       // Create the post
-      .createPost(title, channelName, GPS, photos)
+      .createPost(title, channelName, latitude, longitude, photos)
       .then(
         async (newKey) => {
           // Then update the number of likes etc

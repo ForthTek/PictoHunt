@@ -600,7 +600,7 @@ export default class Firebase {
     }
   };
 
-  createPost = async (title, channelName, GPS, photos) => {
+  createPost = async (title, channelName, latitude, longitude, photos) => {
     const username = this.currentUser().username;
 
     const ref = this.#database.collection("Posts").doc();
@@ -626,7 +626,7 @@ export default class Firebase {
     // Do some input validation stuff here
     const postData = {
       title: title,
-      GPS: GPS,
+      GPS: new firebase.firestore.GeoPoint(latitude, longitude),
       channel: channelRef,
       photos: URLs,
       score: 0,

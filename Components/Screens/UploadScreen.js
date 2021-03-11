@@ -48,7 +48,7 @@ export default class UploadScreen extends Component {
         const blob = await res.blob();
 
         this.connection
-            .createPost(this.state.title, this.state.channel, null, [blob])
+            .createPost(this.state.title, this.state.channel, null, null, [blob])
             .then(
                 (key) => {
                     console.log(key);
