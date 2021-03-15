@@ -75,7 +75,6 @@ class Home extends Component {
                             <Text style={styles.info}>
                                 Joined:{" "}
                                 {this.state.user.timestamp
-                                    .toDate()
                                     .toString()
                                     .substring(4, 15)}
                             </Text>
