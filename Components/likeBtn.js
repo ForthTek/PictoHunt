@@ -13,7 +13,12 @@ export default class LikeBtn extends Component {
             <View>
                 <Pressable
                     style={styles.container}
-                    onPress={() => this.props.onLikeBtnPress(this.props.type)}
+                    onPress={() =>
+                        this.props.onLikeBtnPress(
+                            this.props.type,
+                            this.props.postID
+                        )
+                    }
                 >
                     <Ionicon name={this.props.icon} style={styles.icon} />
                 </Pressable>

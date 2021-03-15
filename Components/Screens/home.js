@@ -37,7 +37,7 @@ class Home extends Component {
                 console.log(res);
             },
             (error) => {
-                console.log(error)
+                console.log(error);
                 Alert.alert(error.message);
             }
         );
@@ -73,7 +73,11 @@ class Home extends Component {
                                 {this.state.user.username}
                             </Text>
                             <Text style={styles.info}>
-                                Joined: {this.state.user.timestamp.toString()}
+                                Joined:{" "}
+                                {this.state.user.timestamp
+                                    .toDate()
+                                    .toString()
+                                    .substring(4, 15)}
                             </Text>
                         </View>
                     </View>
@@ -85,7 +89,10 @@ class Home extends Component {
                         }}
                     >
                         <Score label='Score' number={this.state.user.score} />
-                        <Score label='Pics' number={this.state.user.posts.length} />
+                        <Score
+                            label='Pics'
+                            number={this.state.user.posts.length}
+                        />
                         <Score label='Rank' number={5} />
                     </View>
                     <View style={styles.container}>
@@ -147,12 +154,13 @@ const styles = StyleSheet.create({
     },
     username: {
         fontSize: 22,
-        paddingBottom: "10%",
+        paddingBottom: "2%",
         maxWidth: 200,
     },
     info: {
-        fontSize: 18,
+        fontSize: 15,
         paddingBottom: "5%",
+        color: "grey",
     },
     loadCon: {
         flex: 1,
