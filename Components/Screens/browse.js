@@ -65,24 +65,19 @@ export default class Browse extends Component {
     onLikeBtnPress = (type, id, updateScore) => {
         if (type === "like") {
             alert("Pressed: " + type);
-            this.connection
-                .interactWithPost(id, this.connection.PostInteractionType.like)
-                .then(
-                    () => {
-                        updateScore(id);
-                    },
-                    (error) => {
-                        Alert.alert(error.message);
-                    }
-                );
+            this.connection.likePost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
         }
         if (type === "dislike") {
             alert("Pressed: " + type);
             this.connection
-                .interactWithPost(
-                    id,
-                    this.connection.PostInteractionType.dislike
-                )
+                .dislikePost(id)
                 .then(
                     () => {
                         updateScore(id);
@@ -97,19 +92,14 @@ export default class Browse extends Component {
         }
         if (type === "remove") {
             alert("Pressed: " + type);
-            this.connection
-                .interactWithPost(
-                    id,
-                    this.connection.PostInteractionType.remove
-                )
-                .then(
-                    () => {
-                        updateScore(id);
-                    },
-                    (error) => {
-                        Alert.alert(error.message);
-                    }
-                );
+            this.connection.removeInteractionFromPost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
         }
     };
 
