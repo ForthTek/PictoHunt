@@ -539,7 +539,7 @@ export default class Firebase {
 
       await this.#database
         .collection(`Users/${username}/Posts`)
-        .orderBy(SORT_BY_TIME, ORDER_BY_DESC)
+        .orderBy("timestamp", "desc")
         .get()
         .then(async (querySnapshot) => {
           // Must use async foreach here
