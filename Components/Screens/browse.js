@@ -12,6 +12,7 @@ import {
 import Post from "../post";
 import SinglePost from "../singlePost";
 import FilterBtn from "../filterBtn";
+import Filter from "../API/Filter";
 
 export default class Browse extends Component {
     constructor(props) {
@@ -26,6 +27,7 @@ export default class Browse extends Component {
         singlePostID: "",
         DATA: "",
         refresh: false,
+        filter: new Filter(),
     };
 
     componentDidMount() {
@@ -33,7 +35,9 @@ export default class Browse extends Component {
         // filter.orderBy = Filter.ORDER_BY_SCORE or filter.orderBy = Filter.ORDER_BY_TIME
         // Probs want to keep direction desc
         // filter.followedUsers = true and filter.followedChannels = true
-
+        this.state.filter.orderBy = Filter.ORDER_BY_TIME;
+        this.state.filter.followedChannels = false;
+        this.state.filter.followedUsers = false;
         this.connection.getBrowse(this.state.filter).then(
             (posts) => {
                 this.setState({ DATA: posts });
@@ -61,7 +65,7 @@ export default class Browse extends Component {
 
     onRefresh = async () => {
         this.setState({ refresh: true, DATA: "" });
-        await this.connection.getBrowse().then(
+        await this.connection.getBrowse(this.state.filter).then(
             (res) => {
                 this.setState({ DATA: res });
                 this.setState({ refresh: false });
