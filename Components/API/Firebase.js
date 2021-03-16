@@ -197,6 +197,8 @@ export default class Firebase {
           email: email,
           public: isPublic,
           timestamp: firebase.firestore.Timestamp.now(),
+          // Add username as string just for searching
+          username: username,
         };
 
         // Now we should create the profile
@@ -694,6 +696,8 @@ export default class Firebase {
         description: description,
         timestamp: firebase.firestore.Timestamp.now(),
         createdBy: userRef,
+        // Add the name just as a string - for use in search queries
+        name: name,
       };
 
       await ref.set(data);
