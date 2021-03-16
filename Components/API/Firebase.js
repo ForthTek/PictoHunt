@@ -427,19 +427,19 @@ export default class Firebase {
     const filterFollowing = filter.followedUsers || filter.followedChannels;
 
     // If there is no user, or filter specifies to load all posts
-    // !user || !(filter.followedUsers && filter.followedChannel)
-    if (true) {
+    // !user || !filterFollowing
+    if (!user || !filterFollowing) {
       return await this.getAllPosts(filter);
     }
     // Otherwise load following
     else {
-      let allFollowedUsers = await this.getFollowedUserRefs("Test");
-      let allFollowedChannels = await this.getFollowedChannelRefs("Test");
+      let allFollowedUsers = await this.getFollowedUserRefs(user.username);
+      let allFollowedChannels = await this.getFollowedChannelRefs(
+        user.username
+      );
       if (allFollowedUsers.length === 0 && allFollowedChannels.length === 0) {
         throw new Error("Not following any users or channels");
       }
-
-      //console.log(filter);
 
       let alreadyAdded = {};
       let posts = [];
@@ -484,25 +484,43 @@ export default class Firebase {
           });
       }
 
+      filter.orderBy = Filter.ORDER_BY_TIME;
+      filter.direction = Filter.DIRECTION_DESC;
+
       // Need to sort the list again if we filtered by both channel and user
       if (filter.followedUsers && filter.followedChannels) {
-        // TODO *******************************************************************************************
-        //posts.sort();
+        console.log(`Manually sorting posts with filter:`);
+        console.log(filter);
+        posts.sort((x, y) => this.comparePost(x, y, filter));
       }
-
-      // console.log("LOADED BROWSE WITH POSTS:");
-      //console.log(posts);
 
       return posts;
     }
   };
 
   comparePost(post1, post2, filter) {
+    const invert = filter.direction === Filter.DIRECTION_DESC ? -1 : 1;
+
+    // Assume asc and use invert if we need to
     switch (filter.orderBy) {
-      case "timestamp":
-        break;
-      case "score":
-        break;
+      case Filter.ORDER_BY_TIME:
+        const p1Time = post1.time.getTime();
+        const p2Time = post2.time.getTime();
+        if (p1Time < p2Time) {
+          return invert * -1;
+        } else if (p1Time > p2Time) {
+          return invert * 1;
+        } else {
+          return 0;
+        }
+      case Filter.ORDER_BY_SCORE:
+        if (post1.score < post2.score) {
+          return invert * -1;
+        } else if (post1.score > post2.score) {
+          return invert * 1;
+        } else {
+          return 0;
+        }
     }
   }
 
@@ -766,5 +784,41 @@ export default class Firebase {
     else {
       await ref.delete();
     }
+  };
+
+  /**
+   *
+   * @param {string} collection
+   * @param {string} field
+   * @param {string} search
+   * @param {Filter} filter
+   * @returns
+   */
+  searchWithPrefix = async (
+    collection,
+    field,
+    search,
+    filter = new Filter()
+  ) => {
+    return (
+      this.#database
+        .collection(collection)
+        .where(field, ">=", search)
+        // Append \uf8ff as it has a high unicode value so pretty much any string with the prefix will match before it
+        // Value is 63,743 so we have a lot of leway
+        .where(field, "<=", search + "\uf8ff")
+        //.orderBy()
+        //.limit()
+        .get()
+        .then(
+          (res) => {
+            // Return only the IDs
+            return res.docs.map((x) => x.id);
+          },
+          (error) => {
+            console.log(error);
+          }
+        )
+    );
   };
 }

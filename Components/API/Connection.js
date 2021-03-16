@@ -221,4 +221,8 @@ export default class Connection {
   followChannel = async (channelNameToFollow, value) => {
     return await this.#firebase.followChannel(channelNameToFollow, value);
   };
+
+  searchChannels = async (text) => {
+    return await this.#firebase.searchWithPrefix("Channels", "name", text);
+  };
 }

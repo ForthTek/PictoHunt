@@ -31,6 +31,9 @@ export default class Browse extends Component {
   };
 
   componentDidMount() {
+    // update filter using:
+    // e.g. filter.orderBy = Filter.ORDER_BY_SCORE
+
     this.connection.getBrowse(this.state.filter).then((posts) => {
       this.setState({ DATA: posts });
       this.setState({ isLoading: false });
