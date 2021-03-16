@@ -45,6 +45,18 @@ export default class SignUp extends Component {
             Alert.alert("Passwords do not match");
             return;
         }
+        if (this.state.email.length === 0) {
+            Alert.alert("Email address is required");
+            return;
+        }
+        if (this.state.username.length === 0) {
+            Alert.alert("Username is required");
+            return;
+        }
+        if (this.state.password.length === 0) {
+            Alert.alert("Password is required");
+            return;
+        }
         this.connection
             .createProfile(
                 this.state.email,
