@@ -118,6 +118,20 @@ export default class Browse extends Component {
         }
     };
 
+    updateFilter = (byTime, byScore, usersFollowed, channelsFollowed) => {
+        console.log(byTime, byScore, usersFollowed, channelsFollowed);
+        this.state.filter.followedChannels = channelsFollowed;
+        this.state.filter.followedUsers = usersFollowed;
+        if (byTime) {
+            this.state.filter.orderBy = Filter.ORDER_BY_TIME;
+        }
+        if (byScore) {
+            this.state.filter.orderBy = Filter.ORDER_BY_SCORE;
+        }
+
+        this.onRefresh();
+    };
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -140,7 +154,7 @@ export default class Browse extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.postCon}>
-                    <FilterBtn />
+                    <FilterBtn updateFilter={this.updateFilter} />
 
                     <FlatList
                         data={this.state.DATA}

@@ -58,6 +58,8 @@ npm install --save @react-native-firebase/app
 
 expo install firebase
 
+npm i react-native-check-box --save
+
 # Useful links:
 
 https://getbootstrap.com/ - bootstrap \
