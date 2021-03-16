@@ -9,9 +9,9 @@ import { createMaterialBottomTabNavigator } from "@react-navigation/material-bot
 
 import Home from "./Screens/home";
 import Browse from "./Screens/browse";
-import Channels from "./Screens/channels";
 import Upload from "./Screens/UploadScreen";
 import Map from "./Screens/map";
+import Challenges from "./Screens/challenges";
 
 const bButton = createMaterialBottomTabNavigator(); // Create the bottom tab bar
 
@@ -47,7 +47,7 @@ export default class Nav extends Component {
                             )}
                         </bButton.Screen>
                         <bButton.Screen
-                            name='Channels'
+                            name='Challenges'
                             options={{
                                 tabBarColor: "tomato",
                                 tabBarIcon: ({ color }) => (
@@ -60,27 +60,7 @@ export default class Nav extends Component {
                             }}
                         >
                             {(props) => (
-                                <Channels
-                                    {...props}
-                                    connection={this.connection}
-                                />
-                            )}
-                        </bButton.Screen>
-                        <bButton.Screen
-                            name='Browse'
-                            options={{
-                                tabBarColor: "blue",
-                                tabBarIcon: ({ color }) => (
-                                    <Ionicons
-                                        name='home'
-                                        color={color}
-                                        size={22}
-                                    />
-                                ),
-                            }}
-                        >
-                            {(props) => (
-                                <Browse
+                                <Challenges
                                     {...props}
                                     connection={this.connection}
                                 />
@@ -101,6 +81,26 @@ export default class Nav extends Component {
                         >
                             {(props) => (
                                 <Upload
+                                    {...props}
+                                    connection={this.connection}
+                                />
+                            )}
+                        </bButton.Screen>
+                        <bButton.Screen
+                            name='Browse'
+                            options={{
+                                tabBarColor: "blue",
+                                tabBarIcon: ({ color }) => (
+                                    <Ionicons
+                                        name='home'
+                                        color={color}
+                                        size={22}
+                                    />
+                                ),
+                            }}
+                        >
+                            {(props) => (
+                                <Browse
                                     {...props}
                                     connection={this.connection}
                                 />
