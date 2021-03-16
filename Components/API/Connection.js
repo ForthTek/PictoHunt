@@ -169,9 +169,12 @@ export default class Connection {
   };
 
   createPost = async (title, channelName, latitude, longitude, photos) => {
+    // Filter any swears from the title
+    const newTitle = await this.#server.filterSwears(title);
+
     return await this.#firebase
       // Create the post
-      .createPost(title, channelName, latitude, longitude, photos)
+      .createPost(newTitle, channelName, latitude, longitude, photos)
       .then(
         async (newKey) => {
           // Then update the number of likes etc
@@ -186,6 +189,14 @@ export default class Connection {
   };
 
   createChannel = async (name, description) => {
+    // Ensure that the channel name and description is clean
+    if (await this.#server.containsSwears(name)) {
+      throw new Error(`Channel name ${name} contains a swear`);
+    }
+    if (await this.#server.containsSwears(description)) {
+      throw new Error(`Channel description ${description} contains a swear`);
+    }
+
     return await this.#firebase.createChannel(name, description);
   };
 
