@@ -172,16 +172,25 @@ export default class Firebase {
    * @returns true if succesful
    */
   createProfile = async (email, username, password, isPublic = true) => {
+    const ref = this.#database.doc(`Users/${username}`);
+    const data = await ref.get();
+
+    if (data.exists) {
+      throw new Error(`User ${username} already exists`);
+    }
+
     await this.#auth
       // Create the user
       .createUserWithEmailAndPassword(email, password)
+      .then(() => this.#auth.currentUser)
       // Set their display name
-      .then(async () => {
-        var user = this.#auth.currentUser;
+      .then((user) =>
         user.updateProfile({
           displayName: username,
-        });
-      })
+        })
+      )
+      // Reload the auth now  that the username has been changed
+      .then(() => this.#auth.currentUser.reload())
       // Now create their profile in the database
       .then(async () => {
         const userData = {
@@ -191,11 +200,11 @@ export default class Firebase {
         };
 
         // Now we should create the profile
-        const ref = this.#database.doc(`Users/${username}`);
         await ref.set(userData);
       })
       // Catch any errors
       .catch((error) => {
+        console.log(error);
         throw error;
       });
 

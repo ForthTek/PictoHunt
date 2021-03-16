@@ -55,7 +55,8 @@ describe("guest tests", () => {
 
   test("guest getBrowse", async () => {
     // A guest user viewing browse should see all posts
-    const numberOfAllPosts = (await connection.getAllPosts(new Filter())).length;
+    const numberOfAllPosts = (await connection.getAllPosts(new Filter()))
+      .length;
     const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
     expect(numberOfBrowse).toBe(numberOfAllPosts);
   });

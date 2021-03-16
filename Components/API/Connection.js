@@ -69,6 +69,10 @@ export default class Connection {
    * @returns true if succesful
    */
   createProfile = async (email, username, password, isPublic = true) => {
+    if (await this.#server.containsSwears(username)) {
+      throw new Error(`Username ${username} contains a swear`);
+    }
+
     return await this.#firebase.createProfile(
       email,
       username,
@@ -137,7 +141,6 @@ export default class Connection {
   getPost = async (postID) => {
     return await this.#firebase.getPost(postID);
   };
-
 
   getBrowse = async (filter = new Filter()) => {
     return await this.#firebase.getBrowse(filter);
