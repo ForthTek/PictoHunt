@@ -32,4 +32,30 @@ export default class Server {
         }
       );
   }
+
+  async containsSwears(sentence) {
+    return await fetch(`${ADDRESS}/api/isValidString/${sentence}`).then(
+      async (res) => {
+        return (await res.text()).toLowerCase() === "false";
+      },
+      (error) => {
+        console.log(error);
+        throw new Error(`Server failed to check swears for string ${sentence}`);
+      }
+    );
+  }
+
+  async filterSwears(sentence) {
+    return await fetch(`${ADDRESS}/api/filterString/${sentence}`).then(
+      async (res) => {
+        return await res.text();
+      },
+      (error) => {
+        console.log(error);
+        throw new Error(
+          `Server failed to filter swears for string ${sentence}`
+        );
+      }
+    );
+  }
 }

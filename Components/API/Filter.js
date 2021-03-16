@@ -11,19 +11,19 @@ export default class Filter {
     this.followedChannels = true;
   }
 
-  ORDER_BY_TIME = () => {
+  static get ORDER_BY_TIME() {
     return ORDER_BY_TIME;
-  };
+  }
 
-  ORDER_BY_SCORE = () => {
+  static get ORDER_BY_SCORE() {
     return ORDER_BY_SCORE;
-  };
+  }
 
-  DIRECTION_DESC = () => {
+  static get DIRECTION_DESC() {
     return DIRECTION_DESC;
-  };
+  }
 
-  DIRECTION_ASC = () => {
+  static get DIRECTION_ASC() {
     return DIRECTION_ASC;
-  };
+  }
 }

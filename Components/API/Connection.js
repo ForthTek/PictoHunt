@@ -69,6 +69,10 @@ export default class Connection {
    * @returns true if succesful
    */
   createProfile = async (email, username, password, isPublic = true) => {
+    if (await this.#server.containsSwears(username)) {
+      throw new Error(`Username ${username} contains a swear`);
+    }
+
     return await this.#firebase.createProfile(
       email,
       username,
@@ -138,7 +142,6 @@ export default class Connection {
     return await this.#firebase.getPost(postID);
   };
 
-
   getBrowse = async (filter = new Filter()) => {
     return await this.#firebase.getBrowse(filter);
   };
@@ -166,9 +169,12 @@ export default class Connection {
   };
 
   createPost = async (title, channelName, latitude, longitude, photos) => {
+    // Filter any swears from the title
+    const newTitle = await this.#server.filterSwears(title);
+
     return await this.#firebase
       // Create the post
-      .createPost(title, channelName, latitude, longitude, photos)
+      .createPost(newTitle, channelName, latitude, longitude, photos)
       .then(
         async (newKey) => {
           // Then update the number of likes etc
@@ -183,6 +189,14 @@ export default class Connection {
   };
 
   createChannel = async (name, description) => {
+    // Ensure that the channel name and description is clean
+    if (await this.#server.containsSwears(name)) {
+      throw new Error(`Channel name ${name} contains a swear`);
+    }
+    if (await this.#server.containsSwears(description)) {
+      throw new Error(`Channel description ${description} contains a swear`);
+    }
+
     return await this.#firebase.createChannel(name, description);
   };
 
@@ -206,5 +220,9 @@ export default class Connection {
    */
   followChannel = async (channelNameToFollow, value) => {
     return await this.#firebase.followChannel(channelNameToFollow, value);
+  };
+
+  searchChannels = async (text) => {
+    return await this.#firebase.searchWithPrefix("Channels", "name", text);
   };
 }

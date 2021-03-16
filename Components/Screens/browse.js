@@ -1,167 +1,170 @@
 import React, { Component } from "react";
 import {
-    Text,
-    StyleSheet,
-    SafeAreaView,
-    View,
-    FlatList,
-    Button,
-    Alert,
-    RefreshControl,
+  Text,
+  StyleSheet,
+  SafeAreaView,
+  View,
+  FlatList,
+  Button,
+  Alert,
+  RefreshControl,
 } from "react-native";
 import Post from "../post";
 import SinglePost from "../singlePost";
 
 export default class Browse extends Component {
-    constructor(props) {
-        super(props);
-        this.connection = props.connection;
+  constructor(props) {
+    super(props);
+    this.connection = props.connection;
+  }
+
+  // Browse Page
+  state = {
+    isLoading: true,
+    isPost: false,
+    singlePostID: "",
+    DATA: "",
+    refresh: false,
+  };
+
+  componentDidMount() {
+    // update filter using:
+    // e.g. filter.orderBy = Filter.ORDER_BY_SCORE
+
+    this.connection.getBrowse(this.state.filter).then((posts) => {
+      this.setState({ DATA: posts });
+      this.setState({ isLoading: false });
+    });
+  }
+
+  getID = (id) => {
+    let i = 0;
+    for (; i < this.state.DATA.length; i++) {
+      if (id == this.state.DATA[i].ID) {
+        this.setState({ singlePostID: i });
+      }
     }
+    this.handleSinglePost();
+  };
 
-    // Browse Page
-    state = {
-        isLoading: true,
-        isPost: false,
-        singlePostID: "",
-        DATA: "",
-        refresh: false,
-    };
+  handleSinglePost = () => {
+    this.setState({ isPost: !this.state.isPost });
+  };
 
-    componentDidMount() {
-        this.connection.getBrowse().then((posts) => {
-            this.setState({ DATA: posts });
-            this.setState({ isLoading: false });
+  onRefresh = async () => {
+    this.setState({ refresh: true, DATA: "" });
+    await this.connection.getBrowse().then(
+      (res) => {
+        this.setState({ DATA: res });
+        this.setState({ refresh: false });
+      },
+      (error) => {
+        Alert.alert(error.message);
+        this.setState({ refresh: false });
+      }
+    );
+  };
+
+  onLikeBtnPress = (type, id, updateScore) => {
+    if (type === "like") {
+      alert("Pressed: " + type);
+      this.connection.likePost(id).then(
+        () => {
+          updateScore(id);
+        },
+        (error) => {
+          Alert.alert(error.message);
+        }
+      );
+    }
+    if (type === "dislike") {
+      alert("Pressed: " + type);
+      this.connection
+        .dislikePost(id)
+        .then(
+          () => {
+            updateScore(id);
+          },
+          (error) => {
+            Alert.alert(error.message);
+          }
+        )
+        .catch((error) => {
+          Alert.alert(error.message);
         });
     }
-
-    getID = (id) => {
-        let i = 0;
-        for (; i < this.state.DATA.length; i++) {
-            if (id == this.state.DATA[i].ID) {
-                this.setState({ singlePostID: i });
-            }
+    if (type === "remove") {
+      alert("Pressed: " + type);
+      this.connection.removeInteractionFromPost(id).then(
+        () => {
+          updateScore(id);
+        },
+        (error) => {
+          Alert.alert(error.message);
         }
-        this.handleSinglePost();
-    };
-
-    handleSinglePost = () => {
-        this.setState({ isPost: !this.state.isPost });
-    };
-
-    onRefresh = async () => {
-        this.setState({ refresh: true, DATA: "" });
-        await this.connection.getBrowse().then(
-            (res) => {
-                this.setState({ DATA: res });
-                this.setState({ refresh: false });
-            },
-            (error) => {
-                Alert.alert(error.message);
-                this.setState({ refresh: false });
-            }
-        );
-    };
-
-    onLikeBtnPress = (type, id, updateScore) => {
-        if (type === "like") {
-            alert("Pressed: " + type);
-            this.connection.likePost(id).then(
-                () => {
-                    updateScore(id);
-                },
-                (error) => {
-                    Alert.alert(error.message);
-                }
-            );
-        }
-        if (type === "dislike") {
-            alert("Pressed: " + type);
-            this.connection
-                .dislikePost(id)
-                .then(
-                    () => {
-                        updateScore(id);
-                    },
-                    (error) => {
-                        Alert.alert(error.message);
-                    }
-                )
-                .catch((error) => {
-                    Alert.alert(error.message);
-                });
-        }
-        if (type === "remove") {
-            alert("Pressed: " + type);
-            this.connection.removeInteractionFromPost(id).then(
-                () => {
-                    updateScore(id);
-                },
-                (error) => {
-                    Alert.alert(error.message);
-                }
-            );
-        }
-    };
-
-    render() {
-        if (this.state.isLoading) {
-            return (
-                <View style={styles.container}>
-                    <Text>Loading</Text>
-                </View>
-            );
-        }
-        if (this.state.isPost) {
-            return (
-                <View style={styles.container}>
-                    <SinglePost
-                        item={this.state.DATA[this.state.singlePostID]}
-                        back={this.handleSinglePost}
-                        connection={this.connection}
-                        onLikeBtnPress={this.onLikeBtnPress}
-                    />
-                </View>
-            );
-        } else {
-            return (
-                <SafeAreaView style={styles.postCon}>
-                    {/* <Button title='Refresh' onPress={this.onRefresh} /> */}
-                    <FlatList
-                        data={this.state.DATA}
-                        extraData={this.state.didRefresh}
-                        renderItem={({ item }) => (
-                            <View style={styles.post}>
-                                <Post
-                                    item={item}
-                                    onpressable={this.getID}
-                                    connection={this.connection}
-                                    onLikeBtnPress={this.onLikeBtnPress}
-                                />
-                            </View>
-                        )}
-                        keyExtractor={(item) => item.ID.toString()}
-                        onRefresh={this.onRefresh}
-                        refreshing={this.state.refresh}
-                    />
-                </SafeAreaView>
-            );
-        }
+      );
     }
+  };
+
+  render() {
+    if (this.state.isLoading) {
+      return (
+        <View style={styles.container}>
+          <Text>Loading</Text>
+        </View>
+      );
+    }
+    if (this.state.isPost) {
+      return (
+        <View style={styles.container}>
+          <SinglePost
+            item={this.state.DATA[this.state.singlePostID]}
+            back={this.handleSinglePost}
+            connection={this.connection}
+            onLikeBtnPress={this.onLikeBtnPress}
+          />
+        </View>
+      );
+    } else {
+      return (
+        <SafeAreaView style={styles.postCon}>
+          {/* <Button title='Refresh' onPress={this.onRefresh} /> */}
+          <FlatList
+            data={this.state.DATA}
+            extraData={this.state.didRefresh}
+            renderItem={({ item }) => (
+              <View style={styles.post}>
+                <Post
+                  item={item}
+                  onpressable={this.getID}
+                  connection={this.connection}
+                  onLikeBtnPress={this.onLikeBtnPress}
+                />
+              </View>
+            )}
+            keyExtractor={(item) => item.ID.toString()}
+            onRefresh={this.onRefresh}
+            refreshing={this.state.refresh}
+          />
+        </SafeAreaView>
+      );
+    }
+  }
 }
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    postCon: {
-        flex: 1,
-        backgroundColor: "#fff",
-    },
-    post: {
-        borderColor: "grey",
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
-    },
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  postCon: {
+    flex: 1,
+    backgroundColor: "#fff",
+  },
+  post: {
+    borderColor: "grey",
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
+  },
 });
