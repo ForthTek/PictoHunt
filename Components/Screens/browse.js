@@ -29,7 +29,9 @@ export default class Browse extends Component {
 
   componentDidMount() {
     // update filter using:
-    // e.g. filter.orderBy = Filter.ORDER_BY_SCORE
+    // filter.orderBy = Filter.ORDER_BY_SCORE or filter.orderBy = Filter.ORDER_BY_TIME
+    // Probs want to keep direction desc
+    // filter.followedUsers = true and filter.followedChannels = true
 
     this.connection.getBrowse(this.state.filter).then((posts) => {
       this.setState({ DATA: posts });

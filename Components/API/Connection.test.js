@@ -7,7 +7,7 @@ const TEST_PASSWORD = "password";
 
 const TEST_CHANNEL = "Test";
 
-const TEST_POST = "PSIFLk7xHyKpK50HqTdh";
+//const TEST_POST = "PSIFLk7xHyKpK50HqTdh";
 
 // Create the connection at the start
 const connection = new Connection();
@@ -113,10 +113,10 @@ describe("auth tests", () => {
     //console.log(channel)
   });
 
-  test("auth like", async () => {
-    let x = await connection.likePost(TEST_POST);
-    // Like, dislike and remove interaction
-  });
+  // test("auth like", async () => {
+  //   let x = await connection.likePost(TEST_POST);
+  //   // Like, dislike and remove interaction
+  // });
 
   test("auth followUser", async () => {
     await connection.followUser(TEST_USERNAME, true);
