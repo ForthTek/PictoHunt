@@ -5,7 +5,7 @@ import {
     SafeAreaView,
     StyleSheet,
 } from "react-native";
-import ActivityRings from "react-activity-rings"
+import Channel from "../channel";
 
 export default class challenges extends Component {
     constructor(props) {
@@ -14,7 +14,7 @@ export default class challenges extends Component {
     }
 
     state = {
-        isLoading: true,
+        isLoading: false,
         DATA: "",
     };
 
@@ -28,35 +28,12 @@ export default class challenges extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.container}>
-                    <view>
-                        <text>Weekly Challenge</text>
-                        <ActivityRings data={activityData} config={activityConfig} /> 
-                        <text>Daily Challenges</text>
-                        <ActivityRings data={activityData} config={activityConfig} />
-                    </view>
+                    <Text>HELLO</Text>
                 </SafeAreaView>
             );
         }
     }
 }
-
-const progressRing = () => {
- 
-    const activityData = [ 
-      { value: 0.8 }, 
-    ];
-    
-    const activityConfig = { 
-      width: 150,  
-      height: 150
-    };
-}
-
-const activityData = [
-    {
-      value: 0.8, // ring will use color from theme
-    },
-  ];
 
 const styles = StyleSheet.create({
     container: {
@@ -81,10 +58,3 @@ const styles = StyleSheet.create({
         justifyContent: "center",
     },
 });
-
-const activityConfig = {
-    width: 150,
-    height: 150,
-    radius: 32,
-    ringSize: 14,
-  }

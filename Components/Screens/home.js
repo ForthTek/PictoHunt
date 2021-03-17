@@ -1,176 +1,205 @@
 import React, { Component } from "react";
 import {
     Text,
-    View,
-    SafeAreaView,
     StyleSheet,
+    SafeAreaView,
+    View,
+    FlatList,
     Button,
     Alert,
+    RefreshControl,
 } from "react-native";
-import Image from "react-native-scalable-image";
-import Score from "../score";
-import SettingBtn from "../settingBtn";
+import Post from "../post";
+import SinglePost from "../singlePost";
+import FilterBtn from "../filterBtn";
+import Filter from "../API/Filter";
 
-class Home extends Component {
+export default class Home extends Component {
     constructor(props) {
         super(props);
-        // console.log(props.route);
         this.connection = props.connection;
     }
 
-    // Home page
-
+    // Homepage
     state = {
         isLoading: true,
+        isPost: false,
+        singlePostID: "",
         DATA: "",
-        user: null,
-    };
-
-    onSignOutPress = () => {
-        this.connection.logout();
+        refresh: false,
+        filter: new Filter(),
     };
 
     componentDidMount() {
-        this.connection.getOurProfile().then(
-            (res) => {
-                this.setState({ user: res, isLoading: false });
-                console.log(res);
+        // update filter using:
+        // filter.orderBy = Filter.ORDER_BY_SCORE or filter.orderBy = Filter.ORDER_BY_TIME
+        // Probs want to keep direction desc
+        // filter.followedUsers = true and filter.followedChannels = true
+        this.state.filter.orderBy = Filter.ORDER_BY_TIME;
+        this.state.filter.followedChannels = false;
+        this.state.filter.followedUsers = false;
+
+        this.connection.getBrowse(this.state.filter).then(
+            (posts) => {
+                this.setState({ DATA: posts });
+                this.setState({ isLoading: false });
             },
             (error) => {
-                console.log(error);
                 Alert.alert(error.message);
             }
         );
     }
 
+    getID = (id) => {
+        let i = 0;
+        for (; i < this.state.DATA.length; i++) {
+            if (id == this.state.DATA[i].ID) {
+                this.setState({ singlePostID: i });
+            }
+        }
+        this.handleSinglePost();
+    };
+
+    handleSinglePost = () => {
+        this.setState({ isPost: !this.state.isPost });
+    };
+
+    onRefresh = async () => {
+        this.setState({ refresh: true, DATA: "" });
+        await this.connection.getBrowse(this.state.filter).then(
+            (res) => {
+                this.setState({ DATA: res });
+                this.setState({ refresh: false });
+            },
+            (error) => {
+                Alert.alert(error.message);
+                this.setState({ refresh: false });
+            }
+        );
+    };
+
+    onLikeBtnPress = (type, id, updateScore) => {
+        if (type === "like") {
+            alert("Pressed: " + type);
+            this.connection.likePost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
+        if (type === "dislike") {
+            alert("Pressed: " + type);
+            this.connection
+                .dislikePost(id)
+                .then(
+                    () => {
+                        updateScore(id);
+                    },
+                    (error) => {
+                        Alert.alert(error.message);
+                    }
+                )
+                .catch((error) => {
+                    Alert.alert(error.message);
+                });
+        }
+        if (type === "remove") {
+            alert("Pressed: " + type);
+            this.connection.removeInteractionFromPost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
+    };
+
+    updateFilter = (
+        byTime,
+        byScore,
+        usersFollowed,
+        channelsFollowed,
+        anyChanged
+    ) => {
+        //console.log(byTime, byScore, usersFollowed, channelsFollowed);
+        this.state.filter.followedChannels = channelsFollowed;
+        this.state.filter.followedUsers = usersFollowed;
+        if (byTime) {
+            this.state.filter.orderBy = Filter.ORDER_BY_TIME;
+        }
+        if (byScore) {
+            this.state.filter.orderBy = Filter.ORDER_BY_SCORE;
+        }
+        if (anyChanged) {
+            this.onRefresh();
+        }
+    };
+
     render() {
         if (this.state.isLoading) {
             return (
-                <View style={styles.container1}>
+                <View style={styles.container}>
                     <Text>Loading</Text>
-                    <Button
-                        title='Sign out'
-                        onPress={this.onSignOutPress}
-                        style={{ fontSize: 18, paddingTop: "5%", color: "red" }}
-                    ></Button>
+                </View>
+            );
+        }
+        if (this.state.isPost) {
+            return (
+                <View style={styles.container}>
+                    <SinglePost
+                        item={this.state.DATA[this.state.singlePostID]}
+                        back={this.handleSinglePost}
+                        connection={this.connection}
+                        onLikeBtnPress={this.onLikeBtnPress}
+                    />
                 </View>
             );
         } else {
             return (
-                <SafeAreaView style={styles.container}>
-                    <View style={{ flexDirection: "row", padding: "5%" }}>
-                        <Image
-                            source={require("../../assets/pfp-placeholder.png")}
-                            width={160}
-                        />
-                        <View
-                            style={{
-                                flexDirection: "column",
-                                paddingLeft: "3%",
-                            }}
-                        >
-                            <Text style={styles.username}>
-                                {this.state.user.username}
-                            </Text>
-                            <Text style={styles.info}>
-                                Joined:{" "}
-                                {this.state.user.timestamp
-                                    .toString()
-                                    .substring(4, 15)}
-                            </Text>
-                        </View>
-                    </View>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            paddingBottom: "5%",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <Score label='Score' number={this.state.user.score} />
-                        <Score
-                            label='Pics'
-                            number={this.state.user.posts.length}
-                        />
-                        <Score label='Rank' number={5} />
-                    </View>
-                    <View style={styles.container}>
-                        <SettingBtn
-                            label='Achievements/ Challenges'
-                            icon='trophy-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Your Profile'
-                            icon='person-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Following'
-                            icon='people-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Leader Board'
-                            icon='bar-chart-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Settings'
-                            icon='settings-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Log Out'
-                            icon='log-out-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                    </View>
+                <SafeAreaView style={styles.postCon}>
+                    <FilterBtn updateFilter={this.updateFilter} />
+
+                    <FlatList
+                        data={this.state.DATA}
+                        extraData={this.state.didRefresh}
+                        renderItem={({ item }) => (
+                            <View style={styles.post}>
+                                <Post
+                                    item={item}
+                                    onpressable={this.getID}
+                                    connection={this.connection}
+                                    onLikeBtnPress={this.onLikeBtnPress}
+                                />
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.ID.toString()}
+                        onRefresh={this.onRefresh}
+                        refreshing={this.state.refresh}
+                    />
                 </SafeAreaView>
             );
         }
     }
 }
-export default Home;
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        padding: "1%",
-    },
-    username: {
-        fontSize: 22,
-        paddingBottom: "2%",
-        maxWidth: 200,
-    },
-    info: {
-        fontSize: 15,
-        paddingBottom: "5%",
-        color: "grey",
-    },
-    loadCon: {
-        flex: 1,
-        backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "center",
     },
-    container1: {
+    postCon: {
         flex: 1,
         backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
+    },
+    post: {
+        borderColor: "grey",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
     },
 });

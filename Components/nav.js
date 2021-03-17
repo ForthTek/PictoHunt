@@ -7,11 +7,11 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { createMaterialBottomTabNavigator } from "@react-navigation/material-bottom-tabs"; // Can be used instead of 'createBottomTabNavigator' for a different, possibly nicer looking, tabbar.
 
-import Home from "./Screens/home";
-import Browse from "./Screens/browse";
+import Account from "./Screens/account";
 import Upload from "./Screens/UploadScreen";
 import Map from "./Screens/map";
 import Challenges from "./Screens/challenges";
+import Home from "./Screens/home";
 
 const bButton = createMaterialBottomTabNavigator(); // Create the bottom tab bar
 
@@ -27,15 +27,16 @@ export default class Nav extends Component {
             <SafeAreaView style={styles.container}>
                 <NavigationContainer>
                     <bButton.Navigator // Sets things about the bottom buttons
-                        initialRouteName='Browse'
+                        initialRouteName='Home'
                     >
+                        
                         <bButton.Screen
                             name='Home'
                             options={{
-                                tabBarColor: "purple",
+                                tabBarColor: "blue",
                                 tabBarIcon: ({ color }) => (
                                     <Ionicons
-                                        name='person-circle'
+                                        name='home'
                                         color={color}
                                         size={22}
                                     />
@@ -43,16 +44,20 @@ export default class Nav extends Component {
                             }}
                         >
                             {(props) => (
-                                <Home {...props} connection={this.connection} />
+                                <Home
+                                    {...props}
+                                    connection={this.connection}
+                                />
                             )}
                         </bButton.Screen>
+                        
                         <bButton.Screen
                             name='Challenges'
                             options={{
                                 tabBarColor: "tomato",
                                 tabBarIcon: ({ color }) => (
                                     <Ionicons
-                                        name='albums'
+                                        name='checkmark-circle-outline'
                                         color={color}
                                         size={22}
                                     />
@@ -66,6 +71,7 @@ export default class Nav extends Component {
                                 />
                             )}
                         </bButton.Screen>
+
                         <bButton.Screen
                             name='Upload'
                             options={{
@@ -86,26 +92,7 @@ export default class Nav extends Component {
                                 />
                             )}
                         </bButton.Screen>
-                        <bButton.Screen
-                            name='Browse'
-                            options={{
-                                tabBarColor: "blue",
-                                tabBarIcon: ({ color }) => (
-                                    <Ionicons
-                                        name='home'
-                                        color={color}
-                                        size={22}
-                                    />
-                                ),
-                            }}
-                        >
-                            {(props) => (
-                                <Browse
-                                    {...props}
-                                    connection={this.connection}
-                                />
-                            )}
-                        </bButton.Screen>
+                        
                         <bButton.Screen
                             name='Map'
                             options={{
@@ -123,6 +110,25 @@ export default class Nav extends Component {
                                 <Map {...props} connection={this.connection} />
                             )}
                         </bButton.Screen>
+
+                        <bButton.Screen
+                            name='Account'
+                            options={{
+                                tabBarColor: "purple",
+                                tabBarIcon: ({ color }) => (
+                                    <Ionicons
+                                        name='person-circle'
+                                        color={color}
+                                        size={22}
+                                    />
+                                ),
+                            }}
+                        >
+                            {(props) => (
+                                <Account {...props} connection={this.connection} />
+                            )}
+                        </bButton.Screen>
+
                     </bButton.Navigator>
                 </NavigationContainer>
             </SafeAreaView>
