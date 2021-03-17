@@ -81,6 +81,11 @@ export default class Connection {
     );
   };
 
+  /**
+   *
+   * @param {string} postID
+   * @returns
+   */
   likePost = async (postID) => {
     return await this.#firebase
       .interactWithPost(postID, this.#firebase.PostInteractionType.like)
@@ -98,6 +103,11 @@ export default class Connection {
       });
   };
 
+  /**
+   *
+   * @param {string} postID
+   * @returns
+   */
   dislikePost = async (postID) => {
     return await this.#firebase
       .interactWithPost(postID, this.#firebase.PostInteractionType.dislike)
@@ -115,6 +125,11 @@ export default class Connection {
       });
   };
 
+  /**
+   *
+   * @param {string} postID
+   * @returns
+   */
   removeInteractionFromPost = async (postID) => {
     return await this.#firebase
       .interactWithPost(postID, this.#firebase.PostInteractionType.remove)
@@ -142,18 +157,36 @@ export default class Connection {
     return await this.#firebase.getPost(postID);
   };
 
+  /**
+   *
+   * @param {Filter} filter
+   * @returns
+   */
   getBrowse = async (filter = new Filter()) => {
     return await this.#firebase.getBrowse(filter);
   };
 
+  /**
+   *
+   * @param {Filter} filter
+   * @returns
+   */
   getAllPosts = async (filter = new Filter()) => {
     return await this.#firebase.getAllPosts(filter);
   };
 
+  /**
+   *
+   * @returns
+   */
   getMap = async () => {
     return await this.#firebase.getMap();
   };
 
+  /**
+   *
+   * @returns
+   */
   getOurProfile = async () => {
     const user = this.#firebase.currentUser();
     return await this.getProfile(user.username);
@@ -168,6 +201,15 @@ export default class Connection {
     return await this.#firebase.getProfile(username);
   };
 
+  /**
+   *
+   * @param {string} title
+   * @param {string} channelName
+   * @param {number} latitude
+   * @param {number} longitude
+   * @param {Blob[]} photos
+   * @returns
+   */
   createPost = async (title, channelName, latitude, longitude, photos) => {
     // Filter any swears from the title
     const newTitle = await this.#server.filterSwears(title);
@@ -188,6 +230,12 @@ export default class Connection {
       );
   };
 
+  /**
+   *
+   * @param {string} name
+   * @param {string} description
+   * @returns
+   */
   createChannel = async (name, description) => {
     // Ensure that the channel name and description is clean
     if (await this.#server.containsSwears(name)) {
@@ -200,6 +248,11 @@ export default class Connection {
     return await this.#firebase.createChannel(name, description);
   };
 
+  /**
+   *
+   * @param {string} name
+   * @returns
+   */
   getChannel = async (name) => {
     return await this.#firebase.getChannel(name);
   };
@@ -222,7 +275,21 @@ export default class Connection {
     return await this.#firebase.followChannel(channelNameToFollow, value);
   };
 
+  /**
+   *
+   * @param {string} text
+   * @returns
+   */
   searchChannels = async (text) => {
     return await this.#firebase.searchWithPrefix("Channels", text);
+  };
+
+  /**
+   *
+   * @param {string} text
+   * @returns
+   */
+  searchUsers = async (text) => {
+    return await this.#firebase.searchWithPrefix("Users", text);
   };
 }
