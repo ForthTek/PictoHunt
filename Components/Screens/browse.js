@@ -38,6 +38,7 @@ export default class Browse extends Component {
         this.state.filter.orderBy = Filter.ORDER_BY_TIME;
         this.state.filter.followedChannels = false;
         this.state.filter.followedUsers = false;
+
         this.connection.getBrowse(this.state.filter).then(
             (posts) => {
                 this.setState({ DATA: posts });
@@ -119,7 +120,7 @@ export default class Browse extends Component {
     };
 
     updateFilter = (byTime, byScore, usersFollowed, channelsFollowed) => {
-        console.log(byTime, byScore, usersFollowed, channelsFollowed);
+        //console.log(byTime, byScore, usersFollowed, channelsFollowed);
         this.state.filter.followedChannels = channelsFollowed;
         this.state.filter.followedUsers = usersFollowed;
         if (byTime) {

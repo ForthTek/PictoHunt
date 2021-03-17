@@ -198,7 +198,7 @@ export default class Firebase {
           public: isPublic,
           timestamp: firebase.firestore.Timestamp.now(),
           // Add username as string just for searching
-          username: username,
+          search: username.toUpperCase(),
         };
 
         // Now we should create the profile
@@ -629,7 +629,13 @@ export default class Firebase {
     }
   };
 
-  createPost = async (title, channelName, latitude, longitude, photos) => {
+  createPost = async (
+    title,
+    channelName,
+    latitude = null,
+    longitude = null,
+    photos
+  ) => {
     const username = this.currentUser().username;
 
     const ref = this.#database.collection("Posts").doc();
@@ -652,10 +658,16 @@ export default class Firebase {
     // Upload the images
     let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
 
+    // Only create GPS point if lat and long is not null
+    const GPS =
+      latitude != null && longitude != null
+        ? (GPS = new firebase.firestore.GeoPoint(latitude, longitude))
+        : null;
+
     // Do some input validation stuff here
     const postData = {
       title: title,
-      GPS: new firebase.firestore.GeoPoint(latitude, longitude),
+      GPS: GPS,
       channel: channelRef,
       photos: URLs,
       score: 0,
@@ -697,7 +709,7 @@ export default class Firebase {
         timestamp: firebase.firestore.Timestamp.now(),
         createdBy: userRef,
         // Add the name just as a string - for use in search queries
-        name: name,
+        search: name.toUpperCase(),
       };
 
       await ref.set(data);
@@ -800,17 +812,20 @@ export default class Firebase {
    */
   searchWithPrefix = async (
     collection,
-    field,
     search,
+    field = "search",
     filter = new Filter()
   ) => {
+
+    const query = search.toUpperCase();
+
     return (
       this.#database
         .collection(collection)
-        .where(field, ">=", search)
+        .where(field, ">=", query)
         // Append \uf8ff as it has a high unicode value so pretty much any string with the prefix will match before it
         // Value is 63,743 so we have a lot of leway
-        .where(field, "<=", search + "\uf8ff")
+        .where(field, "<=", query + "\uf8ff")
         //.orderBy()
         //.limit()
         .get()

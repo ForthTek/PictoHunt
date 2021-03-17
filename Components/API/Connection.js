@@ -223,6 +223,6 @@ export default class Connection {
   };
 
   searchChannels = async (text) => {
-    return await this.#firebase.searchWithPrefix("Channels", "name", text);
+    return await this.#firebase.searchWithPrefix("Channels", text);
   };
 }

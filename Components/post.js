@@ -25,7 +25,7 @@ class Post extends Component {
         this.connection.getPost(id).then(
             (res) => {
                 this.setState({ score: res.score });
-                console.log(res.score);
+                //console.log(res.score);
             },
             (error) => {
                 Alert.alert(error.message);
