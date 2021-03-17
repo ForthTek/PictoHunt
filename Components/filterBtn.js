@@ -10,18 +10,14 @@ export default class FilterBtn extends Component {
         orderByScoreCheck: false,
         onlyFollowedUsersCheck: false,
         onlyFollowedChannelsCheck: false,
+        anyChanged: false,
     };
 
     openFilterModal = () => {
-        this.setState({ modalVisible: !this.state.modalVisible });
-        // if (!this.state.modalVisible) {
-        //     this.props.updateFilter(
-        //         this.state.orderByTimeCheck,
-        //         this.state.orderByScoreCheck,
-        //         this.state.onlyFollowedUsersCheck,
-        //         this.state.onlyFollowedChannelsCheck
-        //     );
-        // }
+        this.setState({ modalVisible: true, anyChanged: false });
+    };
+    closeFilterModal = () => {
+        this.setState({ modalVisible: false });
     };
 
     render() {
@@ -40,12 +36,13 @@ export default class FilterBtn extends Component {
                         <View style={styles.modalView}>
                             <Pressable
                                 onPress={() => {
-                                    this.openFilterModal();
+                                    this.closeFilterModal();
                                     this.props.updateFilter(
                                         this.state.orderByTimeCheck,
                                         this.state.orderByScoreCheck,
                                         this.state.onlyFollowedUsersCheck,
-                                        this.state.onlyFollowedChannelsCheck
+                                        this.state.onlyFollowedChannelsCheck,
+                                        this.state.anyChanged
                                     );
                                 }}
                             >
@@ -62,6 +59,7 @@ export default class FilterBtn extends Component {
                                                 .orderByTimeCheck,
                                             orderByScoreCheck: !this.state
                                                 .orderByScoreCheck,
+                                            anyChanged: true,
                                         })
                                     }
                                     isChecked={this.state.orderByTimeCheck}
@@ -76,6 +74,7 @@ export default class FilterBtn extends Component {
                                                 .orderByTimeCheck,
                                             orderByScoreCheck: !this.state
                                                 .orderByScoreCheck,
+                                            anyChanged: true,
                                         })
                                     }
                                     isChecked={this.state.orderByScoreCheck}
@@ -88,6 +87,7 @@ export default class FilterBtn extends Component {
                                         this.setState({
                                             onlyFollowedUsersCheck: !this.state
                                                 .onlyFollowedUsersCheck,
+                                            anyChanged: true,
                                         })
                                     }
                                     isChecked={
@@ -103,6 +103,7 @@ export default class FilterBtn extends Component {
                                             onlyFollowedChannelsCheck: !this
                                                 .state
                                                 .onlyFollowedChannelsCheck,
+                                            anyChanged: true,
                                         })
                                     }
                                     isChecked={

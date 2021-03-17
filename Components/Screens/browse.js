@@ -119,7 +119,13 @@ export default class Browse extends Component {
         }
     };
 
-    updateFilter = (byTime, byScore, usersFollowed, channelsFollowed) => {
+    updateFilter = (
+        byTime,
+        byScore,
+        usersFollowed,
+        channelsFollowed,
+        anyChanged
+    ) => {
         //console.log(byTime, byScore, usersFollowed, channelsFollowed);
         this.state.filter.followedChannels = channelsFollowed;
         this.state.filter.followedUsers = usersFollowed;
@@ -129,8 +135,9 @@ export default class Browse extends Component {
         if (byScore) {
             this.state.filter.orderBy = Filter.ORDER_BY_SCORE;
         }
-
-        this.onRefresh();
+        if (anyChanged) {
+            this.onRefresh();
+        }
     };
 
     render() {
