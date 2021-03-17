@@ -28,17 +28,17 @@ beforeAll(async () => {
 });
 
 // Tests when the user is a guest
-describe("guest tests", () => {
+describe("1.0 guest tests", () => {
   beforeAll(async () => {
     await connection.logout();
   });
 
-  test("guest isLoggedIn", async () => {
+  test("1.1 guest isLoggedIn", async () => {
     let x = connection.isLoggedIn();
     expect(x).toBe(false);
   });
 
-  test("guest getAllPosts", async () => {
+  test("1.2 guest getAllPosts", async () => {
     let x = await connection.getAllPosts(new Filter());
     expect(x.length).toBeGreaterThan(0);
   });
@@ -53,7 +53,7 @@ describe("guest tests", () => {
   //   expect(x.length).toBeGreaterThan(0);
   // });
 
-  test("guest getBrowse", async () => {
+  test("1.3 guest getBrowse", async () => {
     // A guest user viewing browse should see all posts
     const numberOfAllPosts = (await connection.getAllPosts(new Filter())).length;
     const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
@@ -62,29 +62,29 @@ describe("guest tests", () => {
 });
 
 // Tests when the user is authenticated
-describe("auth tests", () => {
+describe("2.0 auth tests", () => {
   beforeAll(async () => {
     await connection.login(TEST_EMAIL, TEST_PASSWORD);
   });
 
-  test("auth login", async () => {
+  test("2.1 auth login", async () => {
     await connection.logout();
     let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
     // If this test fails, the test account could be locked/suspended
     expect(x).toBe(true);
   });
 
-  test("auth isLoggedIn", async () => {
+  test("2.2 auth isLoggedIn", async () => {
     expect(connection.isLoggedIn()).toBe(true);
   });
 
-  test("auth currentUser", async () => {
+  test("2.3 auth currentUser", async () => {
     let x = connection.currentUser();
     expect(x.email).toBe(TEST_EMAIL);
     expect(x.username).toBe(TEST_USERNAME);
   });
 
-  test("auth getBrowse", async () => {
+  test("2.4 auth getBrowse", async () => {
     let x = await connection.getBrowse(new Filter());
     expect(x.length).toBeGreaterThan(0);
   });
@@ -103,7 +103,7 @@ describe("auth tests", () => {
   //   //expect(x.length).toBeGreaterThan(0);
   // });
 
-  test("auth test channel", async () => {
+  test("2.5 auth test channel", async () => {
     try {
       await connection.createChannel(TEST_CHANNEL, "just a test channel");
     } catch (error) {}
@@ -112,20 +112,20 @@ describe("auth tests", () => {
     //console.log(channel)
   });
 
-  test("auth like", async () => {
+  test("2.6 auth like", async () => {
     let x = await connection.likePost(TEST_POST);
     // Like, dislike and remove interaction
   });
 
-  test("auth followUser", async () => {
+  test("2.7 auth followUser", async () => {
     await connection.followUser(TEST_USERNAME, true);
   });
 
-  test("auth followChannel", async () => {
+  test("2.8 auth followChannel", async () => {
     await connection.followChannel(TEST_CHANNEL, true);
   });
 
-  test("auth logout", async () => {
+  test("2.9 auth logout", async () => {
     let x = await connection.logout();
     expect(x).toBe(true);
   });
