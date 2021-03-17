@@ -23,9 +23,14 @@ export default class FilterBtn extends Component {
     render() {
         return (
             <View style={styles.icon}>
-                <Pressable onPress={this.openFilterModal}>
-                    <FeatherIcon name='sliders' style={styles.icon} />
-                </Pressable>
+                <View style={styles.container2}>
+                    <Pressable onPress={this.openFilterModal}>
+                        <FeatherIcon name='search' style={styles.icon} />
+                    </Pressable>
+                    <Pressable onPress={this.openFilterModal}>
+                        <FeatherIcon name='sliders' style={styles.icon} />
+                    </Pressable>
+                </View>
 
                 <Modal
                     visible={this.state.modalVisible}
@@ -129,9 +134,15 @@ const styles = StyleSheet.create({
     container1: {
         flexDirection: "row",
     },
+    container2: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
     icon: {
-        fontSize: 32,
+        fontSize: 28,
         paddingLeft: "1%",
+        paddingRight: "1%",
+        paddingBottom: "1%",
     },
     icon1: {
         fontSize: 32,
