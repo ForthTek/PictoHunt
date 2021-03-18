@@ -816,7 +816,6 @@ export default class Firebase {
     field = "search",
     filter = new Filter()
   ) => {
-
     const query = search.toUpperCase();
 
     return (
@@ -840,4 +839,64 @@ export default class Firebase {
         )
     );
   };
+
+  /**
+   *
+   * @param {Date} deadline
+   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
+   * @returns
+   */
+  async createChallenge(deadline, tasksPerPost) {
+    const milliseconds = deadline - new Date();
+    const hours = milliseconds / 3600000;
+
+    if (milliseconds <= 0 || hours <= 1) {
+      console.log(
+        `Trying to create challenge with duration of ${hours} hours (${milliseconds}ms)`
+      );
+      throw new Error("Challange duration must be more than an hour");
+    }
+
+    if (tasksPerPost.length == 0) {
+      throw new Error("Challange must some tasks");
+    }
+
+    let tasks = [];
+    for (let i = 0; i < tasksPerPost.length; i++) {
+      const channelName = tasksPerPost[i].channel;
+      const channelRef = this.#database.doc(`Channels/${channelName}`);
+      const channelData = await channelRef.get();
+
+      if (!channelData.exists) {
+        throw new Error(`Channel ${channelName} does not exist`);
+      }
+
+      const GPS =
+        tasksPerPost[i].latitude != null && tasksPerPost[i].longitude != null
+          ? (GPS = new firebase.firestore.GeoPoint(
+              tasksPerPost[i].latitude,
+              tasksPerPost[i].longitude
+            ))
+          : null;
+
+      tasks.push({ channel: channelRef, GPS: GPS });
+    }
+
+    const ref = this.#database.collection("Challenges").doc();
+    const key = ref.id;
+
+    const username = this.currentUser().username;
+    const userRef = this.#database.doc(`Users/${username}`);
+
+    const data = {
+      deadline: firebase.firestore.Timestamp.fromDate(deadline),
+      createdBy: userRef,
+      tasks: tasks,
+    };
+
+    await ref.set(data);
+    return key;
+  }
+
+  async inviteUsersToChallenge(challengeKey, users) {}
 }

@@ -126,6 +126,14 @@ describe("auth tests", () => {
     await connection.followChannel(TEST_CHANNEL, true);
   });
 
+  test.only("auth createChallenge", async () => {
+    let x = await connection.createChallenge(new Date("2021-04-17T03:24:00"), [
+      { channel: "Test" },
+      { channel: "Test2", latitude: 1, longitude: 2 },
+    ]);
+    //expect(x.length).toBeGreaterThan(0);
+  });
+
   test("auth logout", async () => {
     let x = await connection.logout();
     expect(x).toBe(true);

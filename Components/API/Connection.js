@@ -292,4 +292,14 @@ export default class Connection {
   searchUsers = async (text) => {
     return await this.#firebase.searchWithPrefix("Users", text);
   };
+
+  /**
+   *
+   * @param {Date} deadline
+   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
+   * @returns
+   */
+  createChallenge = async (deadline, tasksPerPost) => {
+    return await this.#firebase.createChallenge(deadline, tasksPerPost);
+  };
 }
