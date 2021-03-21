@@ -36,7 +36,6 @@ export default class Map extends Component {
   }
 
   async componentDidMount() {
-    console.log("Components mounted.");
     try {
       // Asks the user for permission
       let { status } = await Location.requestPermissionsAsync();
@@ -53,12 +52,21 @@ export default class Map extends Component {
 
       // Gets the last known location of the user
       let location = await Location.getLastKnownPositionAsync();
-         console.log({location});
+      console.log({ location });
       // Saves it in the state varable
-      if (location == null) {Alert.alert("'user location = null' error!"); this.setState({ locationset: true });}
-      else if (location.coords == null) {Alert.alert("'user coords = null' error!"); this.setState({ locationset: true });}
-      else if (location.coords.latitude == null || location.coords.longitude == null) {Alert.alert("'user latitude or longitude = null' error!"); this.setState({ locationset: true });}
-      else{
+      if (location == null) {
+        Alert.alert("'user location = null' error!");
+        this.setState({ locationset: true });
+      } else if (location.coords == null) {
+        Alert.alert("'user coords = null' error!");
+        this.setState({ locationset: true });
+      } else if (
+        location.coords.latitude == null ||
+        location.coords.longitude == null
+      ) {
+        Alert.alert("'user latitude or longitude = null' error!");
+        this.setState({ locationset: true });
+      } else {
         this.setState({ latitude: location.coords.latitude });
         this.setState({ longitude: location.coords.longitude });
         this.setState({ latitudeDelta: 0.2 });
@@ -133,7 +141,7 @@ export default class Map extends Component {
                     }}
                   >
                     <Image
-                      source={{ uri: m.icon }}
+                      source={{ uri: m.photos[0] }}
                       style={{ width: 80, height: 80 }}
                     />
                     <Text style={{ backgroundColor: "#fff" }}> {m.ID} </Text>

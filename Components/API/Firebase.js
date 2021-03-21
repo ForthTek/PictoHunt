@@ -337,10 +337,18 @@ export default class Firebase {
     const data = await doc.data();
     const interaction = await this.calculateInteractedWith(doc.id);
 
+    let GPS = null;
+    if (data.GPS) {
+      GPS = {
+        latitude: data.GPS.latitude,
+        longitude: data.GPS.longitude,
+      };
+    }
+
     // Return the data in a nice format
     let post = {
       title: data.title,
-      GPS: data.GPS,
+      GPS: GPS,
       channel: data.channel.id,
       photos: data.photos,
       score: data.score,
@@ -480,9 +488,6 @@ export default class Firebase {
 
       let posts = await Promise.all(requests);
 
-      filter.orderBy = Filter.ORDER_BY_TIME;
-      filter.direction = Filter.DIRECTION_DESC;
-
       // Need to sort the list again if we filtered by both channel and user
       if (filter.followedUsers && filter.followedChannels) {
         // console.log(`Manually sorting posts with filter:`);
@@ -521,24 +526,24 @@ export default class Firebase {
   }
 
   getMap = async () => {
-    const snapshot = await this.#database
+    return await this.#database
       .collection("Posts")
       .where("GPS", "!=", null)
-      .get();
-    let posts = [];
+      .get()
+      .then(async (snapshot) => {
+        let posts = [];
 
-    snapshot.forEach((doc) => {
-      // Return the data in a nice format
-      let mapPost = {
-        GPS: doc.data().GPS,
-        icon: doc.data().photos[0],
-        ID: doc.id,
-      };
+        snapshot.forEach((x) => {
+          posts.push(this.getPostFromDoc(x));
+        });
 
-      posts.push(mapPost);
-    });
-
-    return posts;
+        // Use promise all to send multiple requests at once, and wait for all the respnses in one go
+        return await Promise.all(posts);
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new Error("Failed to load posts for map");
+      });
   };
 
   /**
