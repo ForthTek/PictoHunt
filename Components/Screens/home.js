@@ -1,5 +1,12 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, View, FlatList, Alert } from "react-native";
+import {
+    Text,
+    StyleSheet,
+    View,
+    FlatList,
+    Alert,
+    KeyboardAvoidingView,
+} from "react-native";
 import Post from "../post";
 import SinglePost from "../singlePost";
 import FilterBtn from "../filterBtn";
@@ -19,6 +26,9 @@ export default class Home extends Component {
         DATA: "",
         refresh: false,
         filter: new Filter(),
+        searching: false,
+        channelDATA: "",
+        userDATA: "",
     };
 
     componentDidMount() {
@@ -134,7 +144,26 @@ export default class Home extends Component {
     onChangeSearch = (search) => {
         this.setState({
             search: search,
+            searching: true,
         });
+        if (this.state.search != "") {
+        }
+        this.connection.searchUsers(search).then(
+            (userData) => {
+                this.setState({ userDATA: userData });
+            },
+            (error) => {
+                Alert.alert(error.message);
+            }
+        );
+        this.connection.searchChannels(search).then(
+            (channelData) => {
+                this.setState({ channelDATA: channelData });
+            },
+            (error) => {
+                Alert.alert(error.message);
+            }
+        );
     };
 
     render() {
@@ -158,7 +187,10 @@ export default class Home extends Component {
             );
         } else {
             return (
-                <View style={styles.postCon}>
+                <KeyboardAvoidingView
+                    style={styles.postCon}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
                     <View style={styles.container1}>
                         <SearchBar
                             containerStyle={styles.searchCon}
@@ -170,6 +202,36 @@ export default class Home extends Component {
                         />
                         <FilterBtn updateFilter={this.updateFilter} />
                     </View>
+                    {this.state.searching && this.state.search != "" && (
+                        <View style={styles.dropDown}>
+                            <Text style={styles.ddText}>------Users------</Text>
+                            <FlatList
+                                data={this.state.userDATA}
+                                renderItem={({ item }) => (
+                                    <View>
+                                        <Text style={styles.ddText}>
+                                            {item}
+                                        </Text>
+                                    </View>
+                                )}
+                                keyExtractor={(item) => item}
+                            />
+                            <Text style={styles.ddText}>
+                                ------Channels------
+                            </Text>
+                            <FlatList
+                                data={this.state.channelDATA}
+                                renderItem={({ item }) => (
+                                    <View>
+                                        <Text style={styles.ddText}>
+                                            {item}
+                                        </Text>
+                                    </View>
+                                )}
+                                keyExtractor={(item) => item}
+                            />
+                        </View>
+                    )}
                     <FlatList
                         data={this.state.DATA}
                         extraData={this.state.didRefresh}
@@ -187,7 +249,7 @@ export default class Home extends Component {
                         onRefresh={this.onRefresh}
                         refreshing={this.state.refresh}
                     />
-                </View>
+                </KeyboardAvoidingView>
             );
         }
     }
@@ -219,10 +281,19 @@ const styles = StyleSheet.create({
         width: "85%",
         borderColor: "black",
         borderTopWidth: 0.2,
-        borderBottomWidth: 0.2,
+        borderBottomWidth: 0.1,
     },
     inputContainerStyle: {
         height: "5%",
         paddingBottom: "1%",
+    },
+    dropDown: {
+        backgroundColor: "#383d42",
+        paddingBottom: "2%",
+    },
+    ddText: {
+        fontSize: 20,
+        paddingLeft: "2%",
+        color: "white",
     },
 });

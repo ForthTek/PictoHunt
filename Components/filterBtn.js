@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import { Pressable, StyleSheet, View, Modal } from "react-native";
 import { CheckBox } from "react-native-elements";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import Ionicon from "react-native-vector-icons/Ionicons";
+
 //import CheckBox from "react-native-check-box";
 export default class FilterBtn extends Component {
     state = {
@@ -50,8 +50,8 @@ export default class FilterBtn extends Component {
                                     );
                                 }}
                             >
-                                <Ionicon
-                                    name='arrow-back-circle-outline'
+                                <FeatherIcon
+                                    name='x-circle'
                                     style={styles.icon1}
                                 />
                             </Pressable>
