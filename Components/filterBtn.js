@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { Alert, Pressable, StyleSheet, View, Modal, Text } from "react-native";
+import { SearchBar, CheckBox } from "react-native-elements";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Ionicon from "react-native-vector-icons/Ionicons";
-import CheckBox from "react-native-check-box";
+//import CheckBox from "react-native-check-box";
 export default class FilterBtn extends Component {
     state = {
         modalVisible: false,
@@ -11,6 +12,7 @@ export default class FilterBtn extends Component {
         onlyFollowedUsersCheck: false,
         onlyFollowedChannelsCheck: false,
         anyChanged: false,
+        search: "",
     };
 
     openFilterModal = () => {
@@ -20,12 +22,29 @@ export default class FilterBtn extends Component {
         this.setState({ modalVisible: false });
     };
 
+    onChangeSearch = (search) => {
+        this.setState({
+            search: search,
+        });
+    };
+
     render() {
         return (
             <View style={styles.icon}>
-                <Pressable onPress={this.openFilterModal}>
-                    <FeatherIcon name='sliders' style={styles.icon} />
-                </Pressable>
+                <View style={styles.container2}>
+                    <SearchBar
+                        containerStyle={styles.searchCon}
+                        inputContainerStyle={styles.inputContainerStyle}
+                        value={this.state.search}
+                        onChangeText={this.onChurchSearch}
+                        placeholder='Search...'
+                        round
+                    />
+                    <View></View>
+                    <Pressable onPress={this.openFilterModal}>
+                        <FeatherIcon name='sliders' style={styles.icon} />
+                    </Pressable>
+                </View>
 
                 <Modal
                     visible={this.state.modalVisible}
@@ -53,7 +72,11 @@ export default class FilterBtn extends Component {
                             </Pressable>
                             <View style={styles.container1}>
                                 <CheckBox
-                                    onClick={() =>
+                                    title='Order by most recent'
+                                    iconType='material'
+                                    checkedIcon='clear'
+                                    uncheckedIcon='add'
+                                    onPress={() =>
                                         this.setState({
                                             orderByTimeCheck: !this.state
                                                 .orderByTimeCheck,
@@ -62,13 +85,16 @@ export default class FilterBtn extends Component {
                                             anyChanged: true,
                                         })
                                     }
-                                    isChecked={this.state.orderByTimeCheck}
+                                    checked={this.state.orderByTimeCheck}
                                 />
-                                <Text>Order by newest post</Text>
                             </View>
                             <View style={styles.container1}>
                                 <CheckBox
-                                    onClick={() =>
+                                    title='Order by highest score'
+                                    iconType='material'
+                                    checkedIcon='clear'
+                                    uncheckedIcon='add'
+                                    onPress={() =>
                                         this.setState({
                                             orderByTimeCheck: !this.state
                                                 .orderByTimeCheck,
@@ -77,28 +103,32 @@ export default class FilterBtn extends Component {
                                             anyChanged: true,
                                         })
                                     }
-                                    isChecked={this.state.orderByScoreCheck}
+                                    checked={this.state.orderByScoreCheck}
                                 />
-                                <Text>Order by highest score</Text>
                             </View>
                             <View style={styles.container1}>
                                 <CheckBox
-                                    onClick={() =>
+                                    title='Only posts by followed users'
+                                    iconType='material'
+                                    checkedIcon='clear'
+                                    uncheckedIcon='add'
+                                    onPress={() =>
                                         this.setState({
                                             onlyFollowedUsersCheck: !this.state
                                                 .onlyFollowedUsersCheck,
                                             anyChanged: true,
                                         })
                                     }
-                                    isChecked={
-                                        this.state.onlyFollowedUsersCheck
-                                    }
+                                    checked={this.state.onlyFollowedUsersCheck}
                                 />
-                                <Text>Only see posts by followed users</Text>
                             </View>
                             <View style={styles.container1}>
                                 <CheckBox
-                                    onClick={() =>
+                                    title='Only posts by followed channels'
+                                    iconType='material'
+                                    checkedIcon='clear'
+                                    uncheckedIcon='add'
+                                    onPress={() =>
                                         this.setState({
                                             onlyFollowedChannelsCheck: !this
                                                 .state
@@ -106,11 +136,10 @@ export default class FilterBtn extends Component {
                                             anyChanged: true,
                                         })
                                     }
-                                    isChecked={
+                                    checked={
                                         this.state.onlyFollowedChannelsCheck
                                     }
                                 />
-                                <Text>Only see posts by followed channels</Text>
                             </View>
                         </View>
                     </View>
@@ -129,9 +158,21 @@ const styles = StyleSheet.create({
     container1: {
         flexDirection: "row",
     },
+    container2: {
+        flexDirection: "row",
+        // justifyContent: "center",
+    },
+    searchCon: {
+        maxWidth: "85%",
+    },
+    inputContainerStyle: {
+        maxHeight: "15%",
+    },
     icon: {
-        fontSize: 32,
+        fontSize: 28,
         paddingLeft: "1%",
+        paddingRight: "1%",
+        paddingBottom: "1%",
     },
     icon1: {
         fontSize: 32,

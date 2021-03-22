@@ -337,10 +337,18 @@ export default class Firebase {
     const data = await doc.data();
     const interaction = await this.calculateInteractedWith(doc.id);
 
+    let GPS = null;
+    if (data.GPS) {
+      GPS = {
+        latitude: data.GPS.latitude,
+        longitude: data.GPS.longitude,
+      };
+    }
+
     // Return the data in a nice format
     let post = {
       title: data.title,
-      GPS: data.GPS,
+      GPS: GPS,
       channel: data.channel.id,
       photos: data.photos,
       score: data.score,
@@ -356,29 +364,23 @@ export default class Firebase {
     return post;
   }
 
-  getPostsFromCollection = async (collectionPath, filter) => {
-    let allPosts = [];
-
-    await this.#database
-      .collection(collectionPath)
+  async getAllPosts(filter) {
+    return await this.#database
+      .collection("Posts")
       .orderBy(filter.orderBy, filter.direction)
       .get()
-      .then(async (querySnapshot) => {
-        // Must use async foreach here
-        for await (let doc of querySnapshot.docs) {
-          allPosts.push(await this.getPostFromDoc(doc));
-        }
+      .then(async (snapshot) => {
+        let allPosts = [];
+        snapshot.forEach((x) => {
+          allPosts.push(this.getPostFromDoc(x));
+        });
+        // Use promise all to send multiple requests at once, and wait for all the respnses in one go
+        return await Promise.all(allPosts);
       })
       .catch((error) => {
         console.log(error);
-        throw Error(`Failed to load posts from collection ${collectionPath}`);
+        throw Error(`Failed to get all posts`);
       });
-
-    return allPosts;
-  };
-
-  async getAllPosts(filter) {
-    return await this.getPostsFromCollection("Posts", filter);
   }
 
   async getFollowedUserRefs(username) {
@@ -444,7 +446,7 @@ export default class Firebase {
       }
 
       let alreadyAdded = {};
-      let posts = [];
+      let requests = [];
 
       if (filter.followedUsers) {
         await this.#database
@@ -452,17 +454,16 @@ export default class Firebase {
           .where("user", "in", allFollowedUsers)
           .orderBy(filter.orderBy, filter.direction)
           .get()
-          .then(async (querySnapshot) => {
-            // Must use async foreach here
-            for await (let doc of querySnapshot.docs) {
+          .then(async (snapshot) => {
+            snapshot.forEach((doc) => {
               const key = doc.id;
+
               // Only add the post if its not already been added
               if (!alreadyAdded[key]) {
-                let x = await this.getPostFromDoc(doc);
-                posts.push(x);
+                requests.push(this.getPostFromDoc(doc));
                 alreadyAdded[key] = true;
               }
-            }
+            });
           });
       }
 
@@ -472,27 +473,25 @@ export default class Firebase {
           .where("channel", "in", allFollowedChannels)
           .orderBy(filter.orderBy, filter.direction)
           .get()
-          .then(async (querySnapshot) => {
-            // Must use async foreach here
-            for await (let doc of querySnapshot.docs) {
+          .then(async (snapshot) => {
+            snapshot.forEach((doc) => {
               const key = doc.id;
+
               // Only add the post if its not already been added
               if (!alreadyAdded[key]) {
-                let x = await this.getPostFromDoc(doc);
-                posts.push(x);
+                requests.push(this.getPostFromDoc(doc));
                 alreadyAdded[key] = true;
               }
-            }
+            });
           });
       }
 
-      filter.orderBy = Filter.ORDER_BY_TIME;
-      filter.direction = Filter.DIRECTION_DESC;
+      let posts = await Promise.all(requests);
 
       // Need to sort the list again if we filtered by both channel and user
       if (filter.followedUsers && filter.followedChannels) {
-        console.log(`Manually sorting posts with filter:`);
-        console.log(filter);
+        // console.log(`Manually sorting posts with filter:`);
+        // console.log(filter);
         posts.sort((x, y) => this.comparePost(x, y, filter));
       }
 
@@ -527,24 +526,24 @@ export default class Firebase {
   }
 
   getMap = async () => {
-    const snapshot = await this.#database
+    return await this.#database
       .collection("Posts")
       .where("GPS", "!=", null)
-      .get();
-    let posts = [];
+      .get()
+      .then(async (snapshot) => {
+        let posts = [];
 
-    snapshot.forEach((doc) => {
-      // Return the data in a nice format
-      let mapPost = {
-        GPS: doc.data().GPS,
-        icon: doc.data().photos[0],
-        ID: doc.id,
-      };
+        snapshot.forEach((x) => {
+          posts.push(this.getPostFromDoc(x));
+        });
 
-      posts.push(mapPost);
-    });
-
-    return posts;
+        // Use promise all to send multiple requests at once, and wait for all the respnses in one go
+        return await Promise.all(posts);
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new Error("Failed to load posts for map");
+      });
   };
 
   /**
@@ -816,7 +815,6 @@ export default class Firebase {
     field = "search",
     filter = new Filter()
   ) => {
-
     const query = search.toUpperCase();
 
     return (
@@ -840,4 +838,66 @@ export default class Firebase {
         )
     );
   };
+
+  /**
+   *
+   * @param {Date} deadline
+   * @param {number} score
+   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
+   * @returns
+   */
+  async createChallenge(deadline, score, tasksPerPost) {
+    const milliseconds = deadline - new Date();
+    const hours = milliseconds / 3600000;
+
+    if (milliseconds <= 0 || hours <= 1) {
+      console.log(
+        `Trying to create challenge with duration of ${hours} hours (${milliseconds}ms)`
+      );
+      throw new Error("Challange duration must be more than an hour");
+    }
+
+    if (tasksPerPost.length == 0) {
+      throw new Error("Challange must some tasks");
+    }
+
+    let tasks = [];
+    for (let i = 0; i < tasksPerPost.length; i++) {
+      const channelName = tasksPerPost[i].channel;
+      const channelRef = this.#database.doc(`Channels/${channelName}`);
+      const channelData = await channelRef.get();
+
+      if (!channelData.exists) {
+        throw new Error(`Channel ${channelName} does not exist`);
+      }
+
+      const GPS =
+        tasksPerPost[i].latitude != null && tasksPerPost[i].longitude != null
+          ? (GPS = new firebase.firestore.GeoPoint(
+              tasksPerPost[i].latitude,
+              tasksPerPost[i].longitude
+            ))
+          : null;
+
+      tasks.push({ channel: channelRef, GPS: GPS });
+    }
+
+    const ref = this.#database.collection("Challenges").doc();
+    const key = ref.id;
+
+    const username = this.currentUser().username;
+    const userRef = this.#database.doc(`Users/${username}`);
+
+    const data = {
+      deadline: firebase.firestore.Timestamp.fromDate(deadline),
+      score: score,
+      createdBy: userRef,
+      tasks: tasks,
+    };
+
+    await ref.set(data);
+    return key;
+  }
+
+  async inviteUsersToChallenge(challengeKey, users) {}
 }

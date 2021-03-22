@@ -85,9 +85,14 @@ describe("auth tests", () => {
     expect(x.username).toBe(TEST_USERNAME);
   });
 
-  test("auth getBrowse", async () => {
+  test.only("auth getBrowse", async () => {
     let x = await connection.getBrowse(new Filter());
     expect(x.length).toBeGreaterThan(0);
+  });
+
+  test.only("auth getGetAllPosts", async () => {
+    let x = await connection.getAllPosts(new Filter());
+    console.log(x.length);
   });
 
   // Dont test this as we cant upload images from here
@@ -125,6 +130,14 @@ describe("auth tests", () => {
   test("auth followChannel", async () => {
     await connection.followChannel(TEST_CHANNEL, true);
   });
+
+  // test("auth createChallenge", async () => {
+  //   let x = await connection.createChallenge(
+  //     new Date("2021-04-17T03:24:00"),
+  //     100,
+  //     [{ channel: "Test" }, { channel: "Test2", latitude: 1, longitude: 2 }]
+  //   );
+  // });
 
   test("auth logout", async () => {
     let x = await connection.logout();
