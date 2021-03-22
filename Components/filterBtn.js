@@ -22,25 +22,10 @@ export default class FilterBtn extends Component {
         this.setState({ modalVisible: false });
     };
 
-    onChangeSearch = (search) => {
-        this.setState({
-            search: search,
-        });
-    };
-
     render() {
         return (
             <View style={styles.icon}>
                 <View style={styles.container2}>
-                    <SearchBar
-                        containerStyle={styles.searchCon}
-                        inputContainerStyle={styles.inputContainerStyle}
-                        value={this.state.search}
-                        onChangeText={this.onChurchSearch}
-                        placeholder='Search...'
-                        round
-                    />
-                    <View></View>
                     <Pressable onPress={this.openFilterModal}>
                         <FeatherIcon name='sliders' style={styles.icon} />
                     </Pressable>
@@ -149,30 +134,17 @@ export default class FilterBtn extends Component {
     }
 }
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        flexDirection: "row",
-        backgroundColor: "#fff",
-        padding: "1%",
-    },
     container1: {
         flexDirection: "row",
     },
     container2: {
         flexDirection: "row",
-        // justifyContent: "center",
-    },
-    searchCon: {
-        maxWidth: "85%",
-    },
-    inputContainerStyle: {
-        maxHeight: "15%",
     },
     icon: {
-        fontSize: 28,
+        fontSize: 32,
+        paddingTop: "1%",
         paddingLeft: "1%",
-        paddingRight: "1%",
-        paddingBottom: "1%",
+        color: "#919191",
     },
     icon1: {
         fontSize: 32,
