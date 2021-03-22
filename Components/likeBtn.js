@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, View, Pressable } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import Ionicon from "react-native-vector-icons/Ionicons";
 
 export default class LikeBtn extends Component {

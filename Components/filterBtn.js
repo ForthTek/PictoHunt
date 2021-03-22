@@ -1,6 +1,6 @@
 import React, { Component } from "react";
-import { Alert, Pressable, StyleSheet, View, Modal, Text } from "react-native";
-import { SearchBar, CheckBox } from "react-native-elements";
+import { Pressable, StyleSheet, View, Modal } from "react-native";
+import { CheckBox } from "react-native-elements";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Ionicon from "react-native-vector-icons/Ionicons";
 //import CheckBox from "react-native-check-box";

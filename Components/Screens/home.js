@@ -1,19 +1,10 @@
 import React, { Component } from "react";
-import {
-    Text,
-    StyleSheet,
-    SafeAreaView,
-    View,
-    FlatList,
-    Button,
-    Alert,
-    RefreshControl,
-} from "react-native";
+import { Text, StyleSheet, View, FlatList, Alert } from "react-native";
 import Post from "../post";
 import SinglePost from "../singlePost";
 import FilterBtn from "../filterBtn";
 import Filter from "../API/Filter";
-import { SearchBar, CheckBox } from "react-native-elements";
+import { SearchBar } from "react-native-elements";
 export default class Home extends Component {
     constructor(props) {
         super(props);
@@ -167,7 +158,7 @@ export default class Home extends Component {
             );
         } else {
             return (
-                <SafeAreaView style={styles.postCon}>
+                <View style={styles.postCon}>
                     <View style={styles.container1}>
                         <SearchBar
                             containerStyle={styles.searchCon}
@@ -196,7 +187,7 @@ export default class Home extends Component {
                         onRefresh={this.onRefresh}
                         refreshing={this.state.refresh}
                     />
-                </SafeAreaView>
+                </View>
             );
         }
     }
