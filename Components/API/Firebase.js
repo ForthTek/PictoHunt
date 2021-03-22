@@ -190,7 +190,7 @@ export default class Firebase {
           displayName: username,
         })
       )
-      // Reload the auth now  that the username has been changed
+      // Reload the auth now that the username has been changed
       .then(() => this.#auth.currentUser.reload())
       // Now create their profile in the database
       .then(async () => {
@@ -200,6 +200,7 @@ export default class Firebase {
           timestamp: firebase.firestore.Timestamp.now(),
           // Add username as string just for searching
           search: username.toUpperCase(),
+          uid: this.#auth.currentUser.uid,
         };
 
         // Now we should create the profile
@@ -355,7 +356,7 @@ export default class Firebase {
       score: data.score,
       likes: data.likes,
       dislikes: data.dislikes,
-      user: data.user.id,
+      user: data.createdBy.id,
       time: data.timestamp.toDate(),
       liked: interaction.liked,
       disliked: interaction.disliked,
@@ -674,7 +675,7 @@ export default class Firebase {
       channel: channelRef,
       photos: URLs,
       score: 0,
-      user: userRef,
+      createdBy: userRef,
       timestamp: firebase.firestore.Timestamp.now(),
     };
 
