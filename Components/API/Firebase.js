@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import * as geofire from "geofire-common";
 
 import Upload from "./Upload.js";
 
@@ -660,13 +661,16 @@ export default class Firebase {
     // Only create GPS point if lat and long is not null
     const GPS =
       latitude != null && longitude != null
-        ? (GPS = new firebase.firestore.GeoPoint(latitude, longitude))
+        ? new firebase.firestore.GeoPoint(latitude, longitude)
         : null;
+    const GPSHash =
+      GPS != null ? geofire.geohashForLocation([latitude, longitude]) : null;
 
     // Do some input validation stuff here
     const postData = {
       title: title,
       GPS: GPS,
+      GPSHash: GPSHash,
       channel: channelRef,
       photos: URLs,
       score: 0,

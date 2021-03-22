@@ -85,24 +85,26 @@ describe("auth tests", () => {
     expect(x.username).toBe(TEST_USERNAME);
   });
 
-  test.only("auth getBrowse", async () => {
+  test("auth getBrowse", async () => {
     let x = await connection.getBrowse(new Filter());
     expect(x.length).toBeGreaterThan(0);
   });
 
-  test.only("auth getGetAllPosts", async () => {
+  test("auth getGetAllPosts", async () => {
     let x = await connection.getAllPosts(new Filter());
-    console.log(x.length);
+    //console.log(x.length);
   });
 
   // Dont test this as we cant upload images from here
-  // test("auth createPost", async () => {
+  // Would need to upload blob[]
+  // test.only("auth createPost", async () => {
   //   await connection.login(TEST_EMAIL, TEST_PASSWORD);
   //   let postID = await connection.createPost(
-  //     "my new post",
-  //     "TestChannel",
-  //     null,
-  //     ["TestTag"],
+  //     "TEST",
+  //     "Test",
+  //     1,
+  //     5,
+  //     ["Test"],
   //     []
   //   );
   //   console.log(`uploaded new post ${postID}`);
