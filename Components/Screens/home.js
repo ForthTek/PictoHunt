@@ -13,7 +13,7 @@ import Post from "../post";
 import SinglePost from "../singlePost";
 import FilterBtn from "../filterBtn";
 import Filter from "../API/Filter";
-
+import { SearchBar, CheckBox } from "react-native-elements";
 export default class Home extends Component {
     constructor(props) {
         super(props);
@@ -140,6 +140,12 @@ export default class Home extends Component {
         }
     };
 
+    onChangeSearch = (search) => {
+        this.setState({
+            search: search,
+        });
+    };
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -162,8 +168,17 @@ export default class Home extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.postCon}>
-                    <FilterBtn updateFilter={this.updateFilter} />
-
+                    <View style={styles.container1}>
+                        <SearchBar
+                            containerStyle={styles.searchCon}
+                            inputContainerStyle={styles.inputContainerStyle}
+                            value={this.state.search}
+                            onChangeText={this.onChangeSearch}
+                            placeholder='Search...'
+                            round
+                        />
+                        <FilterBtn updateFilter={this.updateFilter} />
+                    </View>
                     <FlatList
                         data={this.state.DATA}
                         extraData={this.state.didRefresh}
@@ -193,6 +208,13 @@ const styles = StyleSheet.create({
         alignItems: "center",
         justifyContent: "center",
     },
+    container1: {
+        flexDirection: "row",
+        backgroundColor: "#383d42",
+        borderColor: "black",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+    },
     postCon: {
         flex: 1,
         backgroundColor: "#fff",
@@ -201,5 +223,15 @@ const styles = StyleSheet.create({
         borderColor: "grey",
         borderTopWidth: 1,
         borderBottomWidth: 1,
+    },
+    searchCon: {
+        width: "85%",
+        borderColor: "black",
+        borderTopWidth: 0.2,
+        borderBottomWidth: 0.2,
+    },
+    inputContainerStyle: {
+        height: "5%",
+        paddingBottom: "1%",
     },
 });
