@@ -12,7 +12,7 @@ export default class UserModal extends Component {
     state = {
         DATA: this.props.DATA,
         postDATA: this.props.DATA.posts,
-        hasPosts: true,
+
         singlePost: false,
         singlePostID: "",
     };
@@ -41,7 +41,6 @@ export default class UserModal extends Component {
 
     onLikeBtnPress = (type, id, updateScore) => {
         if (type === "like") {
-            alert("Pressed: " + type);
             this.connection.likePost(id).then(
                 () => {
                     updateScore(id);
@@ -52,7 +51,6 @@ export default class UserModal extends Component {
             );
         }
         if (type === "dislike") {
-            alert("Pressed: " + type);
             this.connection
                 .dislikePost(id)
                 .then(
@@ -68,7 +66,6 @@ export default class UserModal extends Component {
                 });
         }
         if (type === "remove") {
-            alert("Pressed: " + type);
             this.connection.removeInteractionFromPost(id).then(
                 () => {
                     updateScore(id);
@@ -95,7 +92,7 @@ export default class UserModal extends Component {
                     <Score label='Pics' number={this.state.postDATA.length} />
                     <Score label='Rank' number={5} />
                 </View>
-                {this.state.hasPosts && !this.state.singlePost && (
+                {!this.state.singlePost && (
                     <FlatList
                         style={styles.list}
                         data={this.state.postDATA}
@@ -112,7 +109,7 @@ export default class UserModal extends Component {
                         keyExtractor={(item) => item.ID.toString()}
                     />
                 )}
-                {this.state.hasPosts && this.state.singlePost && (
+                {this.state.singlePost && (
                     <View style={styles.singleView}>
                         <SinglePost
                             item={this.state.postDATA[this.state.singlePostID]}

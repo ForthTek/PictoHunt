@@ -84,7 +84,6 @@ export default class Home extends Component {
 
     onLikeBtnPress = (type, id, updateScore) => {
         if (type === "like") {
-            alert("Pressed: " + type);
             this.connection.likePost(id).then(
                 () => {
                     updateScore(id);
@@ -95,7 +94,6 @@ export default class Home extends Component {
             );
         }
         if (type === "dislike") {
-            alert("Pressed: " + type);
             this.connection
                 .dislikePost(id)
                 .then(
@@ -111,7 +109,6 @@ export default class Home extends Component {
                 });
         }
         if (type === "remove") {
-            alert("Pressed: " + type);
             this.connection.removeInteractionFromPost(id).then(
                 () => {
                     updateScore(id);
