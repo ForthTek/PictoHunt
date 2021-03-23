@@ -439,77 +439,90 @@ export default class Firebase {
     }
     // Otherwise load following
     else {
-      let allFollowedUsers = await this.getFollowedUserRefs(user.username);
-      let allFollowedChannels = await this.getFollowedChannelRefs(
-        user.username
-      );
+      try {
+        let allFollowedUsers = await this.getFollowedUserRefs(user.username);
+        let allFollowedChannels = await this.getFollowedChannelRefs(
+          user.username
+        );
 
-      const isFollowingUsers = allFollowedUsers.length > 0;
-      const isFollowingChannels = allFollowedChannels.length > 0;
+        const isFollowingUsers = allFollowedUsers.length > 0;
+        const isFollowingChannels = allFollowedChannels.length > 0;
 
-      if (filter.followedUsers && !filter.followedChannels && !isFollowingUsers) {
-        throw new Error("Not following any users");
-      }
-      if (filter.followedChannels && !filter.followedUsers && !isFollowingChannels) {
-        throw new Error("Not following any channels");
-      }
-      if (!isFollowingUsers && !isFollowingChannels) {
-        throw new Error("Not following any users or channels");
-      }
+        if (
+          filter.followedUsers &&
+          !filter.followedChannels &&
+          !isFollowingUsers
+        ) {
+          throw new Error("Not following any users");
+        }
+        if (
+          filter.followedChannels &&
+          !filter.followedUsers &&
+          !isFollowingChannels
+        ) {
+          throw new Error("Not following any channels");
+        }
+        if (!isFollowingUsers && !isFollowingChannels) {
+          throw new Error("Not following any users or channels");
+        }
 
-      let alreadyAdded = {};
-      let requests = [];
+        let alreadyAdded = {};
+        let requests = [];
 
-      if (filter.followedUsers) {
-        await this.#database
-          .collection("Posts")
-          .where("public", "==", true)
-          .where("createdBy", "in", allFollowedUsers)
-          .orderBy(filter.orderBy, filter.direction)
-          .get()
-          .then(async (snapshot) => {
-            snapshot.forEach((doc) => {
-              const key = doc.id;
+        if (filter.followedUsers) {
+          await this.#database
+            .collection("Posts")
+            .where("public", "==", true)
+            .where("createdBy", "in", allFollowedUsers)
+            .orderBy(filter.orderBy, filter.direction)
+            .get()
+            .then(async (snapshot) => {
+              snapshot.forEach((doc) => {
+                const key = doc.id;
 
-              // Only add the post if its not already been added
-              if (!alreadyAdded[key]) {
-                requests.push(this.getPostFromDoc(doc));
-                alreadyAdded[key] = true;
-              }
+                // Only add the post if its not already been added
+                if (!alreadyAdded[key]) {
+                  requests.push(this.getPostFromDoc(doc));
+                  alreadyAdded[key] = true;
+                }
+              });
             });
-          });
-      }
+        }
 
-      if (filter.followedChannels) {
-        await this.#database
-          .collection("Posts")
-          .where("public", "==", true)
-          .where("channel", "in", allFollowedChannels)
-          .orderBy(filter.orderBy, filter.direction)
-          .get()
-          .then(async (snapshot) => {
-            snapshot.forEach((doc) => {
-              const key = doc.id;
+        if (filter.followedChannels) {
+          await this.#database
+            .collection("Posts")
+            .where("public", "==", true)
+            .where("channel", "in", allFollowedChannels)
+            .orderBy(filter.orderBy, filter.direction)
+            .get()
+            .then(async (snapshot) => {
+              snapshot.forEach((doc) => {
+                const key = doc.id;
 
-              // Only add the post if its not already been added
-              if (!alreadyAdded[key]) {
-                requests.push(this.getPostFromDoc(doc));
-                alreadyAdded[key] = true;
-              }
+                // Only add the post if its not already been added
+                if (!alreadyAdded[key]) {
+                  requests.push(this.getPostFromDoc(doc));
+                  alreadyAdded[key] = true;
+                }
+              });
             });
-          });
+        }
+
+        let posts = await Promise.all(requests);
+
+        // Need to sort the list again if we filtered by both channel and user
+        if (filter.followedUsers && filter.followedChannels) {
+          // console.log(`Manually sorting posts with filter:`);
+          // console.log(filter);
+          posts.sort((x, y) => this.comparePost(x, y, filter));
+        }
+
+        return posts;
+      } catch (error) {
+        console.log(error);
+        throw Error(`Failed to get browse (${error.message})`);
       }
-
-      let posts = await Promise.all(requests);
-
-      // Need to sort the list again if we filtered by both channel and user
-      if (filter.followedUsers && filter.followedChannels) {
-        // console.log(`Manually sorting posts with filter:`);
-        // console.log(filter);
-        posts.sort((x, y) => this.comparePost(x, y, filter));
-      }
-
-      return posts;
     }
   };
 
