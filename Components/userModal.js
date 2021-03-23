@@ -36,7 +36,7 @@ export default class UserModal extends Component {
     };
 
     handleSinglePost = () => {
-        this.setState({ isPost: !this.state.isPost });
+        this.setState({ singlePost: !this.state.singlePost });
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
@@ -113,7 +113,7 @@ export default class UserModal extends Component {
                     />
                 )}
                 {this.state.hasPosts && this.state.singlePost && (
-                    <View style={styles.container}>
+                    <View style={styles.singleView}>
                         <SinglePost
                             item={this.state.postDATA[this.state.singlePostID]}
                             back={this.handleSinglePost}
@@ -146,7 +146,13 @@ const styles = StyleSheet.create({
         borderBottomWidth: 1,
     },
     list: {
-        flexGrow: 0,
-        height: "90%",
+        height: "80%",
+    },
+    singleView: {
+        flex: 1,
+
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
     },
 });
