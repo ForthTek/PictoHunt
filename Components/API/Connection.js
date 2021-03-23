@@ -197,8 +197,8 @@ export default class Connection {
    * @param {string} username
    * @param {boolean} loadFollowedFeeds
    */
-  getProfile = async (username) => {
-    return await this.#firebase.getProfile(username);
+  getProfile = async (username, filter = new FIlter()) => {
+    return await this.#firebase.getProfile(username, filter);
   };
 
   /**
@@ -249,8 +249,8 @@ export default class Connection {
    * @param {string} name
    * @returns
    */
-  getChannel = async (name) => {
-    return await this.#firebase.getChannel(name);
+  getChannel = async (name, filter = new Filter()) => {
+    return await this.#firebase.getChannel(name, filter);
   };
 
   /**

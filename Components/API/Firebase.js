@@ -257,9 +257,11 @@ export default class Firebase {
    * @returns
    */
   getPost = async (postID) => {
+    const ref = this.#database.doc(`Posts/${postID}`);
+    const doc = await ref.get();
+
     // Update the current version if there is one
     if (this.#posts[postID]) {
-      const doc = await this.#database.doc(`Posts/${postID}`).get();
       const data = doc.data();
 
       let interaction = await this.calculateInteractedWith(postID);
@@ -276,9 +278,7 @@ export default class Firebase {
     }
     // Post isn't stored locally so we need to load it from the database
     else {
-      const ref = this.#database.doc(`Posts/${postID}`);
-      const document = await ref.get();
-      return await this.getPostFromDoc(document);
+      return await this.getPostFromDoc(doc);
     }
   };
 
@@ -579,74 +579,49 @@ export default class Firebase {
    * @param {string} username
    * @param {boolean} loadFollowedFeeds
    */
-  getProfile = async (username) => {
+  getProfile = async (username, filter = new Filter()) => {
     // Get the user with username
-    const userRef = this.#database.doc(`Users/${username}`);
-    const userData = await userRef.get();
+    const ref = this.#database.doc(`Users/${username}`);
+    const userData = await ref.get();
 
     // Throw an error if the user does not exist
     if (!userData.exists) {
       throw new Error(`User "${username}" does not exist`);
     }
 
-    let score = 0;
-
     let posts = await this.#database
-      .collection(`Users/${username}/Posts`)
+      .collection("Posts")
+      .where("public", "==", true)
+      .where("createdBy", "==", ref)
+      .orderBy(filter.orderBy, filter.direction)
       .get()
-      .then((snapshot) => {
-        let allPosts = [];
-        snapshot.forEach((post) => {
-          allPosts.push(post.id);
-          score += post.data().score;
+      .then(async (snapshot) => {
+        let requests = [];
+        snapshot.forEach((doc) => {
+          requests.push(this.getPostFromDoc(doc));
         });
-        return allPosts;
-      })
-      .catch((error) => {
-        console.log(error);
-        throw Error(`Failed to load posts for user (${username})`);
+        return await Promise.all(requests);
       });
+
+    // Sort the posts
+    posts.sort((x, y) => this.comparePost(x, y, filter));
+
+    // Calculate score
+    let score = 0;
+    for (let i = 0; i < posts.length; i++) {
+      score += posts[i].score;
+    }
 
     const data = userData.data();
     let user = {
       username: username,
       email: data.email,
-      score: score,
-      totalPosts: posts.length,
       timestamp: data.timestamp.toDate(),
+      score: score,
+      posts: posts,
     };
 
     return user;
-  };
-
-  getPostsByUser = async (username, filter = new Filter()) => {
-    // Get the user with username
-    const userRef = this.#database.doc(`Users/${username}`);
-    const userData = await userRef.get();
-
-    // Throw an error if the user does not exist
-    if (!userData.exists) {
-      throw new Error(`User "${username}" does not exist`);
-    }
-
-    let posts = await this.#database
-      .collection(`Users/${username}/Posts`)
-      .get()
-      .then((snapshot) => {
-        let allPosts = [];
-        snapshot.forEach((post) => {
-          allPosts.push(this.getPost(post.id));
-        });
-        return Promise.all(allPosts);
-      })
-      .catch((error) => {
-        console.log(error);
-        throw Error(`Failed to load posts for user (${username})`);
-      });
-
-    posts.sort((x, y) => this.comparePost(x, y, filter));
-
-    return posts;
   };
 
   createPost = async (
@@ -741,31 +716,50 @@ export default class Firebase {
     }
   };
 
-  getChannel = async (name) => {
+  getChannel = async (name, filter = new Filter()) => {
     const ref = this.#database.doc(`Channels/${name}`);
     const channel = await ref.get();
 
+    // Throw an error if the channel does not exist
     if (!channel.exists) {
       throw new Error(`Channel ${name} does not exist`);
-    } else {
-      return await this.returnChannel(channel);
     }
-  };
 
-  async returnChannel(doc) {
-    const data = await doc.data();
-    const username = data.createdBy.id;
+    let posts = await this.#database
+      .collection("Posts")
+      .where("public", "==", true)
+      .where("channel", "==", ref)
+      .orderBy(filter.orderBy, filter.direction)
+      .get()
+      .then(async (snapshot) => {
+        let requests = [];
+        snapshot.forEach((doc) => {
+          requests.push(this.getPostFromDoc(doc));
+        });
+        return await Promise.all(requests);
+      });
 
-    // Return the data in a nice format
-    let channel = {
-      name: doc.id,
+    // Sort the posts
+    posts.sort((x, y) => this.comparePost(x, y, filter));
+
+    // Calculate score
+    let score = 0;
+    for (let i = 0; i < posts.length; i++) {
+      score += posts[i].score;
+    }
+
+    const data = channel.data();
+    let c = {
+      name: name,
       description: data.description,
+      createdBy: data.createdBy.id,
       timestamp: data.timestamp.toDate(),
-      createdBy: username,
+      score: score,
+      posts: posts,
     };
 
-    return channel;
-  }
+    return c;
+  };
 
   /**
    *
