@@ -12,6 +12,8 @@ import SinglePost from "../singlePost";
 import FilterBtn from "../filterBtn";
 import Filter from "../API/Filter";
 import { SearchBar } from "react-native-elements";
+import { Pressable } from "react-native";
+import SearchItem from "../searchItem";
 export default class Home extends Component {
     constructor(props) {
         super(props);
@@ -166,6 +168,14 @@ export default class Home extends Component {
         );
     };
 
+    userSearchPress = (userName) => {
+        console.log(userName);
+    };
+
+    channelSearchPress = (channelName) => {
+        console.log(channelName);
+    };
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -208,11 +218,10 @@ export default class Home extends Component {
                             <FlatList
                                 data={this.state.userDATA}
                                 renderItem={({ item }) => (
-                                    <View>
-                                        <Text style={styles.ddText}>
-                                            {item}
-                                        </Text>
-                                    </View>
+                                    <SearchItem
+                                        item={item}
+                                        press={this.userSearchPress}
+                                    />
                                 )}
                                 keyExtractor={(item) => item}
                             />
@@ -222,11 +231,10 @@ export default class Home extends Component {
                             <FlatList
                                 data={this.state.channelDATA}
                                 renderItem={({ item }) => (
-                                    <View>
-                                        <Text style={styles.ddText}>
-                                            {item}
-                                        </Text>
-                                    </View>
+                                    <SearchItem
+                                        item={item}
+                                        press={this.channelSearchPress}
+                                    />
                                 )}
                                 keyExtractor={(item) => item}
                             />
