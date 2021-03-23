@@ -4,150 +4,117 @@ import Filter from "./Filter.js";
 const TEST_EMAIL = "forthtek1@gmail.com";
 const TEST_USERNAME = "Test";
 const TEST_PASSWORD = "password";
-
 const TEST_CHANNEL = "Test";
-
-//const TEST_POST = "PSIFLk7xHyKpK50HqTdh";
 
 // Create the connection at the start
 const connection = new Connection();
 
-beforeAll(async () => {
-  try {
-    // Ensure the account already exists
-    await connection.createProfile(
-      TEST_EMAIL,
-      TEST_USERNAME,
-      TEST_PASSWORD,
-      false
-    );
-  } catch (error) {}
-
-  // Then log out
-  await connection.logout();
+afterAll(() => {
+  connection.close();
 });
 
-// Tests when the user is a guest
-describe("guest tests", () => {
+describe("signed out tests", () => {
   beforeAll(async () => {
     await connection.logout();
   });
 
-  test("guest isLoggedIn", async () => {
-    let x = connection.isLoggedIn();
-    expect(x).toBe(false);
-  });
-
-  test("guest getAllPosts", async () => {
-    let x = await connection.getAllPosts(new Filter());
-    expect(x.length).toBeGreaterThan(0);
-  });
-
-  // test("guest getAllPosts", async () => {
-  //   let x = await connection.getAllPosts();
-  //   expect(x.length).toBeGreaterThan(0);
-  // });
-
-  // test("guest getAllPosts", async () => {
-  //   let x = await connection.getAllPosts();
-  //   expect(x.length).toBeGreaterThan(0);
-  // });
-
-  test("guest getBrowse", async () => {
-    // A guest user viewing browse should see all posts
-    const numberOfAllPosts = (await connection.getAllPosts(new Filter()))
-      .length;
-    const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
-    expect(numberOfBrowse).toBe(numberOfAllPosts);
-  });
-});
-
-// Tests when the user is authenticated
-describe("auth tests", () => {
-  beforeAll(async () => {
+  test("isLoggedIn", async () => {
     await connection.login(TEST_EMAIL, TEST_PASSWORD);
-  });
-
-  test("auth login", async () => {
-    await connection.logout();
-    let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
-    // If this test fails, the test account could be locked/suspended
-    expect(x).toBe(true);
-  });
-
-  test("auth isLoggedIn", async () => {
     expect(connection.isLoggedIn()).toBe(true);
+    await connection.logout();
+    expect(connection.isLoggedIn()).toBe(false);
   });
+});
 
-  test("auth currentUser", async () => {
-    let x = connection.currentUser();
-    expect(x.email).toBe(TEST_EMAIL);
-    expect(x.username).toBe(TEST_USERNAME);
-  });
+describe("signed in tests", () => {
+  beforeAll(async () => {
+    try {
+      await connection.createProfile(
+        TEST_EMAIL,
+        TEST_USERNAME,
+        TEST_PASSWORD,
+        false
+      );
+    } catch (error) {}
 
-  test("auth getBrowse", async () => {
-    let x = await connection.getBrowse(new Filter());
-    expect(x.length).toBeGreaterThan(0);
-  });
-
-  test("auth getGetAllPosts", async () => {
-    let x = await connection.getAllPosts(new Filter());
-    //console.log(x.length);
-  });
-
-  // Dont test this as we cant upload images from here
-  // Would need to upload blob[]
-  // test.only("auth createPost", async () => {
-  //   await connection.login(TEST_EMAIL, TEST_PASSWORD);
-  //   let postID = await connection.createPost(
-  //     "TEST",
-  //     "Test",
-  //     1,
-  //     5,
-  //     ["Test"],
-  //     []
-  //   );
-  //   console.log(`uploaded new post ${postID}`);
-  //   //expect(x.length).toBeGreaterThan(0);
-  // });
-
-  test.only("auth test channel", async () => {
     try {
       await connection.createChannel(TEST_CHANNEL, "just a test channel");
     } catch (error) {}
 
-    let channel = await connection.getChannel(TEST_CHANNEL);
-    //console.log(channel);
+    await connection.login(TEST_EMAIL, TEST_PASSWORD);
   });
 
-  test.only("auth test user", async () => {
-    let user = await connection.getProfile(TEST_USERNAME);
-    //console.log(user);
-  });
+  describe("account tests", () => {
+    test("currentUser", async () => {
+      let x = connection.currentUser();
+      expect(x.email).toBe(TEST_EMAIL);
+      expect(x.username).toBe(TEST_USERNAME);
+    });
 
-  // test("auth like", async () => {
-  //   let x = await connection.likePost(TEST_POST);
-  //   // Like, dislike and remove interaction
-  // });
+    test("login", async () => {
+      await connection.logout();
+      await connection.login(TEST_EMAIL, TEST_PASSWORD);
+      // If this test fails, the test account could be locked/suspended
+    });
 
-  test("auth followUser", async () => {
-    await connection.followUser(TEST_USERNAME, true);
-  });
+    describe("profile tests", () => {
+      test("getProfile", async () => {
+        let user = await connection.getProfile(TEST_USERNAME);
+        //console.log(user);
+      });
 
-  test("auth followChannel", async () => {
-    await connection.followChannel(TEST_CHANNEL, true);
-  });
+      // test("likePost", async () => {
+      //   let x = await connection.likePost(TEST_POST);
+      //   // Like, dislike and remove interaction
+      // });
 
-  // test("auth createChallenge", async () => {
-  //   let x = await connection.createChallenge(
-  //     new Date("2021-04-17T03:24:00"),
-  //     100,
-  //     [{ channel: "Test" }, { channel: "Test2", latitude: 1, longitude: 2 }]
-  //   );
-  // });
+      test("auth followUser", async () => {
+        await connection.followUser(TEST_USERNAME, true);
+      });
 
-  test("auth logout", async () => {
-    let x = await connection.logout();
-    expect(x).toBe(true);
+      test("auth followChannel", async () => {
+        await connection.followChannel(TEST_CHANNEL, true);
+      });
+    });
+
+    describe("channel tests", () => {
+      test("auth test channel", async () => {
+        let channel = await connection.getChannel(TEST_CHANNEL);
+        //console.log(channel);
+      });
+    });
+
+    describe("browse tests", () => {
+      beforeEach(async () => {
+        await connection.login(TEST_EMAIL, TEST_PASSWORD);
+      });
+
+      test("auth getGetAllPosts", async () => {
+        let x = await connection.getAllPosts();
+        //console.log(x.length);
+      });
+
+      test("auth getBrowse", async () => {
+        let x = await connection.getBrowse();
+        //console.log(x.length);
+      });
+    });
+
+    describe("map tests", () => {
+      test("auth getMap", async () => {
+        let x = await connection.getMap();
+        //console.log(x.length);
+      });
+    });
+
+    describe("challenge tests", () => {
+      // test("auth createChallenge", async () => {
+      //   let x = await connection.createChallenge(
+      //     new Date("2021-04-17T03:24:00"),
+      //     100,
+      //     [{ channel: "Test" }, { channel: "Test2", latitude: 1, longitude: 2 }]
+      //   );
+      // });
+    });
   });
 });
