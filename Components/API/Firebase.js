@@ -579,7 +579,7 @@ export default class Firebase {
    * @param {string} username
    * @param {boolean} loadFollowedFeeds
    */
-  getProfile = async (username, filter = new Filter()) => {
+  getProfile = async (username) => {
     // Get the user with username
     const userRef = this.#database.doc(`Users/${username}`);
     const userData = await userRef.get();
@@ -593,13 +593,11 @@ export default class Firebase {
 
     let posts = await this.#database
       .collection(`Users/${username}/Posts`)
-      .orderBy(filter.orderBy, filter.direction)
       .get()
-      .then(snapshot => {
+      .then((snapshot) => {
         let allPosts = [];
         snapshot.forEach((post) => {
-          console.log(post.data());
-          allPosts.push( post.id );
+          allPosts.push(post.id);
           score += post.data().score;
         });
         return allPosts;
@@ -613,13 +611,44 @@ export default class Firebase {
     let user = {
       username: username,
       email: data.email,
-      public: data.public,
       score: score,
-      posts: posts,
+      totalPosts: posts.length,
       timestamp: data.timestamp.toDate(),
     };
 
+    const allPosts = await this.getPostsByUser(username);
+
     return user;
+  };
+
+  getPostsByUser = async (username, filter = new Filter()) => {
+    // Get the user with username
+    const userRef = this.#database.doc(`Users/${username}`);
+    const userData = await userRef.get();
+
+    // Throw an error if the user does not exist
+    if (!userData.exists) {
+      throw new Error(`User "${username}" does not exist`);
+    }
+
+    let posts = await this.#database
+      .collection(`Users/${username}/Posts`)
+      .get()
+      .then((snapshot) => {
+        let allPosts = [];
+        snapshot.forEach((post) => {
+          allPosts.push(this.getPost(post.id));
+        });
+        return Promise.all(allPosts);
+      })
+      .catch((error) => {
+        console.log(error);
+        throw Error(`Failed to load posts for user (${username})`);
+      });
+
+    posts.sort((x, y) => this.comparePost(x, y, filter));
+
+    return posts;
   };
 
   createPost = async (
