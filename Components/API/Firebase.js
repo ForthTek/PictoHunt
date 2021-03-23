@@ -369,6 +369,7 @@ export default class Firebase {
   async getAllPosts(filter) {
     return await this.#database
       .collection("Posts")
+      .where("public", "==", true)
       .orderBy(filter.orderBy, filter.direction)
       .get()
       .then(async (snapshot) => {
@@ -381,7 +382,7 @@ export default class Firebase {
       })
       .catch((error) => {
         console.log(error);
-        throw Error(`Failed to get all posts`);
+        throw Error(`Failed to get all posts (${error.message})`);
       });
   }
 
@@ -433,7 +434,6 @@ export default class Firebase {
     const filterFollowing = filter.followedUsers || filter.followedChannels;
 
     // If there is no user, or filter specifies to load all posts
-    // !user || !filterFollowing
     if (!user || !filterFollowing) {
       return await this.getAllPosts(filter);
     }
@@ -443,7 +443,17 @@ export default class Firebase {
       let allFollowedChannels = await this.getFollowedChannelRefs(
         user.username
       );
-      if (allFollowedUsers.length === 0 && allFollowedChannels.length === 0) {
+
+      const isFollowingUsers = allFollowedUsers.length > 0;
+      const isFollowingChannels = allFollowedChannels.length > 0;
+
+      if (filter.followedUsers && !filter.followedChannels && !isFollowingUsers) {
+        throw new Error("Not following any users");
+      }
+      if (filter.followedChannels && !filter.followedUsers && !isFollowingChannels) {
+        throw new Error("Not following any channels");
+      }
+      if (!isFollowingUsers && !isFollowingChannels) {
         throw new Error("Not following any users or channels");
       }
 
@@ -453,7 +463,8 @@ export default class Firebase {
       if (filter.followedUsers) {
         await this.#database
           .collection("Posts")
-          .where("user", "in", allFollowedUsers)
+          .where("public", "==", true)
+          .where("createdBy", "in", allFollowedUsers)
           .orderBy(filter.orderBy, filter.direction)
           .get()
           .then(async (snapshot) => {
@@ -472,6 +483,7 @@ export default class Firebase {
       if (filter.followedChannels) {
         await this.#database
           .collection("Posts")
+          .where("public", "==", true)
           .where("channel", "in", allFollowedChannels)
           .orderBy(filter.orderBy, filter.direction)
           .get()
@@ -530,6 +542,7 @@ export default class Firebase {
   getMap = async () => {
     return await this.#database
       .collection("Posts")
+      .where("public", "==", true)
       .where("GPS", "!=", null)
       .get()
       .then(async (snapshot) => {
