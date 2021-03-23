@@ -111,13 +111,18 @@ describe("auth tests", () => {
   //   //expect(x.length).toBeGreaterThan(0);
   // });
 
-  test("auth test channel", async () => {
+  test.only("auth test channel", async () => {
     try {
       await connection.createChannel(TEST_CHANNEL, "just a test channel");
     } catch (error) {}
 
     let channel = await connection.getChannel(TEST_CHANNEL);
-    //console.log(channel)
+    //console.log(channel);
+  });
+
+  test.only("auth test user", async () => {
+    let user = await connection.getProfile(TEST_USERNAME);
+    //console.log(user);
   });
 
   // test("auth like", async () => {
