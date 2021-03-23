@@ -579,81 +579,47 @@ export default class Firebase {
    * @param {string} username
    * @param {boolean} loadFollowedFeeds
    */
-  getProfile = async (username) => {
+  getProfile = async (username, filter = new Filter()) => {
     // Get the user with username
     const userRef = this.#database.doc(`Users/${username}`);
     const userData = await userRef.get();
 
-    // Process the data
-    if (userData.exists) {
-      const data = userData.data();
-
-      let posts = [];
-      let users = [];
-      let channels = [];
-      let score = 0;
-
-      await this.#database
-        .collection(`Users/${username}/Posts`)
-        .orderBy("timestamp", "desc")
-        .get()
-        .then(async (querySnapshot) => {
-          // Must use async foreach here
-          for await (let doc of querySnapshot.docs) {
-            let post = await this.getPost(doc.id);
-            posts.push(post);
-            score += post.score;
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      await this.#database
-        .collection(`Users/${username}/FollowedUsers`)
-        .get()
-        .then(async (querySnapshot) => {
-          // Must use async foreach here
-          for await (let doc of querySnapshot.docs) {
-            const username = doc.id;
-            users.push(username);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-      await this.#database
-        .collection(`Users/${username}/FollowedChannels`)
-        .get()
-        .then(async (querySnapshot) => {
-          // Must use async foreach here
-          for await (let doc of querySnapshot.docs) {
-            const channel = doc.id;
-            channels.push(channel);
-          }
-        })
-        .catch((error) => {
-          console.log(error);
-        });
-
-      let user = {
-        username: username,
-        email: data.email,
-        public: data.public,
-        score: score,
-        posts: data.posts,
-        timestamp: data.timestamp.toDate(),
-        posts: posts,
-        followedUsers: users,
-        followedChannels: channels,
-      };
-
-      return user;
-    }
     // Throw an error if the user does not exist
-    else {
+    if (!userData.exists) {
       throw new Error(`User "${username}" does not exist`);
     }
+
+    let score = 0;
+
+    let posts = await this.#database
+      .collection(`Users/${username}/Posts`)
+      .orderBy(filter.orderBy, filter.direction)
+      .get()
+      .then(snapshot => {
+        let allPosts = [];
+        snapshot.forEach((post) => {
+          console.log(post.data());
+          allPosts.push( post.id );
+          score += post.data().score;
+        });
+        return allPosts;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw Error(`Failed to load posts for user (${username})`);
+      });
+
+    const data = userData.data();
+    let user = {
+      username: username,
+      email: data.email,
+      public: data.public,
+      score: score,
+      posts: posts,
+      timestamp: data.timestamp.toDate(),
+    };
+
+    return user;
   };
 
   createPost = async (
