@@ -89,9 +89,7 @@ export default class Map extends Component {
     // Catches any arror with the marker obtaining and makes an alert
     this.connection
       .getMap()
-      //.then((response) => response.json())
       .then((response) => {
-        //console.log(response);
         this.setState({ MarkerArray: response });
       })
       .catch((error) => {

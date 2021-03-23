@@ -148,23 +148,15 @@ export default class Home extends Component {
         });
         if (this.state.search != "") {
         }
-        this.connection.searchUsers(search).then(
-            (userData) => {
-                this.setState({ userDATA: userData });
-            },
-            (error) => {
-                Alert.alert(error.message);
-            }
-        );
-        this.connection.searchChannels(search).then(
-            (channelData) => {
-                this.setState({ channelDATA: channelData });
-            },
-            (error) => {
-                Alert.alert(error.message);
-            }
-        );
+
+        this.search(search);
     };
+
+    search = async (search) => {
+        // User Promise.all to send multiple request at the same time
+        const result = await Promise.all([this.connection.searchUsers(search), this.connection.searchChannels(search)]);
+        this.setState({ userDATA: result[0], channelDATA: result[1] });
+    }
 
     render() {
         if (this.state.isLoading) {
