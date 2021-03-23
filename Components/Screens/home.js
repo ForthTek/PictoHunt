@@ -149,9 +149,11 @@ export default class Home extends Component {
             search: search,
             searching: true,
         });
-        if (this.state.search != "") {
-            this.search(search);
+        if (search == "") {
+            this.setState({ searching: false });
         }
+
+        this.search(search);
     };
 
     search = async (search) => {
@@ -160,7 +162,10 @@ export default class Home extends Component {
             this.connection.searchUsers(search),
             this.connection.searchChannels(search),
         ]);
-        this.setState({ userDATA: result[0], channelDATA: result[1] });
+        this.setState({
+            userDATA: result[0],
+            channelDATA: result[1],
+        });
     };
 
     render() {
@@ -193,7 +198,7 @@ export default class Home extends Component {
                             containerStyle={styles.searchCon}
                             inputContainerStyle={styles.inputContainerStyle}
                             value={this.state.search}
-                            onChangeText={this.onChangeSearch}
+                            onChangeText={(text) => this.onChangeSearch(text)}
                             placeholder='Search...'
                             round
                         />
