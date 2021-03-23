@@ -1,17 +1,44 @@
 import React, { Component } from "react";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import { Text, StyleSheet, View, Modal, Pressable } from "react-native";
+import { Text, StyleSheet, View, Modal, Pressable, Alert } from "react-native";
+import UserModal from "./userModal";
+
 export default class SearchItem extends Component {
     constructor(props) {
         super(props);
+        this.connection = this.props.connection;
     }
 
     state = {
+        type: this.props.type,
+        name: this.props.item,
         modalOpen: false,
+        DATA: "",
     };
 
     openModal = () => {
-        this.setState({ modalOpen: true });
+        if (this.state.type == "user") {
+            this.connection.getProfile(this.state.name).then(
+                (user) => {
+                    this.setState({ modalOpen: true, DATA: user });
+                    console.log(user);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
+        if (this.state.type == "channel") {
+            this.connection.getChannel(this.state.name).then(
+                (channel) => {
+                    this.setState({ modalOpen: true, DATA: channel });
+                    console.log(channel);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
     };
     closeModal = () => {
         this.setState({ modalOpen: false });
@@ -41,6 +68,18 @@ export default class SearchItem extends Component {
                                     style={styles.icon1}
                                 />
                             </Pressable>
+
+                            {this.state.type == "user" && (
+                                <UserModal
+                                    DATA={this.state.DATA}
+                                    connection={this.connection}
+                                />
+                            )}
+                            {this.state.type == "channel" && (
+                                <Text style={styles.text}>
+                                    {this.state.DATA.name}
+                                </Text>
+                            )}
                         </View>
                     </View>
                 </Modal>
@@ -61,16 +100,22 @@ const styles = StyleSheet.create({
         paddingLeft: "2%",
         color: "white",
     },
+    text: {
+        fontSize: 20,
+        paddingLeft: "2%",
+    },
     center: {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
     },
     modalView: {
-        margin: 20,
+        margin: 5,
         backgroundColor: "white",
         borderRadius: 20,
-        padding: 35,
+        padding: 5,
+        width: "90%",
+        height: "90%",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,

@@ -14,6 +14,7 @@ import Filter from "../API/Filter";
 import { SearchBar } from "react-native-elements";
 import { Pressable } from "react-native";
 import SearchItem from "../searchItem";
+
 export default class Home extends Component {
     constructor(props) {
         super(props);
@@ -219,8 +220,9 @@ export default class Home extends Component {
                                 data={this.state.userDATA}
                                 renderItem={({ item }) => (
                                     <SearchItem
+                                        type='user'
                                         item={item}
-                                        press={this.userSearchPress}
+                                        connection={this.connection}
                                     />
                                 )}
                                 keyExtractor={(item) => item}
@@ -232,8 +234,9 @@ export default class Home extends Component {
                                 data={this.state.channelDATA}
                                 renderItem={({ item }) => (
                                     <SearchItem
+                                        type='channel'
                                         item={item}
-                                        press={this.channelSearchPress}
+                                        connection={this.connection}
                                     />
                                 )}
                                 keyExtractor={(item) => item}
