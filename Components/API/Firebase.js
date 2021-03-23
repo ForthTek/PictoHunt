@@ -616,8 +616,6 @@ export default class Firebase {
       timestamp: data.timestamp.toDate(),
     };
 
-    const allPosts = await this.getPostsByUser(username);
-
     return user;
   };
 
