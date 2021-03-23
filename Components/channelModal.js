@@ -2,9 +2,7 @@ import React, { Component } from "react";
 import Score from "./score";
 import Post from "./post";
 import SinglePost from "./singlePost";
-import { Text, StyleSheet, View, FlatList, Pressable } from "react-native";
-import FeatherIcon from "react-native-vector-icons/Feather";
-
+import { Text, StyleSheet, View, FlatList } from "react-native";
 export default class UserModal extends Component {
     constructor(props) {
         super(props);
@@ -18,14 +16,6 @@ export default class UserModal extends Component {
         singlePost: false,
         singlePostID: "",
     };
-
-    // componentDidMount() {
-    //     this.connection
-    //         .getPostsByUser(this.state.DATA.username)
-    //         .then((posts) => {
-    //             this.setState({ postDATA: posts, posts: true });
-    //         });
-    // }
 
     getID = (id) => {
         let i = 0;
@@ -79,32 +69,12 @@ export default class UserModal extends Component {
         }
     };
 
-    onFollow = () => {
-        console.log("Follow");
-    };
-
     render() {
         return (
             <View style={styles.bigCon}>
-                <View style={styles.container}>
-                    <Text style={styles.text}>{this.state.DATA.username}</Text>
-                    <Pressable onPress={this.onFollow}>
-                        <FeatherIcon
-                            name='user'
-                            style={{ fontSize: 32, paddingRight: "5%" }}
-                        />
-                    </Pressable>
-                </View>
-                <View style={styles.container}>
-                    <Score label='Score' number={this.state.DATA.score} />
-                    <Score label='Pics' number={this.state.postDATA.length} />
-                    <Score label='Rank' number={5} />
-                </View>
-                {this.state.postDATA.length == 0 && (
-                    <Text style={styles.text1}>
-                        This user hasn't posted yet :/
-                    </Text>
-                )}
+                <Text style={styles.text}>{this.state.DATA.name}</Text>
+                <Text>{this.state.DATA.description}</Text>
+
                 {!this.state.singlePost && (
                     <FlatList
                         style={styles.list}
@@ -138,9 +108,10 @@ export default class UserModal extends Component {
 }
 const styles = StyleSheet.create({
     container: {
-        flexDirection: "row",
-
-        justifyContent: "space-between",
+        flex: 1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
     },
     bigCon: {
         height: "90%",
@@ -148,12 +119,6 @@ const styles = StyleSheet.create({
     text: {
         fontSize: 32,
         paddingLeft: "2%",
-    },
-    text1: {
-        color: "grey",
-        fontSize: 24,
-        paddingLeft: "2%",
-        paddingTop: "5%",
     },
     post: {
         borderColor: "grey",

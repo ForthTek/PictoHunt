@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import { Text, StyleSheet, View, Modal, Pressable, Alert } from "react-native";
 import UserModal from "./userModal";
-
+import ChannelModal from "./channelModal";
 export default class SearchItem extends Component {
     constructor(props) {
         super(props);
@@ -76,9 +76,10 @@ export default class SearchItem extends Component {
                                 />
                             )}
                             {this.state.type == "channel" && (
-                                <Text style={styles.text}>
-                                    {this.state.DATA.name}
-                                </Text>
+                                <ChannelModal
+                                    DATA={this.state.DATA}
+                                    connection={this.connection}
+                                />
                             )}
                         </View>
                     </View>
