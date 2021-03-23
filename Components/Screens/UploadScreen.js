@@ -55,7 +55,8 @@ export default class UploadScreen extends Component {
                     //console.log(key);
                 },
                 (error) => {
-                    console.log(error.message);
+                    console.log(error);
+                    Alert.alert(error.message);
                 }
             );
     };

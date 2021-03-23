@@ -1,6 +1,7 @@
 import "isomorphic-fetch";
 
 const ADDRESS = "https://pictohunt-server.herokuapp.com";
+const SERVER_ERROR = 400;
 
 export default class Server {
   constructor() {
@@ -19,18 +20,39 @@ export default class Server {
       });
   }
 
+  async tryFetchForPost(address, postID) {
+    return await fetch(address).then(async (res) => {
+      if (res.status == SERVER_ERROR) {
+        const status = await res.text();
+        console.log("Server error:");
+        console.log(status);
+        throw new Error(`Server failed to update post`);
+      } else {
+        res.text();
+        return true;
+      }
+    });
+  }
+
   async updatePostValues(postID) {
-    return await fetch(`${ADDRESS}/api/updatePost/${postID}`)
-      .then((res) => res.text())
-      .then(
-        (text) => {
-          return true;
-        },
-        (error) => {
-          console.log(error);
-          throw new Error(`Server failed to update post ${postID}`);
-        }
-      );
+    return await this.tryFetchForPost(
+      `${ADDRESS}/api/updatePost/${postID}`,
+      postID
+    );
+  }
+
+  async approvePost(postID) {
+    return await this.tryFetchForPost(
+      `${ADDRESS}/api/approvePost/${postID}`,
+      postID
+    );
+  }
+
+  async reportPost(postID) {
+    return await this.tryFetchForPost(
+      `${ADDRESS}/api/reportPost/${postID}`,
+      postID
+    );
   }
 
   async containsSwears(sentence) {

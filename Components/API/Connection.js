@@ -217,17 +217,13 @@ export default class Connection {
     return await this.#firebase
       // Create the post
       .createPost(newTitle, channelName, latitude, longitude, photos)
-      .then(
-        async (newKey) => {
-          // Then update the number of likes etc
-          await this.#server.updatePostValues(newKey);
-          return newKey;
-        },
-        (error) => {
-          console.log(error);
-          throw new Error(`Server failed to update post ${postID}`);
-        }
-      );
+      .then(async (newKey) => {
+        // Get the server to approve the post
+        await this.#server.approvePost(newKey);
+        // Then update the number of likes etc
+        //await this.#server.updatePostValues(newKey);
+        return newKey;
+      });
   };
 
   /**
