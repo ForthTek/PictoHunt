@@ -122,7 +122,7 @@ describe("signed in tests", () => {
       //   let x = await connection.inviteUsersToChallenge(c, ["Test", "AlecS"]);
       // });
 
-      test.only("getChallenges", async () => {
+      test("getChallenges", async () => {
         let x = await connection.getChallenges(false);
       });
     });

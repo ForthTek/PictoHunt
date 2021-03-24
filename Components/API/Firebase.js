@@ -590,6 +590,15 @@ export default class Firebase {
       throw new Error(`User "${username}" does not exist`);
     }
 
+    let isFollowing = false;
+    const currentUser = this.currentUser().username;
+    const following = await this.#database
+      .doc(`Users/${currentUser}/FollowedUsers/${username}`)
+      .get();
+    if (following.exists) {
+      isFollowing = true;
+    }
+
     let posts = await this.#database
       .collection("Posts")
       .where("public", "==", true)
@@ -619,6 +628,7 @@ export default class Firebase {
       email: data.email,
       timestamp: data.timestamp.toDate(),
       score: score,
+      isFollowing: isFollowing,
       posts: posts,
     };
 
@@ -726,6 +736,15 @@ export default class Firebase {
       throw new Error(`Channel ${name} does not exist`);
     }
 
+    let isFollowing = false;
+    const currentUser = this.currentUser().username;
+    const following = await this.#database
+      .doc(`Users/${currentUser}/FollowedChannels/${name}`)
+      .get();
+    if (following.exists) {
+      isFollowing = true;
+    }
+
     let posts = await this.#database
       .collection("Posts")
       .where("public", "==", true)
@@ -756,6 +775,7 @@ export default class Firebase {
       createdBy: data.createdBy.id,
       timestamp: data.timestamp.toDate(),
       score: score,
+      isFollowing: isFollowing,
       posts: posts,
     };
 
@@ -789,6 +809,8 @@ export default class Firebase {
     else {
       await ref.delete();
     }
+
+    return value;
   };
 
   /**
@@ -818,6 +840,8 @@ export default class Firebase {
     else {
       await ref.delete();
     }
+
+    return value;
   };
 
   /**
