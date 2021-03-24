@@ -102,7 +102,7 @@ render(){
                   style={styles.icon}
               />
           </Pressable>
-            <View style={{ flexDirection: "row", padding: "5%" }}>
+            <View style={{ flexDirection: "row", padding: "3%" }}>
                 <Image
                     source={require('../assets/pfp-placeholder.png')}
                     width={160}
