@@ -156,7 +156,6 @@ export default class Connection {
   };
 
   /**
-   * Loads the post from local memory if it has been loaded before, or gets it from the server if not.
    *
    * @param {string} postID
    * @returns
@@ -179,14 +178,14 @@ export default class Connection {
    * @param {Filter} filter
    * @returns
    */
-  async getAllPosts(filter = new Filter()) {
+  getAllPosts = async (filter = new Filter()) => {
     return await this.#firebase.getPosts(
       this.#firebase.database
         .collection("Posts")
         .where("public", "==", true)
         .orderBy(filter.orderBy, filter.direction)
     );
-  }
+  };
 
   /**
    *
@@ -206,14 +205,14 @@ export default class Connection {
    * @param {Filter} filter
    * @returns
    */
-  async getAllReportedPosts(filter = new Filter()) {
+  getAllReportedPosts = async (filter = new Filter()) => {
     return await this.#firebase.getPosts(
       this.#firebase.database
         .collection("Posts")
         .where("public", "==", false)
         .orderBy(filter.orderBy, filter.direction)
     );
-  }
+  };
 
   /**
    *

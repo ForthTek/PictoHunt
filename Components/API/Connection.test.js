@@ -99,6 +99,14 @@ describe("signed in tests", () => {
         let x = await connection.getBrowse();
         //console.log(x.length);
       });
+      test("auth getBrowse", async () => {
+        let x = await connection.getBrowse();
+        //console.log(x.length);
+      });
+      test("auth getBrowse", async () => {
+        let x = await connection.getBrowse();
+        //console.log(x.length);
+      });
     });
 
     describe("map tests", () => {

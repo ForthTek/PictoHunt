@@ -566,19 +566,13 @@ export default class Firebase {
       isFollowing = true;
     }
 
-    let posts = await this.database
-      .collection("Posts")
-      .where("public", "==", true)
-      .where("createdBy", "==", ref)
-      .orderBy(filter.orderBy, filter.direction)
-      .get()
-      .then(async (snapshot) => {
-        let requests = [];
-        snapshot.forEach((doc) => {
-          requests.push(this.getPostFromDoc(doc));
-        });
-        return await Promise.all(requests);
-      });
+    let posts = await this.getPosts(
+      this.database
+        .collection("Posts")
+        .where("public", "==", true)
+        .where("createdBy", "==", ref)
+        .orderBy(filter.orderBy, filter.direction)
+    );
 
     // Sort the posts
     posts.sort((x, y) => this.comparePost(x, y, filter));
@@ -697,19 +691,12 @@ export default class Firebase {
       isFollowing = true;
     }
 
-    let posts = await this.database
-      .collection("Posts")
-      .where("public", "==", true)
-      .where("channel", "==", ref)
-      .orderBy(filter.orderBy, filter.direction)
-      .get()
-      .then(async (snapshot) => {
-        let requests = [];
-        snapshot.forEach((doc) => {
-          requests.push(this.getPostFromDoc(doc));
-        });
-        return await Promise.all(requests);
-      });
+    let posts = await this.getPosts(
+      this.database
+        .collection("Posts")
+        .where("public", "==", true)
+        .where("channel", "==", ref)
+    );
 
     // Sort the posts
     posts.sort((x, y) => this.comparePost(x, y, filter));
