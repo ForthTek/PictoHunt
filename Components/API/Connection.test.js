@@ -114,22 +114,22 @@ describe("signed in tests", () => {
       //     "photograph two dogs",
       //     new Date("2021-04-17T03:24:00"),
       //     100,
-      //     [new ChallengeTask("Test"), new ChallengeTask("Test2", 1, 2)]
+      //     [new ChallengeTask("picture of a pug", "Test"), new ChallengeTask("cute golden pls", "Test2", 1, 2)]
       //   );
       // });
 
-      const c = "KuATRbhU2WWVDLyJigDM";
+      // const c = "UXlZhJc8sQGub94WGpiR";
       // test.only("inviteUsersToChallenge", async () => {
       //   let x = await connection.inviteUsersToChallenge(c, ["Test"]);
       // });
 
-      test.only("getChallenges", async () => {
-        let x = await connection.getChallenges(false);
-        console.log(x);
-        // for (let i = 0; i < x[0].tasks.length; i++) {
-        //   console.log(x[0].tasks[i]);
-        // }
-      });
+      // test.only("getChallenges", async () => {
+      //   let x = await connection.getChallenges(false);
+      //   console.log(x);
+      //   for (let i = 0; i < x[0].tasks.length; i++) {
+      //     console.log(x[0].tasks[i]);
+      //   }
+      // });
     });
   });
 });

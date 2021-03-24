@@ -915,6 +915,7 @@ export default class Firebase {
       }
 
       tasks.push({
+        description: tasksPerPost[i].description,
         channel: channelRef,
         GPS: GPS,
         radius: tasksPerPost[i].radius,
@@ -978,6 +979,7 @@ export default class Firebase {
         }
 
         tasks.push({
+          description: task.description,
           channel: task.channel.id,
           latitude: lat,
           longitude: long,
