@@ -7,6 +7,7 @@ import {
     Pressable,
     Image,
     FlatList,
+    Alert,
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import Ionicon from "react-native-vector-icons/Ionicons";
@@ -30,6 +31,11 @@ export default class SinglePost extends Component {
     handleBack = () => {
         this.props.back();
     };
+
+    getuserprofile = () => {
+      let val = this.props.item.user;
+      this.props.onProfilePress(val);
+    }
 
     _renderItem({ item, index }) {
         return (
@@ -110,9 +116,11 @@ export default class SinglePost extends Component {
                                 <Text style={styles.title} numberOfLines={1}>
                                     {this.state.title}
                                 </Text>
-                                <Text style={styles.postName}>
+                                <Pressable onPress={this.getuserprofile}>
+                                  <Text style={styles.postName}>
                                     {this.state.user}
-                                </Text>
+                                  </Text>
+                                </Pressable>
                             </View>
                             <View style={{ flexDirection: "row" }}>
                                 <LikeBtn
