@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, View, SafeAreaView, StyleSheet, Pressable, Button, Alert } from "react-native";
+import { Text, View, SafeAreaView, StyleSheet, Pressable, Button, Alert, Modal } from "react-native";
 import Image from "react-native-scalable-image";
 import Score from "./score";
 import SettingBtn from "./settingBtn";
@@ -7,6 +7,7 @@ import ScoreComp from "./scoreComp";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import Connection from "./API/Connection";
 import Gallery from "./gallery";
+import FeatherIcon from "react-native-vector-icons/Feather";
 
 export default class Profile extends Component {
     // Profile page
@@ -71,7 +72,6 @@ export default class Profile extends Component {
 
 opengallery = () => {
   this.setState({galleryopen: true})
-  Alert.alert("Open gallery TODO");
 }
 
 closegallery = () => {
@@ -93,21 +93,43 @@ render(){
       </SafeAreaView>
     )
   } else {
-
     return (
         <SafeAreaView style={styles.container}>
+          <Modal
+              visible={this.state.galleryopen}
+              animationType='slide'
+              transparent={true}
+          >
+              <View style={styles.center}>
+                  <View style={styles.modalView}>
+                      <Pressable
+                          onPress={() => {
+                              this.closegallery();
+                          }}
+                      >
+                          <FeatherIcon
+                              name='x-circle'
+                              style={styles.icon1}
+                          />
+                      </Pressable>
+
+                      <Text> Someone who knows what they're doing insert a list of all user posts idk what im doing </Text>
+
+                  </View>
+              </View>
+          </Modal>
           <Pressable onPress={() => {this.props.back()}}>
               <Ionicon
                   name='arrow-back-circle-outline'
                   style={styles.icon}
               />
           </Pressable>
-            <View style={{ flexDirection: "row", padding: "3%" }}>
+            <View style={{ flexDirection: "row", padding: "5%" }}>
                 <Image
                     source={require('../assets/pfp-placeholder.png')}
                     width={160}
                 />
-                <View style={{ flexDirection: "column", paddingLeft: "3%" }}>
+              <View style={{ flexDirection: "column", paddingLeft: "3%", paddingRight: "15%" }}>
                     <Text style={styles.username}>{this.state.otherusername}</Text>
                     <Text style={styles.info}>Joined:</Text>
                     <Text style={styles.info}>{this.state.otheruserjoin}</Text>
@@ -128,12 +150,12 @@ render(){
           label1='Rank' label2='ranks'
         />
 
-      <Text style={styles.button} onPress={() => {this.opengallery()}}>
-        Follow User TODO
+      <Text style={styles.button} onPress={() => {this.followuser()}}>
+        Follow User
       </Text>
 
-      <Text style={styles.button} onPress={() => {this.followuser()}}>
-        See Photo Gallery TODO
+      <Text style={styles.button} onPress={() => {this.opengallery()}}>
+        See Photo Gallery
       </Text>
 
         </SafeAreaView>
@@ -147,7 +169,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        padding: "1%",
+        padding: "0%",
     },
     username: {
         fontSize: 22,
@@ -164,5 +186,30 @@ const styles = StyleSheet.create({
         fontSize: 28,
         textAlign: 'center',
         padding: '3.5%'
+    },
+    modalView: {
+        margin: 5,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 5,
+        width: "90%",
+        height: "90%",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    icon1: {
+        fontSize: 32,
+        paddingBottom: "5%",
+    },
+    center: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
     },
 });
