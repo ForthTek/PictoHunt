@@ -19,9 +19,6 @@ const config = {
 };
 
 export default class Firebase {
-  #database;
-  #auth;
-  #upload;
   #stateUpdateCallbacks;
 
   /**
@@ -36,11 +33,11 @@ export default class Firebase {
       console.log("*Created connection to Firebase");
     }
 
-    this.#database = firebase.firestore();
-    this.#auth = firebase.auth();
-    this.#auth.onIdTokenChanged(this.onIdTokenChanged);
+    this.database = firebase.firestore();
+    this.auth = firebase.auth();
+    this.auth.onIdTokenChanged(this.onIdTokenChanged);
 
-    this.#upload = new Upload(firebase);
+    this.upload = new Upload(firebase);
 
     this.#stateUpdateCallbacks = [];
 
@@ -84,7 +81,7 @@ export default class Firebase {
    * @returns true if there is a user logged in
    */
   isLoggedIn = () => {
-    if (this.#auth.currentUser) {
+    if (this.auth.currentUser) {
       return true;
     } else {
       return false;
@@ -95,7 +92,7 @@ export default class Firebase {
    * @returns JSON with .username and .email
    */
   currentUser = () => {
-    const user = this.#auth.currentUser;
+    const user = this.auth.currentUser;
 
     if (user) {
       return { username: user.displayName, email: user.email };
@@ -120,14 +117,12 @@ export default class Firebase {
    */
   login = async (email, password) => {
     // Sign in with auth
-    await this.#auth
+    await this.auth
       .signInWithEmailAndPassword(email, password)
       // Now we should check that the user has an account
       .then(async () => {
         const user = this.currentUser();
-        const profile = await this.#database
-          .doc(`Users/${user.username}`)
-          .get();
+        const profile = await this.database.doc(`Users/${user.username}`).get();
 
         if (!profile.exists) {
           throw Error("Auth valid but account doesn't exist in database");
@@ -144,7 +139,7 @@ export default class Firebase {
    * @returns true if succesful
    */
   logout = async () => {
-    await this.#auth.signOut().catch((error) => {
+    await this.auth.signOut().catch((error) => {
       throw error;
     });
 
@@ -158,7 +153,7 @@ export default class Firebase {
    */
   resetPassword = async (email) => {
     // Send an email to the address
-    await this.#auth.sendPasswordResetEmail(email).catch((error) => {
+    await this.auth.sendPasswordResetEmail(email).catch((error) => {
       throw error;
     });
 
@@ -174,17 +169,17 @@ export default class Firebase {
    * @returns true if succesful
    */
   createProfile = async (email, username, password, isPublic = true) => {
-    const ref = this.#database.doc(`Users/${username}`);
+    const ref = this.database.doc(`Users/${username}`);
     const data = await ref.get();
 
     if (data.exists) {
       throw new Error(`User ${username} already exists`);
     }
 
-    await this.#auth
+    await this.auth
       // Create the user
       .createUserWithEmailAndPassword(email, password)
-      .then(() => this.#auth.currentUser)
+      .then(() => this.auth.currentUser)
       // Set their display name
       .then((user) =>
         user.updateProfile({
@@ -192,7 +187,7 @@ export default class Firebase {
         })
       )
       // Reload the auth now that the username has been changed
-      .then(() => this.#auth.currentUser.reload())
+      .then(() => this.auth.currentUser.reload())
       // Now create their profile in the database
       .then(async () => {
         const userData = {
@@ -201,7 +196,7 @@ export default class Firebase {
           timestamp: firebase.firestore.Timestamp.now(),
           // Add username as string just for searching
           search: username.toUpperCase(),
-          uid: this.#auth.currentUser.uid,
+          uid: this.auth.currentUser.uid,
         };
 
         // Now we should create the profile
@@ -223,8 +218,8 @@ export default class Firebase {
    */
   interactWithPost = async (postID, interaction) => {
     const username = this.currentUser().username;
-    const likeRef = this.#database.doc(`Posts/${postID}/Likes/${username}`);
-    const dislikeRef = this.#database.doc(
+    const likeRef = this.database.doc(`Posts/${postID}/Likes/${username}`);
+    const dislikeRef = this.database.doc(
       `Posts/${postID}/Dislikes/${username}`
     );
 
@@ -258,7 +253,7 @@ export default class Firebase {
    * @returns
    */
   getPost = async (postID) => {
-    const ref = this.#database.doc(`Posts/${postID}`);
+    const ref = this.database.doc(`Posts/${postID}`);
     const doc = await ref.get();
 
     // Update the current version if there is one
@@ -321,12 +316,12 @@ export default class Firebase {
     const user = this.currentUser();
     if (user) {
       liked = (
-        await this.#database.doc(`Posts/${postID}/Likes/${user.username}`).get()
+        await this.database.doc(`Posts/${postID}/Likes/${user.username}`).get()
       ).exists;
 
       if (!liked) {
         disliked = (
-          await this.#database
+          await this.database
             .doc(`Posts/${postID}/Dislikes/${user.username}`)
             .get()
         ).exists;
@@ -367,36 +362,16 @@ export default class Firebase {
     return post;
   }
 
-  async getAllPosts(filter) {
-    return await this.#database
-      .collection("Posts")
-      .where("public", "==", true)
-      .orderBy(filter.orderBy, filter.direction)
-      .get()
-      .then(async (snapshot) => {
-        let allPosts = [];
-        snapshot.forEach((x) => {
-          allPosts.push(this.getPostFromDoc(x));
-        });
-        // Use promise all to send multiple requests at once, and wait for all the respnses in one go
-        return await Promise.all(allPosts);
-      })
-      .catch((error) => {
-        console.log(error);
-        throw Error(`Failed to get all posts (${error.message})`);
-      });
-  }
-
   async getFollowedUserRefs(username) {
     let users = [];
-    await this.#database
+    await this.database
       .collection(`Users/${username}/FollowedUsers`)
       .get()
       .then(async (querySnapshot) => {
         // Must use async foreach here
         for await (let doc of querySnapshot.docs) {
           const followedUsername = doc.id;
-          const ref = this.#database.doc(`Users/${followedUsername}`);
+          const ref = this.database.doc(`Users/${followedUsername}`);
           users.push(ref);
         }
       })
@@ -408,14 +383,14 @@ export default class Firebase {
 
   async getFollowedChannelRefs(username) {
     let channels = [];
-    await this.#database
+    await this.database
       .collection(`Users/${username}/FollowedChannels`)
       .get()
       .then(async (querySnapshot) => {
         // Must use async foreach here
         for await (let doc of querySnapshot.docs) {
           const followedChannelName = doc.id;
-          const ref = this.#database.doc(`Channels/${followedChannelName}`);
+          const ref = this.database.doc(`Channels/${followedChannelName}`);
           channels.push(ref);
         }
       })
@@ -425,11 +400,6 @@ export default class Firebase {
     return channels;
   }
 
-  /**
-   *
-   * @param {object} filters contains { followedUsers: bool, followedChannels: bool, sortBy: string, orderBy: string }
-   * @returns
-   */
   getBrowse = async (filter) => {
     const user = this.currentUser();
     const filterFollowing = filter.followedUsers || filter.followedChannels;
@@ -471,7 +441,7 @@ export default class Firebase {
         let requests = [];
 
         if (filter.followedUsers) {
-          await this.#database
+          await this.database
             .collection("Posts")
             .where("public", "==", true)
             .where("createdBy", "in", allFollowedUsers)
@@ -491,7 +461,7 @@ export default class Firebase {
         }
 
         if (filter.followedChannels) {
-          await this.#database
+          await this.database
             .collection("Posts")
             .where("public", "==", true)
             .where("channel", "in", allFollowedChannels)
@@ -553,11 +523,8 @@ export default class Firebase {
     }
   }
 
-  getMap = async () => {
-    return await this.#database
-      .collection("Posts")
-      .where("public", "==", true)
-      .where("GPS", "!=", null)
+  async getPosts(query) {
+    return await query
       .get()
       .then(async (snapshot) => {
         let posts = [];
@@ -571,9 +538,9 @@ export default class Firebase {
       })
       .catch((error) => {
         console.log(error);
-        throw new Error("Failed to load posts for map");
+        throw new Error(`Failed to load posts (${error.message})`);
       });
-  };
+  }
 
   /**
    *
@@ -582,7 +549,7 @@ export default class Firebase {
    */
   getProfile = async (username, filter = new Filter()) => {
     // Get the user with username
-    const ref = this.#database.doc(`Users/${username}`);
+    const ref = this.database.doc(`Users/${username}`);
     const userData = await ref.get();
 
     // Throw an error if the user does not exist
@@ -592,14 +559,14 @@ export default class Firebase {
 
     let isFollowing = false;
     const currentUser = this.currentUser().username;
-    const following = await this.#database
+    const following = await this.database
       .doc(`Users/${currentUser}/FollowedUsers/${username}`)
       .get();
     if (following.exists) {
       isFollowing = true;
     }
 
-    let posts = await this.#database
+    let posts = await this.database
       .collection("Posts")
       .where("public", "==", true)
       .where("createdBy", "==", ref)
@@ -644,25 +611,25 @@ export default class Firebase {
   ) => {
     const username = this.currentUser().username;
 
-    const ref = this.#database.collection("Posts").doc();
+    const ref = this.database.collection("Posts").doc();
     const newKey = ref.id;
 
     // Get a reference to the user posting this
-    const userRef = this.#database.doc(`Users/${username}`);
+    const userRef = this.database.doc(`Users/${username}`);
     // Throw an error if it does not exist
     if (!(await userRef.get()).exists) {
       throw new Error(`User "${userRef.path}" does not exist`);
     }
 
     // Get a reference to the channel
-    const channelRef = this.#database.doc(`Channels/${channelName}`);
+    const channelRef = this.database.doc(`Channels/${channelName}`);
     // Throw an error if it does not exist
     if (!(await channelRef.get()).exists) {
       throw new Error(`Channel "${channelRef.path}" does not exist`);
     }
 
     // Upload the images
-    let URLs = await this.#upload.uploadImagesForPost(newKey, photos);
+    let URLs = await this.upload.uploadImagesForPost(newKey, photos);
 
     // Only create GPS point if lat and long is not null
     const GPS =
@@ -691,9 +658,9 @@ export default class Firebase {
 
   createChannel = async (name, description) => {
     const username = this.currentUser().username;
-    const ref = this.#database.doc(`Channels/${name}`);
+    const ref = this.database.doc(`Channels/${name}`);
     const channel = await ref.get();
-    const userRef = this.#database.doc(`Users/${username}`);
+    const userRef = this.database.doc(`Users/${username}`);
 
     if (channel.exists) {
       throw new Error(`Channel ${name} already exists`);
@@ -713,7 +680,7 @@ export default class Firebase {
   };
 
   getChannel = async (name, filter = new Filter()) => {
-    const ref = this.#database.doc(`Channels/${name}`);
+    const ref = this.database.doc(`Channels/${name}`);
     const channel = await ref.get();
 
     // Throw an error if the channel does not exist
@@ -723,14 +690,14 @@ export default class Firebase {
 
     let isFollowing = false;
     const currentUser = this.currentUser().username;
-    const following = await this.#database
+    const following = await this.database
       .doc(`Users/${currentUser}/FollowedChannels/${name}`)
       .get();
     if (following.exists) {
       isFollowing = true;
     }
 
-    let posts = await this.#database
+    let posts = await this.database
       .collection("Posts")
       .where("public", "==", true)
       .where("channel", "==", ref)
@@ -774,7 +741,7 @@ export default class Firebase {
    */
   followUser = async (usernameToFollow, value) => {
     // Get the user with username
-    const followRef = this.#database.doc(`Users/${usernameToFollow}`);
+    const followRef = this.database.doc(`Users/${usernameToFollow}`);
     const userData = await followRef.get();
 
     if (!userData.exists) {
@@ -782,7 +749,7 @@ export default class Firebase {
     }
 
     const username = this.currentUser().username;
-    const ref = this.#database.doc(
+    const ref = this.database.doc(
       `Users/${username}/FollowedUsers/${usernameToFollow}`
     );
 
@@ -805,7 +772,7 @@ export default class Firebase {
    */
   followChannel = async (channelNameToFollow, value) => {
     // Get the user with username
-    const followRef = this.#database.doc(`Channels/${channelNameToFollow}`);
+    const followRef = this.database.doc(`Channels/${channelNameToFollow}`);
     const channelData = await followRef.get();
 
     if (!channelData.exists) {
@@ -813,7 +780,7 @@ export default class Firebase {
     }
 
     const username = this.currentUser().username;
-    const ref = this.#database.doc(
+    const ref = this.database.doc(
       `Users/${username}/FollowedChannels/${channelNameToFollow}`
     );
 
@@ -846,7 +813,7 @@ export default class Firebase {
     const query = search.toUpperCase();
 
     return (
-      this.#database
+      this.database
         .collection(collection)
         .where(field, ">=", query)
         // Append \uf8ff as it has a high unicode value so pretty much any string with the prefix will match before it
@@ -896,7 +863,7 @@ export default class Firebase {
     let tasks = [];
     for (let i = 0; i < tasksPerPost.length; i++) {
       const channelName = tasksPerPost[i].channel;
-      const channelRef = this.#database.doc(`Channels/${channelName}`);
+      const channelRef = this.database.doc(`Channels/${channelName}`);
       const channelData = await channelRef.get();
 
       if (!channelData.exists) {
@@ -926,11 +893,11 @@ export default class Firebase {
       throw new Error(`Reward score must be at least ${minScore}`);
     }
 
-    const ref = this.#database.collection("Challenges").doc();
+    const ref = this.database.collection("Challenges").doc();
     const key = ref.id;
 
     const username = this.currentUser().username;
-    const userRef = this.#database.doc(`Users/${username}`);
+    const userRef = this.database.doc(`Users/${username}`);
 
     const data = {
       description: description,
@@ -946,9 +913,7 @@ export default class Firebase {
 
   async getChallenges(completed = false) {
     const username = this.currentUser().username;
-    const refInvited = this.#database.collection(
-      `Users/${username}/Challenges`
-    );
+    const refInvited = this.database.collection(`Users/${username}/Challenges`);
 
     let all = await refInvited
       .where("completed", "==", completed)
@@ -961,10 +926,10 @@ export default class Firebase {
         });
         return all;
       });
-    
+
     let challenges = [];
     for (let i = 0; i < all.length; i++) {
-      const ref = await this.#database.doc(`Challenges/${all[i].ID}`).get();
+      const ref = await this.database.doc(`Challenges/${all[i].ID}`).get();
       const data = ref.data();
 
       let tasks = [];

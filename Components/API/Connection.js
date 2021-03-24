@@ -179,17 +179,41 @@ export default class Connection {
    * @param {Filter} filter
    * @returns
    */
-  getAllPosts = async (filter = new Filter()) => {
-    return await this.#firebase.getAllPosts(filter);
-  };
+  async getAllPosts(filter = new Filter()) {
+    return await this.#firebase.getPosts(
+      this.#firebase.database
+        .collection("Posts")
+        .where("public", "==", true)
+        .orderBy(filter.orderBy, filter.direction)
+    );
+  }
 
   /**
    *
    * @returns
    */
   getMap = async () => {
-    return await this.#firebase.getMap();
+    return await this.#firebase.getPosts(
+      this.#firebase.database
+        .collection("Posts")
+        .where("public", "==", true)
+        .where("GPS", "!=", null)
+    );
   };
+
+  /**
+   *
+   * @param {Filter} filter
+   * @returns
+   */
+  async getAllReportedPosts(filter = new Filter()) {
+    return await this.#firebase.getPosts(
+      this.#firebase.database
+        .collection("Posts")
+        .where("public", "==", false)
+        .orderBy(filter.orderBy, filter.direction)
+    );
+  }
 
   /**
    *
@@ -331,5 +355,9 @@ export default class Connection {
 
   getChallenges = async (completed = false) => {
     return await this.#firebase.getChallenges(completed);
+  };
+
+  getAllReportedPosts = async () => {
+    return await this.#firebase.getAllReportedPosts();
   };
 }
