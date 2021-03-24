@@ -20,9 +20,9 @@ export default class Server {
       });
   }
 
-  async tryFetchForPost(address, postID) {
+  async tryFetchForPost(address) {
     return await fetch(address).then(async (res) => {
-      if (res.status == SERVER_ERROR) {
+      if (res.status >= SERVER_ERROR) {
         const status = await res.text();
         console.log("Server error:");
         console.log(status);
@@ -35,24 +35,30 @@ export default class Server {
   }
 
   async updatePostValues(postID) {
-    return await this.tryFetchForPost(
-      `${ADDRESS}/api/updatePost/${postID}`,
-      postID
-    );
+    return await this.tryFetchForPost(`${ADDRESS}/api/updatePost/${postID}`);
   }
 
   async approvePost(postID) {
-    return await this.tryFetchForPost(
-      `${ADDRESS}/api/approvePost/${postID}`,
-      postID
-    );
+    return await this.tryFetchForPost(`${ADDRESS}/api/approvePost/${postID}`);
   }
 
   async reportPost(postID) {
-    return await this.tryFetchForPost(
-      `${ADDRESS}/api/reportPost/${postID}`,
-      postID
-    );
+    return await this.tryFetchForPost(`${ADDRESS}/api/reportPost/${postID}`);
+  }
+
+  async inviteUserToChallenge(challenge, username) {
+    return await fetch(
+      `${ADDRESS}/api/inviteToChallenge/${challenge}/${username}`
+    ).then(async (res) => {
+      if (res.status >= SERVER_ERROR) {
+        const status = await res.text();
+        console.log("Server error:");
+        console.log(status);
+        throw new Error(`Server failed to invite user to challenge`);
+      } else {
+        return true;
+      }
+    });
   }
 
   async containsSwears(sentence) {

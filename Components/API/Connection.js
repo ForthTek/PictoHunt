@@ -306,4 +306,16 @@ export default class Connection {
   createChallenge = async (deadline, score, tasksPerPost) => {
     return await this.#firebase.createChallenge(deadline, score, tasksPerPost);
   };
+
+  inviteUsersToChallenge = async (challenge, users) => {
+    let promises = [];
+    for (let i = 0; i < users.length; i++) {
+      promises.push(this.#server.inviteUserToChallenge(challenge, users[i]));
+    }
+    await Promise.all(promises);
+  };
+
+  getChallenges = async (completed = false) => {
+    return await this.#firebase.getChallenges(completed);
+  };
 }

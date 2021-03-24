@@ -6,6 +6,7 @@ import * as geofire from "geofire-common";
 import Upload from "./Upload.js";
 
 import Filter from "./Filter.js";
+import ChallengeTask from "./ChallengeTask.js";
 
 const config = {
   apiKey: "AIzaSyCvQv_waR8vtFZIrmHlgVexp0VrrGNwGBE",
@@ -861,22 +862,26 @@ export default class Firebase {
    *
    * @param {Date} deadline
    * @param {number} score
-   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
+   * @param {ChallengeTask[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
    * @returns
    */
   async createChallenge(deadline, score, tasksPerPost) {
-    const milliseconds = deadline - new Date();
+    const milliseconds = deadline.getTime() - new Date().getTime();
     const hours = milliseconds / 3600000;
+    const minDuration = 1;
+    const minRadius = 25;
+    const minScore = 10;
 
-    if (milliseconds <= 0 || hours <= 1) {
+    if (milliseconds < 0 || hours <= 1) {
       console.log(
         `Trying to create challenge with duration of ${hours} hours (${milliseconds}ms)`
       );
-      throw new Error("Challange duration must be more than an hour");
+      throw new Error(
+        `Challange duration must be more than ${minDuration} hour`
+      );
     }
-
     if (tasksPerPost.length == 0) {
-      throw new Error("Challange must some tasks");
+      throw new Error(`Challenge must contain at least one task`);
     }
 
     let tasks = [];
@@ -896,8 +901,19 @@ export default class Firebase {
               tasksPerPost[i].longitude
             ))
           : null;
+      if (GPS != null && tasksPerPost[i].radius < minRadius) {
+        throw new Error(`Radius must be at least ${minRadius}`);
+      }
 
-      tasks.push({ channel: channelRef, GPS: GPS });
+      tasks.push({
+        channel: channelRef,
+        GPS: GPS,
+        radius: tasksPerPost[i].radius,
+      });
+    }
+
+    if (score < minScore) {
+      throw new Error(`Reward score must be at least ${minScore}`);
     }
 
     const ref = this.#database.collection("Challenges").doc();
@@ -917,5 +933,51 @@ export default class Firebase {
     return key;
   }
 
-  async inviteUsersToChallenge(challengeKey, users) {}
+  async getChallenges(completed = false) {
+    const username = this.currentUser().username;
+    const refInvited = this.#database.collection(
+      `Users/${username}/Challenges`
+    );
+
+    let keys = await refInvited
+      .where("completed", "==", completed)
+      .get()
+      .then((snapshot) => {
+        return snapshot.docs.map((x) => x.id);
+      });
+
+    let challengesRaw = [];
+    for (let i = 0; i < keys.length; i++) {
+      const ref = this.#database.doc(`Challenges/${keys[i]}`);
+      challengesRaw.push(await ref.get());
+    }
+
+    await Promise.all(challengesRaw);
+
+    let challenges = [];
+    for (let i = 0; i < challengesRaw.length; i++) {
+      const data = challengesRaw[i].data();
+      let tasks = [];
+      for (let j = 0; j < data.tasks.length; j++) {
+        task = data.tasks[j];
+
+        let lat = null;
+        let long = null;
+        if (task.GPS) {
+          lat = task.GPS.latitude;
+          long = task.GPS.longitude;
+        }
+
+        tasks.push(new ChallengeTask(task.channel.id, lat, long, task.radius));
+      }
+
+      challenges[i] = {
+        deadline: data.deadline.toDate(),
+        score: data.score,
+        tasks: tasks,
+      };
+    }
+
+    return challenges;
+  }
 }

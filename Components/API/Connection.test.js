@@ -1,3 +1,4 @@
+import ChallengeTask from "./ChallengeTask.js";
 import Connection from "./Connection.js";
 import Filter from "./Filter.js";
 
@@ -108,13 +109,22 @@ describe("signed in tests", () => {
     });
 
     describe("challenge tests", () => {
-      // test("auth createChallenge", async () => {
+      // test.only("auth createChallenge", async () => {
       //   let x = await connection.createChallenge(
       //     new Date("2021-04-17T03:24:00"),
       //     100,
-      //     [{ channel: "Test" }, { channel: "Test2", latitude: 1, longitude: 2 }]
+      //     [new ChallengeTask("Test"), new ChallengeTask("Test2", 1, 2)]
       //   );
       // });
+
+      const c = "uqSvyPOMMoK57NyXVCI8";
+      // test.only("inviteUsersToChallenge", async () => {
+      //   let x = await connection.inviteUsersToChallenge(c, ["Test", "AlecS"]);
+      // });
+
+      test.only("getChallenges", async () => {
+        let x = await connection.getChallenges(false);
+      });
     });
   });
 });
