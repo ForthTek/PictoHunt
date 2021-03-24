@@ -29,7 +29,6 @@ export default class Nav extends Component {
                     <bButton.Navigator // Sets things about the bottom buttons
                         initialRouteName='Home'
                     >
-                        
                         <bButton.Screen
                             name='Home'
                             options={{
@@ -44,13 +43,10 @@ export default class Nav extends Component {
                             }}
                         >
                             {(props) => (
-                                <Home
-                                    {...props}
-                                    connection={this.connection}
-                                />
+                                <Home {...props} connection={this.connection} />
                             )}
                         </bButton.Screen>
-                        
+
                         <bButton.Screen
                             name='Challenges'
                             options={{
@@ -92,7 +88,7 @@ export default class Nav extends Component {
                                 />
                             )}
                         </bButton.Screen>
-                        
+
                         <bButton.Screen
                             name='Map'
                             options={{
@@ -125,10 +121,12 @@ export default class Nav extends Component {
                             }}
                         >
                             {(props) => (
-                                <Account {...props} connection={this.connection} />
+                                <Account
+                                    {...props}
+                                    connection={this.connection}
+                                />
                             )}
                         </bButton.Screen>
-
                     </bButton.Navigator>
                 </NavigationContainer>
             </SafeAreaView>

@@ -1,4 +1,4 @@
-import React, { Component } from "react";
+import React, { Component, Animated } from "react";
 
 import {
     Text,
@@ -10,12 +10,15 @@ import {
     Pressable,
     Modal,
 } from "react-native";
-import { Input } from "react-native-elements";
+import { Input, Slider, SearchBar } from "react-native-elements";
 import Challenge from "../challenge";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
-
+import ChallengeTask from "../API/ChallengeTask";
+import NewTask from "../newTask";
+import NumericInput from "react-native-numeric-input";
+import SearchUser from "../searchUsers";
 export default class challenges extends Component {
     constructor(props) {
         super(props);
@@ -31,6 +34,10 @@ export default class challenges extends Component {
         date: new Date(1598051730000),
         datePicker: false,
         mode: "date",
+        tasks: [],
+        taskDD: false,
+        scoreBonus: 25,
+        userDD: false,
     };
 
     componentDidMount() {
@@ -81,6 +88,35 @@ export default class challenges extends Component {
         this.setState({ mode: "time", datePicker: true, modal: false });
     };
 
+    taskDropdownOpen = () => {
+        this.setState({ taskDD: true });
+    };
+
+    taskDropdownClose = () => {
+        this.setState({ taskDD: false });
+    };
+
+    userDropdownOpen = () => {
+        this.setState({ userDD: true });
+    };
+
+    userDropdownClose = () => {
+        this.setState({ userDD: false });
+    };
+
+    addTask = (desc, chan, long, lat, rad) => {
+        const taskArrays = this.state.tasks;
+        taskArrays[taskArrays.length] = new ChallengeTask(
+            desc,
+            chan,
+            long,
+            lat,
+            rad
+        );
+        this.setState({ tasks: taskArrays, taskDD: false });
+        console.log(this.state.tasks);
+    };
+
     newChallenge = () => {};
 
     render() {
@@ -106,16 +142,28 @@ export default class challenges extends Component {
                     >
                         <View style={styles.center}>
                             <View style={styles.modalView}>
-                                <Pressable
-                                    onPress={() => {
-                                        this.closeModal();
-                                    }}
-                                >
-                                    <FeatherIcon
-                                        name='x-circle'
-                                        style={styles.icon1}
-                                    />
-                                </Pressable>
+                                <View style={styles.container1}>
+                                    <Pressable
+                                        onPress={() => {
+                                            this.closeModal();
+                                        }}
+                                    >
+                                        <FeatherIcon
+                                            name='x-circle'
+                                            style={styles.icon1}
+                                        />
+                                    </Pressable>
+                                    <Pressable
+                                        onPress={() => {
+                                            this.closeModal();
+                                        }}
+                                    >
+                                        <FeatherIcon
+                                            name='upload'
+                                            style={styles.icon1}
+                                        />
+                                    </Pressable>
+                                </View>
                                 <Text style={styles.text}>New Challenge</Text>
                                 <Input
                                     placeholder='Description'
@@ -123,17 +171,22 @@ export default class challenges extends Component {
                                         this.setState({ modalDisc: value })
                                     }
                                     label='Challenge Description:'
-                                    containerStyle={{ paddingTop: "5%" }}
+                                    labelStyle={{ color: "black" }}
+                                    containerStyle={{ paddingTop: "2%" }}
                                 />
                                 <View style={styles.container1}>
                                     <Pressable onPress={this.openDatePicker}>
-                                        <Text>Pick Deadline Date</Text>
+                                        <Text style={styles.pickText}>
+                                            Pick Deadline Date
+                                        </Text>
                                     </Pressable>
                                     <Pressable onPress={this.openTimePicker}>
-                                        <Text>Pick Deadline Time</Text>
+                                        <Text style={styles.pickText}>
+                                            Pick Deadline Time
+                                        </Text>
                                     </Pressable>
                                 </View>
-                                <Text>
+                                <Text style={{ textAlign: "center" }}>
                                     Deadline:{" "}
                                     {this.state.date
                                         .toString()
@@ -142,6 +195,84 @@ export default class challenges extends Component {
                                         .toString()
                                         .substring(4, 16)}
                                 </Text>
+                                <Text>Score Bonus Upon Completion:</Text>
+
+                                <NumericInput
+                                    value={this.state.scoreBonus}
+                                    onChange={(value) =>
+                                        this.setState({ scoreBonus: value })
+                                    }
+                                    onLimitReached={(isMax, msg) =>
+                                        console.log(isMax, msg)
+                                    }
+                                    totalWidth={240}
+                                    totalHeight={50}
+                                    minValue={1}
+                                    maxValue={100}
+                                    iconSize={25}
+                                    step={1}
+                                    valueType='real'
+                                    rounded
+                                    textColor='black'
+                                    iconStyle={{ color: "white" }}
+                                    rightButtonBackgroundColor='#EA3788'
+                                    leftButtonBackgroundColor='#E56B70'
+                                />
+
+                                <Text style={styles.text1}>
+                                    Added Tasks: {this.state.tasks.length}
+                                </Text>
+                                <Pressable
+                                    onPress={() => {
+                                        this.taskDropdownOpen();
+                                    }}
+                                >
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                        }}
+                                    >
+                                        <IonIcon
+                                            name='add-circle-outline'
+                                            style={styles.icon1}
+                                        />
+                                        <Text style={styles.text1}>Tasks</Text>
+                                    </View>
+                                </Pressable>
+                                {this.state.taskDD && (
+                                    <NewTask
+                                        connection={this.connection}
+                                        close={this.taskDropdownClose}
+                                        addTask={this.addTask}
+                                    />
+                                )}
+                                <Pressable
+                                    onPress={() => {
+                                        this.userDropdownOpen();
+                                    }}
+                                >
+                                    <View
+                                        style={{
+                                            flexDirection: "row",
+                                        }}
+                                    >
+                                        <IonIcon
+                                            name='add-circle-outline'
+                                            style={styles.icon1}
+                                        />
+                                        <Text style={styles.text1}>
+                                            Challenge Users
+                                        </Text>
+                                    </View>
+                                </Pressable>
+
+                                {this.state.userDD && (
+                                    <SearchUser
+                                        connection={this.connection}
+                                        close={this.userDropdownClose}
+                                        addTask={this.addTask}
+                                    />
+                                )}
                             </View>
                         </View>
                     </Modal>
@@ -191,7 +322,7 @@ const styles = StyleSheet.create({
     },
     container1: {
         flexDirection: "row",
-        justifyContent: "space-around",
+        justifyContent: "space-between",
     },
     center: {
         flex: 1,
@@ -220,5 +351,12 @@ const styles = StyleSheet.create({
     },
     text: {
         fontSize: 25,
+    },
+    text1: {
+        fontSize: 20,
+        paddingTop: "1%",
+    },
+    pickText: {
+        fontSize: 15,
     },
 });

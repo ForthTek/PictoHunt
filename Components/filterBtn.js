@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
         fontSize: 32,
         paddingTop: "1%",
         paddingLeft: "1%",
-        color: "#919191",
+        color: "black",
     },
     icon1: {
         fontSize: 32,
