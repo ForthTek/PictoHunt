@@ -17,6 +17,8 @@ export default class UserModal extends Component {
 
         singlePost: false,
         singlePostID: "",
+
+        justFollowed: false,
     };
 
     // componentDidMount() {
@@ -80,7 +82,19 @@ export default class UserModal extends Component {
     };
 
     onFollow = () => {
-        console.log("Follow");
+        if (this.state.DATA.isFollowing) {
+            this.connection
+                .followUser(this.state.DATA.username, false)
+                .then(() => {
+                    this.setState({ justFollowed: true });
+                });
+        } else {
+            this.connection
+                .followUser(this.state.DATA.username, true)
+                .then(() => {
+                    this.setState({ justFollowed: true });
+                });
+        }
     };
 
     render() {
@@ -88,12 +102,30 @@ export default class UserModal extends Component {
             <View style={styles.bigCon}>
                 <View style={styles.container}>
                     <Text style={styles.text}>{this.state.DATA.username}</Text>
-                    <Pressable onPress={this.onFollow}>
-                        <FeatherIcon
-                            name='user'
-                            style={{ fontSize: 32, paddingRight: "5%" }}
-                        />
-                    </Pressable>
+                    {!this.state.DATA.isFollowing && (
+                        <Pressable onPress={this.onFollow}>
+                            <FeatherIcon
+                                name={
+                                    this.state.justFollowed
+                                        ? "user-check"
+                                        : "user-plus"
+                                }
+                                style={{ fontSize: 32, paddingRight: "5%" }}
+                            />
+                        </Pressable>
+                    )}
+                    {this.state.DATA.isFollowing && (
+                        <Pressable onPress={this.onFollow}>
+                            <FeatherIcon
+                                name={
+                                    this.state.justFollowed
+                                        ? "user-x"
+                                        : "user-minus"
+                                }
+                                style={{ fontSize: 32, paddingRight: "5%" }}
+                            />
+                        </Pressable>
+                    )}
                 </View>
                 <View style={styles.container}>
                     <Score label='Score' number={this.state.DATA.score} />

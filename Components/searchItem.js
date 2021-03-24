@@ -21,7 +21,6 @@ export default class SearchItem extends Component {
             this.connection.getProfile(this.state.name).then(
                 (user) => {
                     this.setState({ modalOpen: true, DATA: user });
-                    console.log(user);
                 },
                 (error) => {
                     Alert.alert(error.message);
@@ -32,7 +31,6 @@ export default class SearchItem extends Component {
             this.connection.getChannel(this.state.name).then(
                 (channel) => {
                     this.setState({ modalOpen: true, DATA: channel });
-                    console.log(channel);
                 },
                 (error) => {
                     Alert.alert(error.message);
