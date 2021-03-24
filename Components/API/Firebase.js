@@ -876,6 +876,7 @@ export default class Firebase {
       }
 
       challenges[i] = {
+        ID: all[i].ID,
         description: data.description,
         deadline: data.deadline.toDate(),
         score: data.score,
