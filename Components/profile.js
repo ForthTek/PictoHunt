@@ -6,6 +6,7 @@ import SettingBtn from "./settingBtn";
 import ScoreComp from "./scoreComp";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import Connection from "./API/Connection";
+import Gallery from "./gallery";
 
 export default class Profile extends Component {
     // Profile page
@@ -15,9 +16,6 @@ export default class Profile extends Component {
         super(props);
         this.connection = props.connection;
         this.state = {
-
-          //ser: this.props.item.user,
-
           otherusername: "",
           otheruserjoin: '',
           otheruserlocation: '',
@@ -35,7 +33,7 @@ export default class Profile extends Component {
           rankdiff: -1,
 
           isLoading: true,
-
+          galleryopen: false,
         };
         this.connection = props.connection;
     }
@@ -70,6 +68,19 @@ export default class Profile extends Component {
       }
     }
 
+
+opengallery = () => {
+  this.setState({galleryopen: true})
+  Alert.alert("Open gallery TODO");
+}
+
+closegallery = () => {
+  this.setState({galleryopen: false})
+}
+
+followuser = () => {
+  Alert.alert("Follow User TODO");
+}
 
 render(){
 
@@ -117,11 +128,11 @@ render(){
           label1='Rank' label2='ranks'
         />
 
-      <Text style={styles.button} onPress={() => {Alert.alert("TODO")}}>
+      <Text style={styles.button} onPress={() => {this.opengallery()}}>
         Follow User TODO
       </Text>
 
-      <Text style={styles.button} onPress={() => {Alert.alert("TODO")}}>
+      <Text style={styles.button} onPress={() => {this.followuser()}}>
         See Photo Gallery TODO
       </Text>
 
@@ -130,6 +141,7 @@ render(){
 }
 }
 }
+
 
 const styles = StyleSheet.create({
     container: {
@@ -149,7 +161,7 @@ const styles = StyleSheet.create({
         fontSize: 32,
     },
     button: {
-        fontSize: 32,
+        fontSize: 28,
         textAlign: 'center',
         padding: '3.5%'
     },

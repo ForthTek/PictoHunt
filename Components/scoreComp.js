@@ -18,7 +18,7 @@ const ScoreComp = (props) => {
           {props.label1}   {props.othernumber}
         </Text>
         <Text style={{fontSize: 18,}}>
-          ({props.numberdiff} {props.label2} {word} of you, {props.usernumber})
+          {props.numberdiff} {props.label2} {word} of you ({props.usernumber})
         </Text>
       </View>
 

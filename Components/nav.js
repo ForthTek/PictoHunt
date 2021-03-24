@@ -29,7 +29,7 @@ export default class Nav extends Component {
                     <bButton.Navigator // Sets things about the bottom buttons
                         initialRouteName='Home'
                     >
-                        
+
                         <bButton.Screen
                             name='Home'
                             options={{
@@ -50,7 +50,7 @@ export default class Nav extends Component {
                                 />
                             )}
                         </bButton.Screen>
-                        
+
                         <bButton.Screen
                             name='Challenges'
                             options={{
@@ -92,7 +92,7 @@ export default class Nav extends Component {
                                 />
                             )}
                         </bButton.Screen>
-                        
+
                         <bButton.Screen
                             name='Map'
                             options={{

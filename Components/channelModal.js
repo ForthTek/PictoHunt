@@ -2,8 +2,7 @@ import React, { Component } from "react";
 import Score from "./score";
 import Post from "./post";
 import SinglePost from "./singlePost";
-import { Text, StyleSheet, View, FlatList, Pressable } from "react-native";
-import FeatherIcon from "react-native-vector-icons/Feather";
+import { Text, StyleSheet, View, FlatList, Alert } from "react-native";
 export default class UserModal extends Component {
     constructor(props) {
         super(props);
@@ -16,8 +15,6 @@ export default class UserModal extends Component {
 
         singlePost: false,
         singlePostID: "",
-
-        justFollowed: false,
     };
 
     getID = (id) => {
@@ -33,6 +30,10 @@ export default class UserModal extends Component {
     handleSinglePost = () => {
         this.setState({ singlePost: !this.state.singlePost });
     };
+
+    getUser = (as) => {
+      Alert.alert("aaa");
+    }
 
     onLikeBtnPress = (type, id, updateScore) => {
         if (type === "like") {
@@ -72,52 +73,12 @@ export default class UserModal extends Component {
         }
     };
 
-    onFollow = () => {
-        if (this.state.DATA.isFollowing) {
-            this.connection
-                .followChannel(this.state.DATA.name, false)
-                .then(() => {
-                    this.setState({ justFollowed: true });
-                });
-        } else {
-            this.connection
-                .followChannel(this.state.DATA.name, true)
-                .then(() => {
-                    this.setState({ justFollowed: true });
-                });
-        }
-    };
+
 
     render() {
         return (
             <View style={styles.bigCon}>
-                <View style={styles.container}>
-                    <Text style={styles.text}>{this.state.DATA.name}</Text>
-                    {!this.state.DATA.isFollowing && (
-                        <Pressable onPress={this.onFollow}>
-                            <FeatherIcon
-                                name={
-                                    this.state.justFollowed
-                                        ? "user-check"
-                                        : "user-plus"
-                                }
-                                style={{ fontSize: 32, paddingRight: "5%" }}
-                            />
-                        </Pressable>
-                    )}
-                    {this.state.DATA.isFollowing && (
-                        <Pressable onPress={this.onFollow}>
-                            <FeatherIcon
-                                name={
-                                    this.state.justFollowed
-                                        ? "user-x"
-                                        : "user-minus"
-                                }
-                                style={{ fontSize: 32, paddingRight: "5%" }}
-                            />
-                        </Pressable>
-                    )}
-                </View>
+                <Text style={styles.text}>{this.state.DATA.name}</Text>
                 <Text>{this.state.DATA.description}</Text>
 
                 {!this.state.singlePost && (
@@ -131,6 +92,7 @@ export default class UserModal extends Component {
                                     onpressable={this.getID}
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
+                                    onProfilePress={this.getUser}
                                 />
                             </View>
                         )}
@@ -144,6 +106,7 @@ export default class UserModal extends Component {
                             back={this.handleSinglePost}
                             connection={this.connection}
                             onLikeBtnPress={this.onLikeBtnPress}
+                            onProfilePress={this.getUser}
                         />
                     </View>
                 )}
@@ -153,9 +116,10 @@ export default class UserModal extends Component {
 }
 const styles = StyleSheet.create({
     container: {
-        flexDirection: "row",
-
-        justifyContent: "space-between",
+        flex: 1,
+        backgroundColor: "#fff",
+        alignItems: "center",
+        justifyContent: "center",
     },
     bigCon: {
         height: "90%",
