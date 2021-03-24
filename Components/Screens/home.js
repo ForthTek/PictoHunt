@@ -181,7 +181,7 @@ export default class Home extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.container}>
-                    <Text>Loading</Text>
+                    <Text>Loading Home Page...</Text>
                 </View>
             );
         }
@@ -233,6 +233,7 @@ export default class Home extends Component {
                                         type='user'
                                         item={item}
                                         connection={this.connection}
+                                        getUserH={this.getUser}
                                     />
                                 )}
                                 keyExtractor={(item) => item}

@@ -47,7 +47,7 @@ class Account extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.container1}>
-                    <Text>Loading...</Text>
+                    <Text>Loading Account Page...</Text>
                     <Button
                         title='Sign out'
                         onPress={this.onSignOutPress}

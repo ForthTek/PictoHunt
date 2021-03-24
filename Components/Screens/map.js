@@ -122,6 +122,7 @@ export default class Map extends Component {
             mapType="standard"
           >
             {this.state.MarkerArray.map((m) => {
+              console.log(m);
               return (
                 <MapView.Marker
                   coordinate={{
@@ -142,7 +143,9 @@ export default class Map extends Component {
                       source={{ uri: m.photos[0] }}
                       style={{ width: 80, height: 80 }}
                     />
-                    <Text style={{ backgroundColor: "#fff" }}> {m.ID} </Text>
+                  <Text style={{ backgroundColor: "#fff", fontSize: 11 }}> {m.title} </Text>
+                  <Text style={{ backgroundColor: "#fff", fontSize: 8 }}> By {m.user} in {m.channel} </Text>
+                  <Text style={{ backgroundColor: "#fff", fontSize: 8 }}> Score: {m.score} </Text>
                   </View>
                 </MapView.Marker>
               );
@@ -152,7 +155,13 @@ export default class Map extends Component {
       );
     } else {
       // In case the program hasnt attempted to get the user location
-      return null;
+      return (
+        <SafeAreaView>
+          <Text>
+            Loading Map...
+          </Text>
+        </SafeAreaView>
+      );
     }
   }
 }
