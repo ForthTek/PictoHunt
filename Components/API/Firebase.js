@@ -347,6 +347,8 @@ export default class Firebase {
 
   getBrowse = async (filter) => {
     try {
+      const user = this.currentUser();
+
       let allFollowedUsers = await this.getFollowedUserRefs(user.username);
       let allFollowedChannels = await this.getFollowedChannelRefs(
         user.username

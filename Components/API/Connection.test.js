@@ -69,17 +69,17 @@ describe("signed in tests", () => {
       //   // Like, dislike and remove interaction
       // });
 
-      test("auth followUser", async () => {
+      test("followUser", async () => {
         await connection.followUser(TEST_USERNAME, true);
       });
 
-      test("auth followChannel", async () => {
+      test("followChannel", async () => {
         await connection.followChannel(TEST_CHANNEL, true);
       });
     });
 
     describe("channel tests", () => {
-      test("auth test channel", async () => {
+      test("getChannel", async () => {
         let channel = await connection.getChannel(TEST_CHANNEL);
         //console.log(channel);
       });
@@ -90,34 +90,26 @@ describe("signed in tests", () => {
         await connection.login(TEST_EMAIL, TEST_PASSWORD);
       });
 
-      test("auth getGetAllPosts", async () => {
+      test("getGetAllPosts", async () => {
         let x = await connection.getAllPosts();
         //console.log(x.length);
       });
 
-      test("auth getBrowse", async () => {
-        let x = await connection.getBrowse();
-        //console.log(x.length);
-      });
-      test("auth getBrowse", async () => {
-        let x = await connection.getBrowse();
-        //console.log(x.length);
-      });
-      test("auth getBrowse", async () => {
+      test("getBrowse", async () => {
         let x = await connection.getBrowse();
         //console.log(x.length);
       });
     });
 
     describe("map tests", () => {
-      test("auth getMap", async () => {
+      test("getMap", async () => {
         let x = await connection.getMap();
         //console.log(x.length);
       });
     });
 
     describe("challenge tests", () => {
-      // test.only("auth createChallenge", async () => {
+      // test.only("createChallenge", async () => {
       //   let x = await connection.createChallenge(
       //     "photograph two dogs",
       //     new Date("2021-04-17T03:24:00"),
