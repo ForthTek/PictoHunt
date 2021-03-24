@@ -47,7 +47,7 @@ export default class Profile extends Component {
         let otheruser = await connection.getProfile(this.props.user);
         this.setState({
           otherusername: otheruser.username,
-          otheruserjoin: otheruser.timestamp.toDateString(),
+          otheruserjoin: otheruser.timestamp.toString().substring(4, 15),
           otheruserlocation: 'TODO',
           otheruserpfp: '../assets/pfp-placeholder.png',
 
