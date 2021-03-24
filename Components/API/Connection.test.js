@@ -126,9 +126,13 @@ describe("signed in tests", () => {
       //   );
       // });
 
-      // const c = "UXlZhJc8sQGub94WGpiR";
+      const c = "UXlZhJc8sQGub94WGpiR";
       // test.only("inviteUsersToChallenge", async () => {
       //   let x = await connection.inviteUsersToChallenge(c, ["Test"]);
+      // });
+
+      // test.only("deleteChallengeRequest", async () => {
+      //   let x = await connection.deleteChallenge(c);
       // });
 
       // test.only("getChallenges", async () => {

@@ -887,4 +887,14 @@ export default class Firebase {
 
     return challenges;
   }
+
+  async deleteChallengeRequest(challengeKey) {
+    const user = this.currentUser();
+    const ref = this.database.doc(
+      `Users/${user.username}/Challenges/${challengeKey}`
+    );
+
+    await ref.delete();
+    return true;
+  }
 }
