@@ -684,23 +684,8 @@ export default class Firebase {
       timestamp: firebase.firestore.Timestamp.now(),
     };
 
-    // Add a reference to this post in the channel and user page
-    const profilePosts = this.#database.doc(
-      `Users/${username}/Posts/${newKey}`
-    );
-    const channelPosts = this.#database.doc(
-      `Channels/${channelName}/Posts/${newKey}`
-    );
-
-    const refData = { timestamp: postData.timestamp, score: postData.score };
-
     // Set the data
-    await Promise.all([
-      ref.set(postData),
-      profilePosts.set(refData),
-      channelPosts.set(refData),
-    ]);
-
+    await ref.set(postData);
     return newKey;
   };
 

@@ -89,8 +89,8 @@ class Account extends Component {
                     >
                         <Score label='Score' number={this.state.user.score} />
                         <Score
-                            label='Pics'
-                            number={this.state.user.totalPosts}
+                            label='Posts'
+                            number={this.state.user.posts.length}
                         />
                         <Score label='Rank' number={5} />
                     </View>
