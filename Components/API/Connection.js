@@ -303,8 +303,14 @@ export default class Connection {
    * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
    * @returns
    */
-  createChallenge = async (deadline, score, tasksPerPost) => {
-    return await this.#firebase.createChallenge(deadline, score, tasksPerPost);
+  createChallenge = async (description, deadline, score, tasksPerPost) => {
+    const newDescription = await this.#server.filterSwears(description);
+    return await this.#firebase.createChallenge(
+      newDescription,
+      deadline,
+      score,
+      tasksPerPost
+    );
   };
 
   inviteUsersToChallenge = async (challenge, users) => {

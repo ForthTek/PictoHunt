@@ -111,19 +111,24 @@ describe("signed in tests", () => {
     describe("challenge tests", () => {
       // test.only("auth createChallenge", async () => {
       //   let x = await connection.createChallenge(
+      //     "photograph two dogs",
       //     new Date("2021-04-17T03:24:00"),
       //     100,
       //     [new ChallengeTask("Test"), new ChallengeTask("Test2", 1, 2)]
       //   );
       // });
 
-      const c = "uqSvyPOMMoK57NyXVCI8";
+      const c = "KuATRbhU2WWVDLyJigDM";
       // test.only("inviteUsersToChallenge", async () => {
-      //   let x = await connection.inviteUsersToChallenge(c, ["Test", "AlecS"]);
+      //   let x = await connection.inviteUsersToChallenge(c, ["Test"]);
       // });
 
-      test("getChallenges", async () => {
+      test.only("getChallenges", async () => {
         let x = await connection.getChallenges(false);
+        console.log(x);
+        // for (let i = 0; i < x[0].tasks.length; i++) {
+        //   console.log(x[0].tasks[i]);
+        // }
       });
     });
   });

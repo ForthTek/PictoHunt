@@ -874,7 +874,7 @@ export default class Firebase {
    * @param {ChallengeTask[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
    * @returns
    */
-  async createChallenge(deadline, score, tasksPerPost) {
+  async createChallenge(description, deadline, score, tasksPerPost) {
     const milliseconds = deadline.getTime() - new Date().getTime();
     const hours = milliseconds / 3600000;
     const minDuration = 1;
@@ -932,6 +932,7 @@ export default class Firebase {
     const userRef = this.#database.doc(`Users/${username}`);
 
     const data = {
+      description: description,
       deadline: firebase.firestore.Timestamp.fromDate(deadline),
       score: score,
       createdBy: userRef,
@@ -948,24 +949,23 @@ export default class Firebase {
       `Users/${username}/Challenges`
     );
 
-    let keys = await refInvited
+    let all = await refInvited
       .where("completed", "==", completed)
       .get()
       .then((snapshot) => {
-        return snapshot.docs.map((x) => x.id);
+        let all = [];
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          all.push({ ID: doc.id, completed: data.tasks });
+        });
+        return all;
       });
-
-    let challengesRaw = [];
-    for (let i = 0; i < keys.length; i++) {
-      const ref = this.#database.doc(`Challenges/${keys[i]}`);
-      challengesRaw.push(await ref.get());
-    }
-
-    await Promise.all(challengesRaw);
-
+    
     let challenges = [];
-    for (let i = 0; i < challengesRaw.length; i++) {
-      const data = challengesRaw[i].data();
+    for (let i = 0; i < all.length; i++) {
+      const ref = await this.#database.doc(`Challenges/${all[i].ID}`).get();
+      const data = ref.data();
+
       let tasks = [];
       for (let j = 0; j < data.tasks.length; j++) {
         task = data.tasks[j];
@@ -977,13 +977,21 @@ export default class Firebase {
           long = task.GPS.longitude;
         }
 
-        tasks.push(new ChallengeTask(task.channel.id, lat, long, task.radius));
+        tasks.push({
+          channel: task.channel.id,
+          latitude: lat,
+          longitude: long,
+          radius: task.radius,
+          completed: all[i].completed[j],
+        });
       }
 
       challenges[i] = {
+        description: data.description,
         deadline: data.deadline.toDate(),
         score: data.score,
         tasks: tasks,
+        completed: completed,
       };
     }
 
