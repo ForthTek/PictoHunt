@@ -170,7 +170,17 @@ export default class Connection {
    * @returns
    */
   getBrowse = async (filter = new Filter()) => {
-    return await this.#firebase.getBrowse(filter);
+    const user = this.currentUser();
+    const filterFollowing = filter.followedUsers || filter.followedChannels;
+
+    // If there is no user, or filter specifies to load all posts
+    if (!user || !filterFollowing) {
+      return await this.getAllPosts(filter);
+    }
+    // Otherwise do browse
+    else {
+      return await this.#firebase.getBrowse(filter);
+    }
   };
 
   /**

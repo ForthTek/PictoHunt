@@ -21,11 +21,6 @@ const config = {
 export default class Firebase {
   #stateUpdateCallbacks;
 
-  /**
-   * Dictionary for storing loaded posts locally. We should check a post isn't here before loading it from the server
-   */
-  #posts;
-
   constructor() {
     // Initialise the connection
     if (firebase.apps.length === 0) {
@@ -46,8 +41,6 @@ export default class Firebase {
       like: 1,
       dislike: 2,
     });
-
-    this.#posts = {};
   }
 
   /**
@@ -254,112 +247,64 @@ export default class Firebase {
    */
   getPost = async (postID) => {
     const ref = this.database.doc(`Posts/${postID}`);
-    const doc = await ref.get();
 
-    // Update the current version if there is one
-    if (this.#posts[postID]) {
-      const data = doc.data();
-
-      let interaction = await this.calculateInteractedWith(postID);
-
-      // Calculate the values we need to
-      this.#posts[postID].score = data.score;
-      this.#posts[postID].likes = data.likes;
-      this.#posts[postID].dislikes = data.dislikes;
-      this.#posts[postID].liked = interaction.liked;
-      this.#posts[postID].disliked = interaction.disliked;
-
-      // Return the updated version
-      return this.#posts[postID];
-    }
-    // Post isn't stored locally so we need to load it from the database
-    else {
-      return await this.getPostFromDoc(doc);
-    }
+    return await ref.get().then(async (doc) => this.getPostFromDoc(doc));
   };
 
   async getPostFromDoc(doc) {
     if (doc.exists) {
-      const postID = doc.id;
+      const data = doc.data();
+      const user = this.currentUser();
 
-      // Load the post from the database if we don't have it
-      if (!this.#posts[postID]) {
-        this.#posts[postID] = await this.returnPost(doc);
-      }
-      // Otherwise just update the values on it
-      else {
-        let interaction = await this.calculateInteractedWith(postID);
-        const data = await doc.data();
-
-        // Calculate the values we need to
-        this.#posts[postID].score = data.score;
-        this.#posts[postID].likes = data.likes;
-        this.#posts[postID].dislikes = data.dislikes;
-        this.#posts[postID].liked = interaction.liked;
-        this.#posts[postID].disliked = interaction.disliked;
+      let GPS = null;
+      if (data.GPS) {
+        GPS = {
+          latitude: data.GPS.latitude,
+          longitude: data.GPS.longitude,
+        };
       }
 
-      // Return the updated version
-      return this.#posts[postID];
+      // See if the user has interacted with the post
+      let liked = false;
+      let disliked = false;
+      if (user) {
+        liked = (
+          await this.database
+            .doc(`Posts/${doc.id}/Likes/${user.username}`)
+            .get()
+        ).exists;
+
+        if (!liked) {
+          disliked = (
+            await this.database
+              .doc(`Posts/${doc.id}/Dislikes/${user.username}`)
+              .get()
+          ).exists;
+        }
+      }
+
+      // Return the data in a nice format
+      let post = {
+        title: data.title,
+        GPS: GPS,
+        channel: data.channel.id,
+        photos: data.photos,
+        score: data.score,
+        likes: data.likes,
+        dislikes: data.dislikes,
+        user: data.createdBy.id,
+        time: data.timestamp.toDate(),
+        liked: liked,
+        disliked: disliked,
+        ID: doc.id,
+      };
+
+      return post;
     }
     // Throw an error if it doesn't exist
     else {
       throw new Error(`Doc does not exist`);
     }
-  }
-
-  async calculateInteractedWith(postID) {
-    // See if the user has interacted with the post
-    let liked = false;
-    let disliked = false;
-
-    const user = this.currentUser();
-    if (user) {
-      liked = (
-        await this.database.doc(`Posts/${postID}/Likes/${user.username}`).get()
-      ).exists;
-
-      if (!liked) {
-        disliked = (
-          await this.database
-            .doc(`Posts/${postID}/Dislikes/${user.username}`)
-            .get()
-        ).exists;
-      }
-    }
-
-    return { liked: liked, disliked: disliked };
-  }
-
-  async returnPost(doc) {
-    const data = await doc.data();
-    const interaction = await this.calculateInteractedWith(doc.id);
-
-    let GPS = null;
-    if (data.GPS) {
-      GPS = {
-        latitude: data.GPS.latitude,
-        longitude: data.GPS.longitude,
-      };
-    }
-
-    // Return the data in a nice format
-    let post = {
-      title: data.title,
-      GPS: GPS,
-      channel: data.channel.id,
-      photos: data.photos,
-      score: data.score,
-      likes: data.likes,
-      dislikes: data.dislikes,
-      user: data.createdBy.id,
-      time: data.timestamp.toDate(),
-      liked: interaction.liked,
-      disliked: interaction.disliked,
-      ID: doc.id,
-    };
-
-    return post;
   }
 
   async getFollowedUserRefs(username) {
@@ -401,99 +346,89 @@ export default class Firebase {
   }
 
   getBrowse = async (filter) => {
-    const user = this.currentUser();
-    const filterFollowing = filter.followedUsers || filter.followedChannels;
+    try {
+      let allFollowedUsers = await this.getFollowedUserRefs(user.username);
+      let allFollowedChannels = await this.getFollowedChannelRefs(
+        user.username
+      );
 
-    // If there is no user, or filter specifies to load all posts
-    if (!user || !filterFollowing) {
-      return await this.getAllPosts(filter);
-    }
-    // Otherwise load following
-    else {
-      try {
-        let allFollowedUsers = await this.getFollowedUserRefs(user.username);
-        let allFollowedChannels = await this.getFollowedChannelRefs(
-          user.username
-        );
+      const isFollowingUsers = allFollowedUsers.length > 0;
+      const isFollowingChannels = allFollowedChannels.length > 0;
 
-        const isFollowingUsers = allFollowedUsers.length > 0;
-        const isFollowingChannels = allFollowedChannels.length > 0;
-
-        if (
-          filter.followedUsers &&
-          !filter.followedChannels &&
-          !isFollowingUsers
-        ) {
-          throw new Error("Not following any users");
-        }
-        if (
-          filter.followedChannels &&
-          !filter.followedUsers &&
-          !isFollowingChannels
-        ) {
-          throw new Error("Not following any channels");
-        }
-        if (!isFollowingUsers && !isFollowingChannels) {
-          throw new Error("Not following any users or channels");
-        }
-
-        let alreadyAdded = {};
-        let requests = [];
-
-        if (filter.followedUsers) {
-          await this.database
-            .collection("Posts")
-            .where("public", "==", true)
-            .where("createdBy", "in", allFollowedUsers)
-            .orderBy(filter.orderBy, filter.direction)
-            .get()
-            .then(async (snapshot) => {
-              snapshot.forEach((doc) => {
-                const key = doc.id;
-
-                // Only add the post if its not already been added
-                if (!alreadyAdded[key]) {
-                  requests.push(this.getPostFromDoc(doc));
-                  alreadyAdded[key] = true;
-                }
-              });
-            });
-        }
-
-        if (filter.followedChannels) {
-          await this.database
-            .collection("Posts")
-            .where("public", "==", true)
-            .where("channel", "in", allFollowedChannels)
-            .orderBy(filter.orderBy, filter.direction)
-            .get()
-            .then(async (snapshot) => {
-              snapshot.forEach((doc) => {
-                const key = doc.id;
-
-                // Only add the post if its not already been added
-                if (!alreadyAdded[key]) {
-                  requests.push(this.getPostFromDoc(doc));
-                  alreadyAdded[key] = true;
-                }
-              });
-            });
-        }
-
-        let posts = await Promise.all(requests);
-
-        // Need to sort the list again if we filtered by both channel and user
-        if (filter.followedUsers && filter.followedChannels) {
-          // console.log(`Manually sorting posts with filter:`);
-          // console.log(filter);
-          posts.sort((x, y) => this.comparePost(x, y, filter));
-        }
-
-        return posts;
-      } catch (error) {
-        console.log(error);
-        throw Error(`Failed to get browse (${error.message})`);
+      if (
+        filter.followedUsers &&
+        !filter.followedChannels &&
+        !isFollowingUsers
+      ) {
+        throw new Error("Not following any users");
       }
+      if (
+        filter.followedChannels &&
+        !filter.followedUsers &&
+        !isFollowingChannels
+      ) {
+        throw new Error("Not following any channels");
+      }
+      if (!isFollowingUsers && !isFollowingChannels) {
+        throw new Error("Not following any users or channels");
+      }
+
+      let alreadyAdded = {};
+      let requests = [];
+
+      if (filter.followedUsers) {
+        await this.database
+          .collection("Posts")
+          .where("public", "==", true)
+          .where("createdBy", "in", allFollowedUsers)
+          .orderBy(filter.orderBy, filter.direction)
+          .get()
+          .then(async (snapshot) => {
+            snapshot.forEach((doc) => {
+              const key = doc.id;
+
+              // Only add the post if its not already been added
+              if (!alreadyAdded[key]) {
+                requests.push(this.getPostFromDoc(doc));
+                alreadyAdded[key] = true;
+              }
+            });
+          });
+      }
+
+      if (filter.followedChannels) {
+        await this.database
+          .collection("Posts")
+          .where("public", "==", true)
+          .where("channel", "in", allFollowedChannels)
+          .orderBy(filter.orderBy, filter.direction)
+          .get()
+          .then(async (snapshot) => {
+            snapshot.forEach((doc) => {
+              const key = doc.id;
+
+              // Only add the post if its not already been added
+              if (!alreadyAdded[key]) {
+                requests.push(this.getPostFromDoc(doc));
+                alreadyAdded[key] = true;
+              }
+            });
+          });
+      }
+
+      let posts = await Promise.all(requests);
+
+      // Need to sort the list again if we filtered by both channel and user
+      if (filter.followedUsers && filter.followedChannels) {
+        // console.log(`Manually sorting posts with filter:`);
+        // console.log(filter);
+        posts.sort((x, y) => this.comparePost(x, y, filter));
+      }
+
+      return posts;
+    } catch (error) {
+      console.log(error);
+      throw Error(`Failed to get browse (${error.message})`);
     }
   };
 
