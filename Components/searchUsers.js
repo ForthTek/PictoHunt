@@ -21,14 +21,9 @@ export default class NewTask extends Component {
         this.connection = this.props.connection;
     }
     state = {
-        newTask: new ChallengeTask(),
-        newTaskDesc: "",
-        newTaskChannel: "",
-        newTaskLong: "",
-        newTaskLat: "",
-        newTaskRadius: "",
+        newUsers: [],
         searching: false,
-        channelDATA: "",
+        userDATA: "",
         search: "",
     };
 
@@ -46,13 +41,15 @@ export default class NewTask extends Component {
 
     search = async (search) => {
         // User Promise.all to send multiple request at the same time
-        this.connection.searchChannels(search).then((res) => {
-            this.setState({ channelDATA: res });
+        this.connection.searchUsers(search).then((res) => {
+            this.setState({ userDATA: res });
         });
     };
 
-    addChannel = (item) => {
-        this.setState({ newTaskChannel: item, searching: false });
+    addUser = (item) => {
+        const users = this.state.newUsers;
+        users[users.length] = item;
+        this.setState({ newUsers: users, searching: false });
     };
 
     render() {
@@ -81,7 +78,7 @@ export default class NewTask extends Component {
                     </Pressable>
 
                     <SearchBar
-                        label='Add a channel:'
+                        label='Challenge a User:'
                         labelStyle={{ color: "black" }}
                         containerStyle={styles.searchCon}
                         inputContainerStyle={styles.inputContainerStyle}
@@ -92,15 +89,13 @@ export default class NewTask extends Component {
                     />
                     {this.state.searching && this.state.search != "" && (
                         <View style={styles.dropDown}>
-                            <Text style={styles.ddText}>
-                                ------Channels------
-                            </Text>
+                            <Text style={styles.ddText}>------Users------</Text>
                             <FlatList
-                                data={this.state.channelDATA}
+                                data={this.state.userDATA}
                                 renderItem={({ item }) => (
                                     <Pressable
                                         onPress={() => {
-                                            this.addChannel(item);
+                                            this.addUser(item);
                                         }}
                                     >
                                         <Text
@@ -118,19 +113,11 @@ export default class NewTask extends Component {
                         </View>
                     )}
                     <Text style={styles.text1}>
-                        Post must be to Channel: {this.state.newTaskChannel}
+                        Added Users: {this.state.newUsers.toString()}
                     </Text>
 
                     <Pressable
-                        onPress={() =>
-                            this.props.addTask(
-                                this.state.newTaskDesc,
-                                this.state.newTaskChannel,
-                                null,
-                                null,
-                                null
-                            )
-                        }
+                        onPress={() => this.props.addUsers(this.state.newUsers)}
                     >
                         <FeatherIcon name='upload' style={{ fontSize: 32 }} />
                     </Pressable>

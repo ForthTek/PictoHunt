@@ -9,6 +9,7 @@ import {
     FlatList,
     Pressable,
     Modal,
+    KeyboardAvoidingView,
 } from "react-native";
 import { Input, Slider, SearchBar } from "react-native-elements";
 import Challenge from "../challenge";
@@ -38,6 +39,7 @@ export default class challenges extends Component {
         taskDD: false,
         scoreBonus: 25,
         userDD: false,
+        users: [],
     };
 
     componentDidMount() {
@@ -117,7 +119,24 @@ export default class challenges extends Component {
         console.log(this.state.tasks);
     };
 
-    newChallenge = () => {};
+    addUsers = (newUsers) => {
+        this.setState({ users: newUsers, userDD: false });
+        console.log(this.state.users.toString());
+    };
+
+    newChallenge = () => {
+        this.connection
+            .createChallenge(
+                this.state.modalDesc,
+                this.state.date,
+                this.state.scoreBonus,
+                this.state.tasks
+            )
+            .then((res) => {
+                this.setState({ modal: false });
+                this.connection.inviteUsersToChallenge(res, this.state.users);
+            });
+    };
 
     render() {
         if (this.state.isLoading) {
@@ -128,7 +147,10 @@ export default class challenges extends Component {
             );
         } else {
             return (
-                <SafeAreaView style={styles.container}>
+                <KeyboardAvoidingView
+                    style={styles.container}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
                     <Pressable onPress={this.openModal}>
                         <IonIcon
                             name='add-circle-outline'
@@ -140,7 +162,12 @@ export default class challenges extends Component {
                         animationType='slide'
                         transparent={true}
                     >
-                        <View style={styles.center}>
+                        <KeyboardAvoidingView
+                            style={styles.center}
+                            behavior={
+                                Platform.OS === "ios" ? "padding" : "height"
+                            }
+                        >
                             <View style={styles.modalView}>
                                 <View style={styles.container1}>
                                     <Pressable
@@ -155,7 +182,7 @@ export default class challenges extends Component {
                                     </Pressable>
                                     <Pressable
                                         onPress={() => {
-                                            this.closeModal();
+                                            this.newChallenge();
                                         }}
                                     >
                                         <FeatherIcon
@@ -168,7 +195,7 @@ export default class challenges extends Component {
                                 <Input
                                     placeholder='Description'
                                     onChangeText={(value) =>
-                                        this.setState({ modalDisc: value })
+                                        this.setState({ modalDesc: value })
                                     }
                                     label='Challenge Description:'
                                     labelStyle={{ color: "black" }}
@@ -222,6 +249,10 @@ export default class challenges extends Component {
                                 <Text style={styles.text1}>
                                     Added Tasks: {this.state.tasks.length}
                                 </Text>
+                                <Text style={styles.text1}>
+                                    Challenged Users:{" "}
+                                    {this.state.users.toString()}
+                                </Text>
                                 <Pressable
                                     onPress={() => {
                                         this.taskDropdownOpen();
@@ -239,13 +270,6 @@ export default class challenges extends Component {
                                         <Text style={styles.text1}>Tasks</Text>
                                     </View>
                                 </Pressable>
-                                {this.state.taskDD && (
-                                    <NewTask
-                                        connection={this.connection}
-                                        close={this.taskDropdownClose}
-                                        addTask={this.addTask}
-                                    />
-                                )}
                                 <Pressable
                                     onPress={() => {
                                         this.userDropdownOpen();
@@ -265,16 +289,23 @@ export default class challenges extends Component {
                                         </Text>
                                     </View>
                                 </Pressable>
-
-                                {this.state.userDD && (
-                                    <SearchUser
+                                {this.state.taskDD && (
+                                    <NewTask
                                         connection={this.connection}
-                                        close={this.userDropdownClose}
+                                        close={this.taskDropdownClose}
                                         addTask={this.addTask}
                                     />
                                 )}
+
+                                {this.state.userDD && !this.state.taskDD && (
+                                    <SearchUser
+                                        connection={this.connection}
+                                        close={this.userDropdownClose}
+                                        addUsers={this.addUsers}
+                                    />
+                                )}
                             </View>
-                        </View>
+                        </KeyboardAvoidingView>
                     </Modal>
 
                     {this.state.datePicker && (
@@ -308,7 +339,7 @@ export default class challenges extends Component {
                         onRefresh={this.onRefresh}
                         refreshing={this.state.refresh}
                     />
-                </SafeAreaView>
+                </KeyboardAvoidingView>
             );
         }
     }
@@ -335,7 +366,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 5,
         width: "90%",
-        height: "90%",
+        height: "95%",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
@@ -347,7 +378,7 @@ const styles = StyleSheet.create({
     },
     icon1: {
         fontSize: 32,
-        paddingBottom: "5%",
+        paddingBottom: "1%",
     },
     text: {
         fontSize: 25,

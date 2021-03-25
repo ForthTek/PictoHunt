@@ -58,7 +58,7 @@ export default class NewTask extends Component {
     render() {
         return (
             <View>
-                <View>
+                <View stlye={styles.container}>
                     <Pressable
                         onPress={() => {
                             this.props.close();
@@ -89,9 +89,6 @@ export default class NewTask extends Component {
                         value={this.state.newTaskDesc}
                         label='Task Description:'
                         labelStyle={{ color: "black" }}
-                        containerStyle={{
-                            paddingTop: "2%",
-                        }}
                     />
 
                     <SearchBar
@@ -146,7 +143,10 @@ export default class NewTask extends Component {
                             )
                         }
                     >
-                        <FeatherIcon name='upload' style={{ fontSize: 32 }} />
+                        <FeatherIcon
+                            name='upload'
+                            style={{ fontSize: 32, paddingBottom: "5%" }}
+                        />
                     </Pressable>
                 </View>
             </View>
@@ -157,7 +157,8 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        paddingLeft: "3%",
+        justifyContent: "space-around",
+        alignContent: "space-around",
     },
     container1: {
         flexDirection: "row",
@@ -172,7 +173,6 @@ const styles = StyleSheet.create({
     },
     text1: {
         fontSize: 20,
-        paddingTop: "1%",
     },
     searchCon: {
         width: "85%",
