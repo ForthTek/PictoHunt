@@ -9,17 +9,32 @@ export default class UserModal extends Component {
     constructor(props) {
         super(props);
         this.connection = this.props.connection;
+        if (this.props.DATA.posts.length == 0) {
+            this.state = {
+                DATA: this.props.DATA,
+                postDATA: this.props.DATA.posts,
+
+                singlePost: false,
+                singlePostID: "",
+
+                justFollowed: false,
+                refresh: false,
+                noPosts: true,
+            };
+        } else {
+            this.state = {
+                DATA: this.props.DATA,
+                postDATA: this.props.DATA.posts,
+
+                singlePost: false,
+                singlePostID: "",
+
+                justFollowed: false,
+                refresh: false,
+                noPosts: false,
+            };
+        }
     }
-
-    state = {
-        DATA: this.props.DATA,
-        postDATA: this.props.DATA.posts,
-
-        singlePost: false,
-        singlePostID: "",
-
-        justFollowed: false,
-    };
 
     // componentDidMount() {
     //     this.connection
@@ -40,7 +55,25 @@ export default class UserModal extends Component {
     };
 
     handleSinglePost = () => {
-        this.setState({ singlePost: !this.state.singlePost });
+        this.setState({ singlePost: true });
+    };
+    handleSinglePostClose = () => {
+        this.setState({ singlePost: false });
+        this.onRefresh();
+    };
+
+    onRefresh = async () => {
+        this.setState({ refresh: true, postDATA: "" });
+        await this.connection.getBrowse(this.state.filter).then(
+            (res) => {
+                this.setState({ postDATA: res });
+                this.setState({ refresh: false });
+            },
+            (error) => {
+                Alert.alert(error.message);
+                this.setState({ refresh: false });
+            }
+        );
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
@@ -132,7 +165,7 @@ export default class UserModal extends Component {
                     <Score label='Pics' number={this.state.postDATA.length} />
                     <Score label='Rank' number={5} />
                 </View>
-                {this.state.postDATA.length == 0 && (
+                {this.state.noPosts && (
                     <Text style={styles.text1}>
                         This user hasn't posted yet :/
                     </Text>
@@ -152,13 +185,15 @@ export default class UserModal extends Component {
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}
+                        onRefresh={this.onRefresh}
+                        refreshing={this.state.refresh}
                     />
                 )}
                 {this.state.singlePost && (
                     <View style={styles.singleView}>
                         <SinglePost
                             item={this.state.postDATA[this.state.singlePostID]}
-                            back={this.handleSinglePost}
+                            back={this.handleSinglePostClose}
                             connection={this.connection}
                             onLikeBtnPress={this.onLikeBtnPress}
                         />

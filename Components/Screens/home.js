@@ -66,7 +66,11 @@ export default class Home extends Component {
     };
 
     handleSinglePost = () => {
-        this.setState({ isPost: !this.state.isPost });
+        this.setState({ isPost: true });
+    };
+    handleSinglePostClose = () => {
+        this.setState({ isPost: false });
+        this.onRefresh();
     };
 
     onRefresh = async () => {
@@ -179,7 +183,7 @@ export default class Home extends Component {
                 <View style={styles.container}>
                     <SinglePost
                         item={this.state.DATA[this.state.singlePostID]}
-                        back={this.handleSinglePost}
+                        back={this.handleSinglePostClose}
                         connection={this.connection}
                         onLikeBtnPress={this.onLikeBtnPress}
                     />
