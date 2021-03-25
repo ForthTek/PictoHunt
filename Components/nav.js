@@ -29,6 +29,7 @@ export default class Nav extends Component {
                     <bButton.Navigator // Sets things about the bottom buttons
                         initialRouteName='Home'
                     >
+
                         <bButton.Screen
                             name='Home'
                             options={{

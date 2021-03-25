@@ -21,6 +21,7 @@ export default class SearchItem extends Component {
             this.connection.getProfile(this.state.name).then(
                 (user) => {
                     this.setState({ modalOpen: true, DATA: user });
+                    console.log(user);
                 },
                 (error) => {
                     Alert.alert(error.message);
@@ -31,6 +32,7 @@ export default class SearchItem extends Component {
             this.connection.getChannel(this.state.name).then(
                 (channel) => {
                     this.setState({ modalOpen: true, DATA: channel });
+                    console.log(channel);
                 },
                 (error) => {
                     Alert.alert(error.message);
@@ -41,6 +43,12 @@ export default class SearchItem extends Component {
     closeModal = () => {
         this.setState({ modalOpen: false });
     };
+
+    getUserSI = (val) => {
+
+      this.props.getUserH(val);
+      this.closeModal();
+    }
 
     render() {
         return (
@@ -71,6 +79,7 @@ export default class SearchItem extends Component {
                                 <UserModal
                                     DATA={this.state.DATA}
                                     connection={this.connection}
+                                    getUserSI={this.getUserSI}
                                 />
                             )}
                             {this.state.type == "channel" && (

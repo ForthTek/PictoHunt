@@ -47,7 +47,7 @@ class Account extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.container1}>
-                    <Text>Loading</Text>
+                    <Text>Loading Account Page...</Text>
                     <Button
                         title='Sign out'
                         onPress={this.onSignOutPress}
@@ -58,28 +58,19 @@ class Account extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.container}>
-                    <View style={{ flexDirection: "row", padding: "5%" }}>
-                        <Image
-                            source={require("../../assets/pfp-placeholder.png")}
-                            width={160}
-                        />
-                        <View
-                            style={{
-                                flexDirection: "column",
-                                paddingLeft: "3%",
-                            }}
-                        >
-                            <Text style={styles.username}>
-                                {this.state.user.username}
-                            </Text>
-                            <Text style={styles.info}>
-                                Joined:{" "}
-                                {this.state.user.timestamp
-                                    .toString()
-                                    .substring(4, 15)}
-                            </Text>
-                        </View>
-                    </View>
+                  <View style={{ flexDirection: "row", padding: "5%" }}>
+                      <Image
+                          source={require('../../assets/pfp-placeholder.png')}
+                          width={160}
+                      />
+                      <View style={{ flexDirection: "column", paddingLeft: "3%" }}>
+                          <Text style={styles.username}>{this.state.user.username}</Text>
+                          <Text style={styles.info}>Joined:</Text>
+                          <Text style={styles.info}>{this.state.user.timestamp.toString().substring(4, 15)}</Text>
+                          <Text style={styles.info}>Located:</Text>
+                          <Text style={styles.info}>[TODO]</Text>
+                      </View>
+                  </View>
                     <View
                         style={{
                             flexDirection: "row",
@@ -89,10 +80,10 @@ class Account extends Component {
                     >
                         <Score label='Score' number={this.state.user.score} />
                         <Score
-                            label='Posts'
+                            label='Pics'
                             number={this.state.user.posts.length}
                         />
-                        <Score label='Rank' number={5} />
+                      <Score label='Rank' number={"[TODO]"}/>
                     </View>
                     <View style={styles.container}>
                         <SettingBtn
@@ -152,14 +143,13 @@ const styles = StyleSheet.create({
         padding: "1%",
     },
     username: {
-        fontSize: 22,
-        paddingBottom: "2%",
-        maxWidth: 200,
+      fontSize: 22,
+      paddingBottom: "10%",
+      maxWidth: 200,
     },
     info: {
-        fontSize: 15,
-        paddingBottom: "5%",
-        color: "grey",
+      fontSize: 18,
+      paddingBottom: "5%",
     },
     loadCon: {
         flex: 1,
