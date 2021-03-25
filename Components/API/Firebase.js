@@ -858,7 +858,7 @@ export default class Firebase {
       const ref = await this.database.doc(`Challenges/${all[i].ID}`).get();
       const data = ref.data();
 
-      if (now > data.deadline) {
+      if (now > data.deadline && !data.completed) {
         console.log(
           `Deadline for challenge has expired. Removing it from the user's challenges`
         );
