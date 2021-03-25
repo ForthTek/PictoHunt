@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import Upload from "../upload";
 import Ionicon from "react-native-vector-icons/Ionicons";
+import MapPicker from "../mapPicker";
+import { Modal } from "react-native";
 export default class UploadScreen extends Component {
     constructor(props) {
         super(props);
@@ -24,6 +26,7 @@ export default class UploadScreen extends Component {
         channel: "",
         image: null,
         res: null,
+        modalVisible: false,
     };
 
     onChangeTitle = (value) => {
@@ -48,7 +51,9 @@ export default class UploadScreen extends Component {
         const blob = await res.blob();
 
         this.connection
-            .createPost(this.state.title, this.state.channel, null, null, [blob])
+            .createPost(this.state.title, this.state.channel, null, null, [
+                blob,
+            ])
             .then(
                 (key) => {
                     // Maybe go to single post view now?
@@ -114,6 +119,23 @@ export default class UploadScreen extends Component {
                             />
                         </View>
                     </View>
+                    <Pressable
+                        onPress={() => this.setState({ modalVisible: true })}
+                    >
+                        <Text>Add a location</Text>
+                    </Pressable>
+                    <Modal
+                        visible={this.state.modalVisible}
+                        animationType='slide'
+                        transparent={true}
+                    >
+                        <View style={styles.center}>
+                            <View style={styles.modalView}>
+                                <MapPicker />
+                            </View>
+                        </View>
+                    </Modal>
+
                     <View style={styles.button}>
                         <Button
                             title='SUBMIT'
