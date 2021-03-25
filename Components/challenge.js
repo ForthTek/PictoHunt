@@ -67,7 +67,9 @@ export default class Challenge extends Component {
                 </View>
 
                 <View style={styles.container3}>
-                    <Pressable onPress={() => this.props.delete(this.DATA.ID)}>
+                    <Pressable
+                        onPress={() => this.props.delete(this.state.DATA.ID)}
+                    >
                         <AntIcon name='delete' style={styles.icon} />
                     </Pressable>
                 </View>
