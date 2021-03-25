@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import { Modal } from "react-native";
 import { Text, StyleSheet, View, Image, Pressable, Alert } from "react-native";
 import LikeBtn from "./likeBtn";
 
@@ -26,11 +27,11 @@ class Post extends Component {
     updateScore = (id) => {
         this.connection.getPost(id).then(
             (res) => {
-              this.setState({
-                 score: res.score,
-                 isLiked: res.liked,
-                 isDisliked: res.disliked,
-             });
+                this.setState({
+                    score: res.score,
+                    isLiked: res.liked,
+                    isDisliked: res.disliked,
+                });
             },
             (error) => {
                 Alert.alert(error.message);
@@ -39,9 +40,9 @@ class Post extends Component {
     };
 
     getuserprofile = () => {
-      let val = this.props.item.user;
-      this.props.onProfilePress(val);
-    }
+        let val = this.props.item.user;
+        this.props.onProfilePress(val);
+    };
 
     render() {
         return (
@@ -59,9 +60,7 @@ class Post extends Component {
                         {this.state.title}
                     </Text>
                     <Pressable onPress={this.getuserprofile}>
-                      <Text style={styles.postName}>
-                        {this.state.user}
-                      </Text>
+                        <Text style={styles.postName}>{this.state.user}</Text>
                     </Pressable>
                     <View style={styles.likeCon}>
                         <LikeBtn
@@ -73,18 +72,18 @@ class Post extends Component {
                             postID={this.state.postID}
                             onLikeBtnPress={(type, id) => {
                                 if (this.state.isLiked) {
-                                     this.props.onLikeBtnPress(
-                                         "remove",
-                                         id,
-                                         this.updateScore
-                                     );
-                                 } else {
-                                this.props.onLikeBtnPress(
-                                    type,
-                                    id,
-                                    this.updateScore
-                                );
-                              }
+                                    this.props.onLikeBtnPress(
+                                        "remove",
+                                        id,
+                                        this.updateScore
+                                    );
+                                } else {
+                                    this.props.onLikeBtnPress(
+                                        type,
+                                        id,
+                                        this.updateScore
+                                    );
+                                }
                             }}
                             connection={this.connection}
                         />
@@ -93,10 +92,10 @@ class Post extends Component {
                         </Text>
                         <LikeBtn
                             icon={
-                               this.state.isDisliked
-                                   ? "heart-dislike"
-                                   : "heart-dislike-outline"
-                           }
+                                this.state.isDisliked
+                                    ? "heart-dislike"
+                                    : "heart-dislike-outline"
+                            }
                             title='Dis-Like'
                             type='dislike'
                             postID={this.state.postID}
@@ -108,12 +107,12 @@ class Post extends Component {
                                         this.updateScore
                                     );
                                 } else {
-                                this.props.onLikeBtnPress(
-                                    type,
-                                    id,
-                                    this.updateScore
-                                );
-                              }
+                                    this.props.onLikeBtnPress(
+                                        type,
+                                        id,
+                                        this.updateScore
+                                    );
+                                }
                             }}
                             connection={this.connection}
                         />
@@ -154,5 +153,26 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         flexDirection: "row",
+    },
+    center: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    modalView: {
+        margin: 5,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 5,
+        width: "90%",
+        height: "90%",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
     },
 });

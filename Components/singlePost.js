@@ -13,6 +13,7 @@ import Carousel from "react-native-snap-carousel";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import LikeBtn from "./likeBtn";
+import { stopLocationUpdatesAsync } from "expo-location";
 
 export default class SinglePost extends Component {
     constructor(props) {
@@ -91,13 +92,8 @@ export default class SinglePost extends Component {
         );
 
         return (
-            <SafeAreaView style={styles.container}>
-                <View
-                    style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                    }}
-                >
+            <View style={styles.container}>
+                <View style={styles.container1}>
                     <Pressable onPress={this.handleBack}>
                         <Ionicon
                             name='arrow-back-circle-outline'
@@ -108,115 +104,97 @@ export default class SinglePost extends Component {
                         <FeatherIcon name='flag' style={styles.icon} />
                     </Pressable>
                 </View>
-                <SafeAreaView
-                    style={{
-                        flex: 1,
-                        backgroundColor: "white",
-                        paddingTop: 30,
-                    }}
-                >
-                    <View
-                        style={{
-                            flex: 1,
-                            flexDirection: "row",
-                            justifyContent: "center",
-                        }}
-                    >
-                        <Carousel
-                            layout={"tinder"}
-                            ref={(ref) => (this.carousel = ref)}
-                            data={this.state.photos}
-                            sliderWidth={300}
-                            itemWidth={300}
-                            renderItem={this._renderItem}
-                            firstItem={this.state.photos.length - 1}
-                            onSnapToItem={(index) =>
-                                this.setState({ activeIndex: index })
+                <View style={styles.container3}>
+                    <Carousel
+                        layout={"tinder"}
+                        ref={(ref) => (this.carousel = ref)}
+                        data={this.state.photos}
+                        sliderWidth={300}
+                        itemWidth={300}
+                        renderItem={this._renderItem}
+                        firstItem={this.state.photos.length - 1}
+                        onSnapToItem={(index) =>
+                            this.setState({ activeIndex: index })
+                        }
+                    />
+                </View>
+
+                <View style={styles.container2}>
+                    <View style={{ maxWidth: "70%" }}>
+                        <Text style={styles.title} numberOfLines={3}>
+                            {this.state.title}
+                        </Text>
+                        <Pressable onPress={this.getuserprofile}>
+                            <Text style={styles.postName}>
+                                {this.state.user}
+                            </Text>
+                        </Pressable>
+                    </View>
+
+                    <View style={{ flexDirection: "row" }}>
+                        <LikeBtn
+                            icon={
+                                this.state.isLiked ? "heart" : "heart-outline"
                             }
+                            title='Like'
+                            type='like'
+                            postID={this.state.postID}
+                            onLikeBtnPress={(type, id) => {
+                                if (this.state.isLiked) {
+                                    this.props.onLikeBtnPress(
+                                        "remove",
+                                        id,
+                                        this.updateScore
+                                    );
+                                } else {
+                                    this.props.onLikeBtnPress(
+                                        type,
+                                        id,
+                                        this.updateScore
+                                    );
+                                }
+                            }}
+                            connection={this.connection}
+                        />
+                        <Text style={{ fontSize: 22, paddingRight: "2%" }}>
+                            {this.state.score}
+                        </Text>
+                        <LikeBtn
+                            icon={
+                                this.state.isDisliked
+                                    ? "heart-dislike"
+                                    : "heart-dislike-outline"
+                            }
+                            title='Dis-Like'
+                            type='dislike'
+                            postID={this.state.postID}
+                            onLikeBtnPress={(type, id) => {
+                                if (this.state.isDisliked) {
+                                    this.props.onLikeBtnPress(
+                                        "remove",
+                                        id,
+                                        this.updateScore
+                                    );
+                                } else {
+                                    this.props.onLikeBtnPress(
+                                        type,
+                                        id,
+                                        this.updateScore
+                                    );
+                                }
+                            }}
+                            connection={this.connection}
                         />
                     </View>
-                    <View style={styles.container}>
-                        <View style={styles.likeCon}>
-                            <View>
-                                <Text style={styles.title} numberOfLines={1}>
-                                    {this.state.title}
-                                </Text>
-                                <Pressable onPress={this.getuserprofile}>
-                                    <Text style={styles.postName}>
-                                        {this.state.user}
-                                    </Text>
-                                </Pressable>
-                            </View>
-                            <View style={{ flexDirection: "row" }}>
-                                <LikeBtn
-                                    icon={
-                                        this.state.isLiked
-                                            ? "heart"
-                                            : "heart-outline"
-                                    }
-                                    title='Like'
-                                    type='like'
-                                    postID={this.state.postID}
-                                    onLikeBtnPress={(type, id) => {
-                                        if (this.state.isLiked) {
-                                            this.props.onLikeBtnPress(
-                                                "remove",
-                                                id,
-                                                this.updateScore
-                                            );
-                                        } else {
-                                            this.props.onLikeBtnPress(
-                                                type,
-                                                id,
-                                                this.updateScore
-                                            );
-                                        }
-                                    }}
-                                    connection={this.connection}
-                                />
-                                <Text
-                                    style={{ fontSize: 22, paddingRight: "2%" }}
-                                >
-                                    {this.state.score}
-                                </Text>
-                                <LikeBtn
-                                    icon={
-                                        this.state.isDisliked
-                                            ? "heart-dislike"
-                                            : "heart-dislike-outline"
-                                    }
-                                    title='Dis-Like'
-                                    type='dislike'
-                                    postID={this.state.postID}
-                                    onLikeBtnPress={(type, id) => {
-                                        if (this.state.isDisliked) {
-                                            this.props.onLikeBtnPress(
-                                                "remove",
-                                                id,
-                                                this.updateScore
-                                            );
-                                        } else {
-                                            this.props.onLikeBtnPress(
-                                                type,
-                                                id,
-                                                this.updateScore
-                                            );
-                                        }
-                                    }}
-                                    connection={this.connection}
-                                />
-                            </View>
-                        </View>
-                        <View style={styles.comments}>
-                            <FlatList
-                                data={this.state.comments}
-                                renderItem={renderComments}
-                                keyExtractor={(item) => item.time}
-                            />
-                        </View>
-                    </View>
-                </SafeAreaView>
-            </SafeAreaView>
+                </View>
+                <View style={styles.comments}>
+                    <FlatList
+                        data={this.state.comments}
+                        renderItem={renderComments}
+                        keyExtractor={(item) => item.time}
+                    />
+                </View>
+            </View>
         );
     }
 }
@@ -224,6 +202,27 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
+        width: "95%",
+        maxWidth: "95%",
+        alignItems: "center",
+        // backgroundColor: "blue",
+    },
+    container1: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        paddingBottom: "5%",
+        // backgroundColor: "green",
+        width: "100%",
+    },
+    container2: {
+        // backgroundColor: "red",
+        width: "100%",
+        paddingTop: "1%",
+        flexDirection: "row",
+        justifyContent: "space-between",
+    },
+    container3: {
+        maxHeight: "40%",
     },
     Image: {
         width: 250,
