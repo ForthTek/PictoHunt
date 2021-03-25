@@ -148,7 +148,10 @@ describe("2.0 signed in tests", () => {
       //     "photograph two dogs",
       //     new Date("2021-04-17T03:24:00"),
       //     100,
-      //     [new ChallengeTask("picture of a pug", "Test"), new ChallengeTask("cute golden pls", "Test2", 1, 2)]
+      //     [
+      //       new ChallengeTask("picture of a pug", "Test"),
+      //       new ChallengeTask("cute golden pls", "Test2", 1, 2),
+      //     ]
       //   );
       // });
 
@@ -171,7 +174,7 @@ describe("2.0 signed in tests", () => {
     });
 
     describe("5.0 admin tests", () => {
-      test.only("getReportedPosts", async () => {
+      test("getReportedPosts", async () => {
         let x = await connection.getAllReportedPosts();
         //console.log(x.length);
       });
@@ -195,3 +198,75 @@ describe("5.0 signed in tests", () => {
     });
   });
 });
+
+// test.only("create sample data", async () => {
+//   try {
+//     await connection.createProfile(
+//       TEST_EMAIL,
+//       TEST_USERNAME,
+//       TEST_PASSWORD,
+//       false
+//     );
+//   } catch (error) {}
+
+//   await connection.login(TEST_EMAIL, TEST_PASSWORD);
+
+//   try {
+//     await connection.createChannel(
+//       "Animals",
+//       "Pictures of cute animals. Anything goes!"
+//     );
+//   } catch (error) {}
+
+//   try {
+//     await connection.createChannel("doggos", "cute doggos only!");
+//   } catch (error) {}
+
+//   try {
+//     await connection.createChannel(
+//       "Holiday pictures",
+//       "Dedicated to pictures taken on holiday"
+//     );
+//   } catch (error) {}
+
+//   try {
+//     await connection.createChannel("Cities", "Cities from around the world");
+//   } catch (error) {}
+
+//   try {
+//     await connection.createChallenge(
+//       "Weekly challenge",
+//       new Date("2021-04-01T00:00:00"),
+//       100,
+//       [
+//         new ChallengeTask("Photograph any animal", "Animals"),
+//         new ChallengeTask("Take a picture of a dog", "doggos"),
+//       ]
+//     );
+//   } catch (error) {}
+
+//   try {
+//     await connection.createChallenge(
+//       "Daily challenge",
+//       new Date("2021-03-27T00:00:00"),
+//       75,
+//       [new ChallengeTask("Take a picture in the city", "Cities")]
+//     );
+//   } catch (error) {}
+
+//   try {
+//     await connection.createChallenge(
+//       "Interesting buildings",
+//       new Date("2021-03-27T00:00:00"),
+//       150,
+//       [
+//         new ChallengeTask("Photograph a tall building", "Cities"),
+//         new ChallengeTask("Take a pic of an interesting building", "Cities"),
+//         new ChallengeTask(
+//           "Take a snap of a damaged building",
+//           "Holiday pictures"
+//         ),
+//       ]
+//     );
+//   } catch (error) {}
+// });
