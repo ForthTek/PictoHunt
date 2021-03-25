@@ -51,6 +51,7 @@ export default class UploadScreen extends Component {
     };
 
     callConnection = async () => {
+        Alert.alert("Post Submitted");
         const res = await fetch(this.state.image.uri);
         const blob = await res.blob();
 
