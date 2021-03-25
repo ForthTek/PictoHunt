@@ -125,6 +125,7 @@ export default class UserModal extends Component {
                           </Pressable>
                       )}
                 </View>
+                <Text>{this.state.DATA.description}</Text>
                 {!this.state.singlePost && (
                     <FlatList
                         style={styles.list}
