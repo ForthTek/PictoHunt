@@ -7,11 +7,17 @@ import {
   View,
   Image,
   Alert,
+  Modal,
+  Pressable,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Geocoder from "react-native-geocoding";
+import FeatherIcon from "react-native-vector-icons/Feather";
+import Ionicon from "react-native-vector-icons/Ionicons";
+import SinglePost from "../singlePost";
+import Connection from "../API/Connection";
 
 // NOTE: internal commentary dosn't have spell check, sorry
 
@@ -30,9 +36,21 @@ export default class Map extends Component {
       locationset: false,
       // Empty set for the map markers to be put in
       MarkerArray: [],
+      // The current post being displayed as a single post
+      singlePostOpen: false,
+      currentSinglePost: [],
     };
 
     this.connection = props.connection;
+  }
+
+  opensinglepost = (id) => {
+    //let post = connection.getPost(id);
+    this.setState({singlePostOpen: true, currentSinglePost: id})
+  }
+
+  closesinglepost = () => {
+    this.setState({singlePostOpen: false, currentSinglePost: []})
   }
 
   async componentDidMount() {
@@ -110,6 +128,49 @@ export default class Map extends Component {
     if (this.state.locationset == true) {
       return (
         <SafeAreaView style={styles.container}>
+
+
+
+          <Modal
+              visible={this.state.singlePostOpen}
+              animationType='slide'
+              transparent={true}
+          >
+              <View style={styles.center}>
+                  <View style={styles.modalView}>
+                      <Pressable
+                          onPress={() => {
+                              this.closesinglepost();
+                          }}
+                      >
+                          <FeatherIcon
+                              name='x-circle'
+                              style={styles.icon1}
+                          />
+                      </Pressable>
+
+                    <Text> {this.state.currentSinglePost.title} </Text>
+                    <Text> {this.state.currentSinglePost.ID} </Text>
+                    <Text> By {this.state.currentSinglePost.user} </Text>
+                    <Text> Posted in {this.state.currentSinglePost.channel} </Text>
+                    <Text> Score: {this.state.currentSinglePost.score} </Text>
+
+                    <Text> Idk what im doing </Text>
+
+                  </View>
+              </View>
+          </Modal>
+          <Pressable onPress={() => {this.props.back()}}>
+              <Ionicon
+                  name='arrow-back-circle-outline'
+                  style={styles.icon}
+              />
+          </Pressable>
+
+
+
+
+
           <MapView
             style={StyleSheet.absoluteFillObject}
             provider={MapView.PROVIDER_GOOGLE}
@@ -122,6 +183,7 @@ export default class Map extends Component {
             mapType="standard"
           >
             {this.state.MarkerArray.map((m) => {
+              //console.log(m); // for testing, prints all posts
               return (
                 <MapView.Marker
                   coordinate={{
@@ -129,6 +191,7 @@ export default class Map extends Component {
                     longitude: m.GPS.longitude,
                   }}
                   key={m.ID}
+                  onPress={() => this.opensinglepost(m)}
                 >
                   <View
                     style={{
@@ -142,7 +205,8 @@ export default class Map extends Component {
                       source={{ uri: m.photos[0] }}
                       style={{ width: 80, height: 80 }}
                     />
-                    <Text style={{ backgroundColor: "#fff" }}> {m.ID} </Text>
+                  <Text style={{ backgroundColor: "#fff", fontSize: 11 }}> {m.title} </Text>
+                  <Text style={{ backgroundColor: "#fff", fontSize: 8 }}> {m.photos.length} post(s) </Text>
                   </View>
                 </MapView.Marker>
               );
@@ -152,7 +216,13 @@ export default class Map extends Component {
       );
     } else {
       // In case the program hasnt attempted to get the user location
-      return null;
+      return (
+        <SafeAreaView>
+          <Text>
+            Loading Map...
+          </Text>
+        </SafeAreaView>
+      );
     }
   }
 }
@@ -163,5 +233,30 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     alignItems: "center",
     justifyContent: "center",
+  },
+  modalView: {
+      margin: 5,
+      backgroundColor: "white",
+      borderRadius: 20,
+      padding: 5,
+      width: "90%",
+      height: "90%",
+      shadowColor: "#000",
+      shadowOffset: {
+          width: 0,
+          height: 2,
+      },
+      shadowOpacity: 0.25,
+      shadowRadius: 4,
+      elevation: 5,
+  },
+  icon1: {
+      fontSize: 32,
+      paddingBottom: "5%",
+  },
+  center: {
+      flex: 1,
+      alignItems: "center",
+      justifyContent: "center",
   },
 });

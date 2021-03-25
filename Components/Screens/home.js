@@ -14,6 +14,7 @@ import Filter from "../API/Filter";
 import { SearchBar } from "react-native-elements";
 import { Pressable } from "react-native";
 import SearchItem from "../searchItem";
+import Profile from "../profile";
 
 export default class Home extends Component {
     constructor(props) {
@@ -25,7 +26,9 @@ export default class Home extends Component {
     state = {
         isLoading: true,
         isPost: false,
+        isProfile: false,
         singlePostID: "",
+        ProfileUser: "",
         DATA: "",
         refresh: false,
         filter: new Filter(),
@@ -71,6 +74,15 @@ export default class Home extends Component {
     handleSinglePostClose = () => {
         this.setState({ isPost: false });
         this.onRefresh();
+    };
+
+    getUser = (user) => {
+      this.setState({ ProfileUser: user });
+      this.handleProfile();
+    }
+
+    handleProfile = () => {
+        this.setState({ isProfile: !this.state.isProfile });
     };
 
     onRefresh = async () => {
@@ -174,11 +186,20 @@ export default class Home extends Component {
         if (this.state.isLoading) {
             return (
                 <View style={styles.container}>
-                    <Text>Loading</Text>
+                    <Text>Loading Home Page...</Text>
                 </View>
             );
         }
-        if (this.state.isPost) {
+        if (this.state.isProfile) {
+            return (
+                <View style={styles.container}>
+                    <Profile
+                      user={this.state.ProfileUser}
+                      back={this.handleProfile}
+                    />
+                </View>
+            );
+        } else if (this.state.isPost) {
             return (
                 <View style={styles.container}>
                     <SinglePost
@@ -186,10 +207,11 @@ export default class Home extends Component {
                         back={this.handleSinglePostClose}
                         connection={this.connection}
                         onLikeBtnPress={this.onLikeBtnPress}
+                        onProfilePress={this.getUser}
                     />
                 </View>
             );
-        } else {
+        } else  {
             return (
                 <KeyboardAvoidingView
                     style={styles.postCon}
@@ -216,6 +238,7 @@ export default class Home extends Component {
                                         type='user'
                                         item={item}
                                         connection={this.connection}
+                                        getUserH={this.getUser}
                                     />
                                 )}
                                 keyExtractor={(item) => item}
@@ -246,6 +269,7 @@ export default class Home extends Component {
                                     onpressable={this.getID}
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
+                                    onProfilePress={this.getUser}
                                 />
                             </View>
                         )}

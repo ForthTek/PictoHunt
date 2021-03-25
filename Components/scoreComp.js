@@ -18,7 +18,7 @@ const ScoreComp = (props) => {
           {props.label1}   {props.othernumber}
         </Text>
         <Text style={{fontSize: 18,}}>
-          ({props.numberdiff} {props.label2} {word} of you, {props.usernumber})
+          {props.numberdiff} {props.label2} {word} of you ({props.usernumber})
         </Text>
       </View>
 
@@ -29,11 +29,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        padding: "2%",
+        padding: "1%",
         alignItems: "center",
     },
     text: {
       paddingBottom: "5%",
-      paddingLeft: "3%",
+      paddingLeft: "5%",
     },
 });

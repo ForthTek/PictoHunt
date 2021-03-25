@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import Score from "./score";
 import Post from "./post";
 import SinglePost from "./singlePost";
-import { Text, StyleSheet, View, FlatList, Pressable } from "react-native";
+import { Text, StyleSheet, View, FlatList, Pressable, Alert } from "react-native";
 import FeatherIcon from "react-native-vector-icons/Feather";
 export default class UserModal extends Component {
     constructor(props) {
@@ -37,6 +37,10 @@ export default class UserModal extends Component {
         this.setState({ singlePost: false });
         this.onRefresh();
     };
+
+    getUser = (as) => {
+      Alert.alert("aaa");
+    }
 
     onLikeBtnPress = (type, id, updateScore) => {
         if (type === "like") {
@@ -92,38 +96,40 @@ export default class UserModal extends Component {
         }
     };
 
+
+
     render() {
         return (
             <View style={styles.bigCon}>
                 <View style={styles.container}>
-                    <Text style={styles.text}>{this.state.DATA.name}</Text>
+                  <Text style={styles.text}>{this.state.DATA.name}</Text>
+                  <Text>{this.state.DATA.description}</Text>
                     {!this.state.DATA.isFollowing && (
-                        <Pressable onPress={this.onFollow}>
-                            <FeatherIcon
-                                name={
-                                    this.state.justFollowed
-                                        ? "user-check"
-                                        : "user-plus"
-                                }
-                                style={{ fontSize: 32, paddingRight: "5%" }}
-                            />
-                        </Pressable>
-                    )}
-                    {this.state.DATA.isFollowing && (
-                        <Pressable onPress={this.onFollow}>
-                            <FeatherIcon
-                                name={
-                                    this.state.justFollowed
-                                        ? "user-x"
-                                        : "user-minus"
-                                }
-                                style={{ fontSize: 32, paddingRight: "5%" }}
-                            />
-                        </Pressable>
-                    )}
+                          <Pressable onPress={this.onFollow}>
+                              <FeatherIcon
+                                  name={
+                                      this.state.justFollowed
+                                          ? "user-check"
+                                          : "user-plus"
+                                  }
+                                  style={{ fontSize: 32, paddingRight: "5%" }}
+                              />
+                          </Pressable>
+                      )}
+                      {this.state.DATA.isFollowing && (
+                          <Pressable onPress={this.onFollow}>
+                              <FeatherIcon
+                                  name={
+                                      this.state.justFollowed
+                                          ? "user-x"
+                                          : "user-minus"
+                                  }
+                                  style={{ fontSize: 32, paddingRight: "5%" }}
+                              />
+                          </Pressable>
+                      )}
                 </View>
                 <Text>{this.state.DATA.description}</Text>
-
                 {!this.state.singlePost && (
                     <FlatList
                         style={styles.list}
@@ -135,6 +141,7 @@ export default class UserModal extends Component {
                                     onpressable={this.getID}
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
+                                    onProfilePress={this.getUser}
                                 />
                             </View>
                         )}
@@ -148,6 +155,7 @@ export default class UserModal extends Component {
                             back={this.handleSinglePostClose}
                             connection={this.connection}
                             onLikeBtnPress={this.onLikeBtnPress}
+                            onProfilePress={this.getUser}
                         />
                     </View>
                 )}
@@ -157,9 +165,9 @@ export default class UserModal extends Component {
 }
 const styles = StyleSheet.create({
     container: {
-        flexDirection: "row",
+      flexDirection: "row",
 
-        justifyContent: "space-between",
+      justifyContent: "space-between",
     },
     bigCon: {
         height: "90%",
