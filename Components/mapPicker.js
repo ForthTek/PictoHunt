@@ -38,43 +38,51 @@ export default class Map extends Component {
             MarkerChosen: false,
         };
 
-        this.connection = props.connection;
+        this.connection = this.props.connection;
     }
 
     // When the map is pressed gets the coodinates of where on the map, this is used by the <Marker> to create a merker where the user has tapped
     onMapPress(e) {
-         this.setState({
+        this.setState({
             MarkerArray: [e.nativeEvent.coordinate],
             MarkerLatitude: [e.nativeEvent.coordinate.latitude],
             MarkerLongitude: [e.nativeEvent.coordinate.longitude],
             MarkerChosen: true,
-          })
+        });
     }
 
     // The button the user presses when they want to submit, is displayed when a marker is placed
     // TODO: This should return the location data to where the post is being created instead of printing it
     // To whoever is making this work with the post creating process this is the only part you should need to edit
-    submitButton(){
-      return(
-        <Button
-          onPress={() => Alert.alert("Submitt this.state.MarkerLatitude and this.state.MarkerLongitude")}
-          title="Submit Location"
-          color="#111"
-          accessibilityLabel="Submit the indicated location."
-        />
-      );
+    submitButton() {
+        return (
+            <Button
+                onPress={() =>
+                    Alert.alert(
+                        "Submitt this.state.MarkerLatitude and this.state.MarkerLongitude"
+                    )
+                }
+                title='Submit Location'
+                color='#111'
+                accessibilityLabel='Submit the indicated location.'
+            />
+        );
     }
 
     // The button displayed before the user places a marker on the map
-    placeholderButton(){
-      return(
-        <Button
-          onPress={() => Alert.alert("Please tap to add a marker to the map before submiting.")}
-          title="Please select location"
-          color="#111"
-          accessibilityLabel="Please select location on map."
-        />
-      )
+    placeholderButton() {
+        return (
+            <Button
+                onPress={() =>
+                    Alert.alert(
+                        "Please tap to add a marker to the map before submiting."
+                    )
+                }
+                title='Please select location'
+                color='#111'
+                accessibilityLabel='Please select location on map.'
+            />
+        );
     }
 
     async componentDidMount() {
@@ -95,16 +103,25 @@ export default class Map extends Component {
             // Gets the last known location of the user
             let location = await Location.getLastKnownPositionAsync();
             // Saves it in the state varable
-           if (location == null) {Alert.alert("'user location = null' error!"); this.setState({ locationset: true });}
-           else if (location.coords == null) {Alert.alert("'user coords = null' error!"); this.setState({ locationset: true });}
-           else if (location.coords.latitude == null || location.coords.longitude == null) {Alert.alert("'user latitude or longitude = null' error!"); this.setState({ locationset: true });}
-           else{
-            this.setState({ latitude: location.coords.latitude });
-            this.setState({ longitude: location.coords.longitude });
-            this.setState({ latitudeDelta: 0.2 });
-            this.setState({ longitudeDelta: 0.2 });
-            this.setState({ locationset: true });
-           }
+            if (location == null) {
+                Alert.alert("'user location = null' error!");
+                this.setState({ locationset: true });
+            } else if (location.coords == null) {
+                Alert.alert("'user coords = null' error!");
+                this.setState({ locationset: true });
+            } else if (
+                location.coords.latitude == null ||
+                location.coords.longitude == null
+            ) {
+                Alert.alert("'user latitude or longitude = null' error!");
+                this.setState({ locationset: true });
+            } else {
+                this.setState({ latitude: location.coords.latitude });
+                this.setState({ longitude: location.coords.longitude });
+                this.setState({ latitudeDelta: 0.2 });
+                this.setState({ longitudeDelta: 0.2 });
+                this.setState({ locationset: true });
+            }
             // If an error occurs, such as the emulator not have a location set it is caught and an alert is made.
         } catch (error) {
             console.log(error);
@@ -135,21 +152,26 @@ export default class Map extends Component {
                             latitudeDelta: this.state.latitudeDelta,
                             longitudeDelta: this.state.longitudeDelta,
                         }}
-                        onPress={e => this.onMapPress(e)}
+                        onPress={(e) => this.onMapPress(e)}
                         mapType='standard'
                     >
-                    {this.state.MarkerArray.map(marker => (
-                       <Marker
-                          coordinate={marker}
-                          key="0"
-                       />
-                    ))}
+                        {this.state.MarkerArray.map((marker) => (
+                            <Marker coordinate={marker} key='0' />
+                        ))}
                     </MapView>
                     <View>
-                      <Text style={{backgroundColor: "#fff"}}> latitude: {this.state.MarkerLatitude} </Text>
-                      <Text style={{backgroundColor: "#fff"}}> longitude: {this.state.MarkerLongitude} </Text>
+                        <Text style={{ backgroundColor: "#fff" }}>
+                            {" "}
+                            latitude: {this.state.MarkerLatitude}{" "}
+                        </Text>
+                        <Text style={{ backgroundColor: "#fff" }}>
+                            {" "}
+                            longitude: {this.state.MarkerLongitude}{" "}
+                        </Text>
                     </View>
-                    {this.state.MarkerChosen ? this.submitButton() : this.placeholderButton()}
+                    {this.state.MarkerChosen
+                        ? this.submitButton()
+                        : this.placeholderButton()}
                 </SafeAreaView>
             );
         } else {
@@ -162,10 +184,9 @@ export default class Map extends Component {
 // css style stuff
 const styles = StyleSheet.create({
     container: {
-        flexDirection: 'column',
-        justifyContent: 'space-between',
+        flexDirection: "column",
+        justifyContent: "space-between",
         flex: 1,
         backgroundColor: "#fff",
-
     },
 });

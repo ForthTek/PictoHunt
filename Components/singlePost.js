@@ -13,6 +13,7 @@ import Carousel from "react-native-snap-carousel";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import LikeBtn from "./likeBtn";
+
 export default class SinglePost extends Component {
     constructor(props) {
         super(props);
@@ -29,16 +30,16 @@ export default class SinglePost extends Component {
             isLiked: this.props.item.liked,
             isDisliked: this.props.item.disliked,
         };
-        this.connection = props.connection;
+        this.connection = this.props.connection;
     }
     handleBack = () => {
         this.props.back();
     };
 
     getuserprofile = () => {
-      let val = this.props.item.user;
-      this.props.onProfilePress(val);
-    }
+        let val = this.props.item.user;
+        this.props.onProfilePress(val);
+    };
 
     _renderItem({ item, index }) {
         return (
@@ -72,6 +73,13 @@ export default class SinglePost extends Component {
         );
     };
 
+    handleReport = () => {
+        this.connection.reportPost(this.state.postID).then(
+            () => Alert.alert("Post Reported"),
+            (error) => Alert.alert(error.message)
+        );
+    };
+
     render() {
         const renderComments = ({ item }) => (
             <View style={{ maxHeight: 50 }}>
@@ -96,7 +104,7 @@ export default class SinglePost extends Component {
                             style={styles.icon}
                         />
                     </Pressable>
-                    <Pressable onPress={this.handleBack}>
+                    <Pressable onPress={this.handleReport}>
                         <FeatherIcon name='flag' style={styles.icon} />
                     </Pressable>
                 </View>
@@ -134,9 +142,9 @@ export default class SinglePost extends Component {
                                     {this.state.title}
                                 </Text>
                                 <Pressable onPress={this.getuserprofile}>
-                                  <Text style={styles.postName}>
-                                    {this.state.user}
-                                  </Text>
+                                    <Text style={styles.postName}>
+                                        {this.state.user}
+                                    </Text>
                                 </Pressable>
                             </View>
                             <View style={{ flexDirection: "row" }}>
