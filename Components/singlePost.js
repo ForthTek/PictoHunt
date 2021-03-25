@@ -13,7 +13,7 @@ import Carousel from "react-native-snap-carousel";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import LikeBtn from "./likeBtn";
-import { Alert } from "react-native";
+
 export default class SinglePost extends Component {
     constructor(props) {
         super(props);
@@ -37,9 +37,9 @@ export default class SinglePost extends Component {
     };
 
     getuserprofile = () => {
-      let val = this.props.item.user;
-      this.props.onProfilePress(val);
-    }
+        let val = this.props.item.user;
+        this.props.onProfilePress(val);
+    };
 
     _renderItem({ item, index }) {
         return (
@@ -142,9 +142,9 @@ export default class SinglePost extends Component {
                                     {this.state.title}
                                 </Text>
                                 <Pressable onPress={this.getuserprofile}>
-                                  <Text style={styles.postName}>
-                                    {this.state.user}
-                                  </Text>
+                                    <Text style={styles.postName}>
+                                        {this.state.user}
+                                    </Text>
                                 </Pressable>
                             </View>
                             <View style={{ flexDirection: "row" }}>
