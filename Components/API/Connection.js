@@ -375,17 +375,21 @@ export default class Connection {
     return await this.#firebase.deleteChallengeRequest(challengeID);
   };
 
+  /**
+   *
+   * @param {boolean} completed
+   * @returns
+   */
   getChallenges = async (completed = false) => {
     return await this.#firebase.getChallenges(completed);
   };
 
-
-/**
- * 
- * @param {string} postID 
- * @returns 
- */
-  reportPost = (postID) => {
+  /**
+   *
+   * @param {string} postID
+   * @returns
+   */
+  reportPost = async (postID) => {
     return await this.#server.reportPost(postID);
-  }
+  };
 }
