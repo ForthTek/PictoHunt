@@ -61,6 +61,20 @@ export default class Server {
     });
   }
 
+  async userCreated(username) {
+    return await fetch(`${ADDRESS}/api/userCreated/${username}`).then(
+      async (res) => {
+        if (res.status >= SERVER_ERROR) {
+          const status = await res.text();
+          console.log("Server error:");
+          console.log(status);
+        } else {
+          return true;
+        }
+      }
+    );
+  }
+
   async isAdmin(IDToken) {}
 
   async containsSwears(sentence) {
