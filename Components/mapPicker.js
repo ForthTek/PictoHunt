@@ -10,7 +10,6 @@ import {
     Button,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
-import Geolocation from "react-native-geolocation-service";
 import * as Location from "expo-location";
 import * as Permissions from "expo-permissions";
 import Geocoder from "react-native-geocoding";
@@ -96,11 +95,16 @@ export default class Map extends Component {
             // Gets the last known location of the user
             let location = await Location.getLastKnownPositionAsync();
             // Saves it in the state varable
+           if (location == null) {Alert.alert("'user location = null' error!"); this.setState({ locationset: true });}
+           else if (location.coords == null) {Alert.alert("'user coords = null' error!"); this.setState({ locationset: true });}
+           else if (location.coords.latitude == null || location.coords.longitude == null) {Alert.alert("'user latitude or longitude = null' error!"); this.setState({ locationset: true });}
+           else{
             this.setState({ latitude: location.coords.latitude });
             this.setState({ longitude: location.coords.longitude });
             this.setState({ latitudeDelta: 0.2 });
             this.setState({ longitudeDelta: 0.2 });
             this.setState({ locationset: true });
+           }
             // If an error occurs, such as the emulator not have a location set it is caught and an alert is made.
         } catch (error) {
             console.log(error);

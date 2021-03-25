@@ -29,13 +29,13 @@ export default class UploadScreen extends Component {
     onChangeTitle = (value) => {
         this.setState({ title: value });
     };
-    onChangeChannel = (value) => {
+    onChangeChannel = async (value) => {
         this.setState({ channel: value });
+        console.log(await this.connection.searchChannels(value));
     };
 
     newImage = (value) => {
         this.setState({ image: value });
-        // console.log(this.state.image.base64);
         this.setState({ getImage: false });
     };
 
@@ -51,10 +51,12 @@ export default class UploadScreen extends Component {
             .createPost(this.state.title, this.state.channel, null, null, [blob])
             .then(
                 (key) => {
-                    console.log(key);
+                    // Maybe go to single post view now?
+                    //console.log(key);
                 },
                 (error) => {
-                    console.log(error.message);
+                    console.log(error);
+                    Alert.alert(error.message);
                 }
             );
     };

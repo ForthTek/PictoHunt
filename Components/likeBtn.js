@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Text, StyleSheet, View, Pressable } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import Ionicon from "react-native-vector-icons/Ionicons";
 
 export default class LikeBtn extends Component {
@@ -13,7 +13,12 @@ export default class LikeBtn extends Component {
             <View>
                 <Pressable
                     style={styles.container}
-                    onPress={() => this.props.onLikeBtnPress(this.props.type)}
+                    onPress={() =>
+                        this.props.onLikeBtnPress(
+                            this.props.type,
+                            this.props.postID
+                        )
+                    }
                 >
                     <Ionicon name={this.props.icon} style={styles.icon} />
                 </Pressable>

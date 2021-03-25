@@ -1,30 +1,30 @@
+import ChallengeTask from "./ChallengeTask.js";
 import Connection from "./Connection.js";
 import Filter from "./Filter.js";
+import Server from "./Server.js";
 
 const TEST_EMAIL = "forthtek1@gmail.com";
 const TEST_USERNAME = "Test";
 const TEST_PASSWORD = "password";
-
 const TEST_CHANNEL = "Test";
 
-const TEST_POST = "PSIFLk7xHyKpK50HqTdh";
+
+/*
+
+Tests Index
+1.0: Guest Tests
+2.0: User Tests
+3.0: Channel Tests
+4.0: Challenge Tests
+5.0: Unit Tests
+
+*/
 
 // Create the connection at the start
 const connection = new Connection();
 
-beforeAll(async () => {
-  try {
-    // Ensure the account already exists
-    await connection.createProfile(
-      TEST_EMAIL,
-      TEST_USERNAME,
-      TEST_PASSWORD,
-      false
-    );
-  } catch (error) {}
-
-  // Then log out
-  await connection.logout();
+afterAll(() => {
+  connection.close();
 });
 
 // Tests when the user is a guest
@@ -61,72 +61,132 @@ describe("1.0 guest tests", () => {
   });
 });
 
-// Tests when the user is authenticated
-describe("2.0 auth tests", () => {
+
+describe("2.0 signed in tests", () => {
   beforeAll(async () => {
-    await connection.login(TEST_EMAIL, TEST_PASSWORD);
-  });
+    try {
+      await connection.createProfile(
+        TEST_EMAIL,
+        TEST_USERNAME,
+        TEST_PASSWORD,
+        false
+      );
+    } catch (error) {}
 
-  test("2.1 auth login", async () => {
-    await connection.logout();
-    let x = await connection.login(TEST_EMAIL, TEST_PASSWORD);
-    // If this test fails, the test account could be locked/suspended
-    expect(x).toBe(true);
-  });
-
-  test("2.2 auth isLoggedIn", async () => {
-    expect(connection.isLoggedIn()).toBe(true);
-  });
-
-  test("2.3 auth currentUser", async () => {
-    let x = connection.currentUser();
-    expect(x.email).toBe(TEST_EMAIL);
-    expect(x.username).toBe(TEST_USERNAME);
-  });
-
-  test("2.4 auth getBrowse", async () => {
-    let x = await connection.getBrowse(new Filter());
-    expect(x.length).toBeGreaterThan(0);
-  });
-
-  // Dont test this as we cant upload images from here
-  // test("auth createPost", async () => {
-  //   await connection.login(TEST_EMAIL, TEST_PASSWORD);
-  //   let postID = await connection.createPost(
-  //     "my new post",
-  //     "TestChannel",
-  //     null,
-  //     ["TestTag"],
-  //     []
-  //   );
-  //   console.log(`uploaded new post ${postID}`);
-  //   //expect(x.length).toBeGreaterThan(0);
-  // });
-
-  test("2.5 auth test channel", async () => {
     try {
       await connection.createChannel(TEST_CHANNEL, "just a test channel");
     } catch (error) {}
 
-    let channel = await connection.getChannel(TEST_CHANNEL);
-    //console.log(channel)
+    await connection.login(TEST_EMAIL, TEST_PASSWORD);
   });
 
-  test("2.6 auth like", async () => {
-    let x = await connection.likePost(TEST_POST);
-    // Like, dislike and remove interaction
+  describe("2.1 account tests", () => {
+    test("currentUser", async () => {
+      let x = connection.currentUser();
+      expect(x.email).toBe(TEST_EMAIL);
+      expect(x.username).toBe(TEST_USERNAME);
+    });
+
+    test("2.2 login", async () => {
+      await connection.logout();
+      await connection.login(TEST_EMAIL, TEST_PASSWORD);
+      // If this test fails, the test account could be locked/suspended
+    });
+
+    describe("2.3 profile tests", () => {
+      test("getProfile", async () => {
+        let user = await connection.getProfile(TEST_USERNAME);
+        //console.log(user);
+      });
+
+      // test("likePost", async () => {
+      //   let x = await connection.likePost(TEST_POST);
+      //   // Like, dislike and remove interaction
+      // });
+
+      test("2.4 followUser", async () => {
+        await connection.followUser(TEST_USERNAME, true);
+      });
+
+      test("2.5 followChannel", async () => {
+        await connection.followChannel(TEST_CHANNEL, true);
+      });
+    });
+
+    describe("3.0 channel tests", () => {
+      test("getChannel", async () => {
+        let channel = await connection.getChannel(TEST_CHANNEL);
+        //console.log(channel);
+      });
+    });
+
+    describe("3.1 browse tests", () => {
+      beforeEach(async () => {
+        await connection.login(TEST_EMAIL, TEST_PASSWORD);
+      });
+
+      test("3.2 getGetAllPosts", async () => {
+        let x = await connection.getAllPosts();
+        //console.log(x.length);
+      });
+
+      test("3.3 getBrowse", async () => {
+        let x = await connection.getBrowse();
+        //console.log(x.length);
+      });
+    });
+
+    describe("3.4 map tests", () => {
+      test("getMap", async () => {
+        let x = await connection.getMap();
+        //console.log(x.length);
+      });
+    });
+
+    describe("4.0 challenge tests", () => {
+      // test.only("createChallenge", async () => {
+      //   let x = await connection.createChallenge(
+      //     "photograph two dogs",
+      //     new Date("2021-04-17T03:24:00"),
+      //     100,
+      //     [new ChallengeTask("picture of a pug", "Test"), new ChallengeTask("cute golden pls", "Test2", 1, 2)]
+      //   );
+      // });
+
+      const c = "UXlZhJc8sQGub94WGpiR";
+      // test.only("inviteUsersToChallenge", async () => {
+      //   let x = await connection.inviteUsersToChallenge(c, ["Test"]);
+      // });
+
+      // test.only("deleteChallengeRequest", async () => {
+      //   let x = await connection.deleteChallenge(c);
+      // });
+
+      // test.only("getChallenges", async () => {
+      //   let x = await connection.getChallenges(false);
+      //   console.log(x);
+      //   for (let i = 0; i < x[0].tasks.length; i++) {
+      //     console.log(x[0].tasks[i]);
+      //   }
+      // });
+    });
+  });
+});
+
+let server = new Server();
+describe("5.0 signed in tests", () => {
+  describe("5.1 filter tests", () => {
+    test("SwearString", async () => {
+      var swear = "shit"
+      let x = await server.containsSwears(swear);
+      expect(x).toBe(true)
+    });
+
+    test("NoSwearString", async () => {
+      var noSwear = "test string"
+      let x = await server.containsSwears(noSwear);
+      expect(x).toBe(false)
+    });
   });
 
-  test("2.7 auth followUser", async () => {
-    await connection.followUser(TEST_USERNAME, true);
-  });
-
-  test("2.8 auth followChannel", async () => {
-    await connection.followChannel(TEST_CHANNEL, true);
-  });
-
-  test("2.9 auth logout", async () => {
-    let x = await connection.logout();
-    expect(x).toBe(true);
-  });
 });

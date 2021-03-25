@@ -47,6 +47,18 @@ export default class SinglePost extends Component {
         );
     }
 
+    updateScore = (id) => {
+        this.connection.getPost(id).then(
+            (res) => {
+                this.setState({ score: res.score });
+                console.log(res.score);
+            },
+            (error) => {
+                Alert.alert(error.message);
+            }
+        );
+    };
+
     render() {
         const renderComments = ({ item }) => (
             <View style={{ maxHeight: 50 }}>
@@ -108,6 +120,13 @@ export default class SinglePost extends Component {
                                     title='Like'
                                     type='like'
                                     postID={this.state.postID}
+                                    onLikeBtnPress={(type, id) => {
+                                        this.props.onLikeBtnPress(
+                                            type,
+                                            id,
+                                            this.updateScore
+                                        );
+                                    }}
                                     connection={this.connection}
                                 />
                                 <Text
@@ -120,6 +139,13 @@ export default class SinglePost extends Component {
                                     title='Dis-Like'
                                     type='dislike'
                                     postID={this.state.postID}
+                                    onLikeBtnPress={(type, id) => {
+                                        this.props.onLikeBtnPress(
+                                            type,
+                                            id,
+                                            this.updateScore
+                                        );
+                                    }}
                                     connection={this.connection}
                                 />
                             </View>

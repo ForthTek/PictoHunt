@@ -1,169 +1,296 @@
 import React, { Component } from "react";
 import {
     Text,
-    View,
-    SafeAreaView,
     StyleSheet,
-    Button,
+    View,
+    FlatList,
     Alert,
+    KeyboardAvoidingView,
 } from "react-native";
-import Image from "react-native-scalable-image";
-import Score from "../score";
-import SettingBtn from "../settingBtn";
+import Post from "../post";
+import SinglePost from "../singlePost";
+import FilterBtn from "../filterBtn";
+import Filter from "../API/Filter";
+import { SearchBar } from "react-native-elements";
+import { Pressable } from "react-native";
+import SearchItem from "../searchItem";
 
-class Home extends Component {
+export default class Home extends Component {
     constructor(props) {
         super(props);
-        // console.log(props.route);
         this.connection = props.connection;
     }
 
-    // Home page
-
+    // Homepage
     state = {
         isLoading: true,
+        isPost: false,
+        singlePostID: "",
         DATA: "",
-        user: null,
-    };
-
-    onSignOutPress = () => {
-        this.connection.logout();
+        refresh: false,
+        filter: new Filter(),
+        searching: false,
+        search: "",
+        channelDATA: "",
+        userDATA: "",
     };
 
     componentDidMount() {
-        this.connection.getOurProfile().then(
-            (res) => {
-                this.setState({ user: res, isLoading: false });
-                console.log(res);
+        // update filter using:
+        // filter.orderBy = Filter.ORDER_BY_SCORE or filter.orderBy = Filter.ORDER_BY_TIME
+        // Probs want to keep direction desc
+        // filter.followedUsers = true and filter.followedChannels = true
+        this.state.filter.orderBy = Filter.ORDER_BY_TIME;
+        this.state.filter.followedChannels = false;
+        this.state.filter.followedUsers = false;
+
+        this.connection.getBrowse(this.state.filter).then(
+            (posts) => {
+                this.setState({ DATA: posts });
+                this.setState({ isLoading: false });
             },
             (error) => {
-                console.log(error)
                 Alert.alert(error.message);
             }
         );
     }
 
+    getID = (id) => {
+        let i = 0;
+        for (; i < this.state.DATA.length; i++) {
+            if (id == this.state.DATA[i].ID) {
+                this.setState({ singlePostID: i });
+            }
+        }
+        this.handleSinglePost();
+    };
+
+    handleSinglePost = () => {
+        this.setState({ isPost: !this.state.isPost });
+    };
+
+    onRefresh = async () => {
+        this.setState({ refresh: true, DATA: "" });
+        await this.connection.getBrowse(this.state.filter).then(
+            (res) => {
+                this.setState({ DATA: res });
+                this.setState({ refresh: false });
+            },
+            (error) => {
+                Alert.alert(error.message);
+                this.setState({ refresh: false });
+            }
+        );
+    };
+
+    onLikeBtnPress = (type, id, updateScore) => {
+        if (type === "like") {
+            this.connection.likePost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
+        if (type === "dislike") {
+            this.connection
+                .dislikePost(id)
+                .then(
+                    () => {
+                        updateScore(id);
+                    },
+                    (error) => {
+                        Alert.alert(error.message);
+                    }
+                )
+                .catch((error) => {
+                    Alert.alert(error.message);
+                });
+        }
+        if (type === "remove") {
+            this.connection.removeInteractionFromPost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
+    };
+
+    updateFilter = (
+        byTime,
+        byScore,
+        usersFollowed,
+        channelsFollowed,
+        anyChanged
+    ) => {
+        //console.log(byTime, byScore, usersFollowed, channelsFollowed);
+        this.state.filter.followedChannels = channelsFollowed;
+        this.state.filter.followedUsers = usersFollowed;
+        if (byTime) {
+            this.state.filter.orderBy = Filter.ORDER_BY_TIME;
+        }
+        if (byScore) {
+            this.state.filter.orderBy = Filter.ORDER_BY_SCORE;
+        }
+        if (anyChanged) {
+            this.onRefresh();
+        }
+    };
+
+    onChangeSearch = (search) => {
+        this.setState({
+            search: search,
+            searching: true,
+        });
+        if (search == "") {
+            this.setState({ searching: false });
+        }
+
+        this.search(search);
+    };
+
+    search = async (search) => {
+        // User Promise.all to send multiple request at the same time
+        const result = await Promise.all([
+            this.connection.searchUsers(search),
+            this.connection.searchChannels(search),
+        ]);
+        this.setState({
+            userDATA: result[0],
+            channelDATA: result[1],
+        });
+    };
+
     render() {
         if (this.state.isLoading) {
             return (
-                <View style={styles.container1}>
+                <View style={styles.container}>
                     <Text>Loading</Text>
-                    <Button
-                        title='Sign out'
-                        onPress={this.onSignOutPress}
-                        style={{ fontSize: 18, paddingTop: "5%", color: "red" }}
-                    ></Button>
+                </View>
+            );
+        }
+        if (this.state.isPost) {
+            return (
+                <View style={styles.container}>
+                    <SinglePost
+                        item={this.state.DATA[this.state.singlePostID]}
+                        back={this.handleSinglePost}
+                        connection={this.connection}
+                        onLikeBtnPress={this.onLikeBtnPress}
+                    />
                 </View>
             );
         } else {
             return (
-                <SafeAreaView style={styles.container}>
-                    <View style={{ flexDirection: "row", padding: "5%" }}>
-                        <Image
-                            source={require("../../assets/pfp-placeholder.png")}
-                            width={160}
+                <KeyboardAvoidingView
+                    style={styles.postCon}
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                >
+                    <View style={styles.container1}>
+                        <SearchBar
+                            containerStyle={styles.searchCon}
+                            inputContainerStyle={styles.inputContainerStyle}
+                            value={this.state.search}
+                            onChangeText={(text) => this.onChangeSearch(text)}
+                            placeholder='Search...'
+                            round
                         />
-                        <View
-                            style={{
-                                flexDirection: "column",
-                                paddingLeft: "3%",
-                            }}
-                        >
-                            <Text style={styles.username}>
-                                {this.state.user.username}
+                        <FilterBtn updateFilter={this.updateFilter} />
+                    </View>
+                    {this.state.searching && this.state.search != "" && (
+                        <View style={styles.dropDown}>
+                            <Text style={styles.ddText}>------Users------</Text>
+                            <FlatList
+                                data={this.state.userDATA}
+                                renderItem={({ item }) => (
+                                    <SearchItem
+                                        type='user'
+                                        item={item}
+                                        connection={this.connection}
+                                    />
+                                )}
+                                keyExtractor={(item) => item}
+                            />
+                            <Text style={styles.ddText}>
+                                ------Channels------
                             </Text>
-                            <Text style={styles.info}>
-                                Joined: {this.state.user.timestamp.toString()}
-                            </Text>
+                            <FlatList
+                                data={this.state.channelDATA}
+                                renderItem={({ item }) => (
+                                    <SearchItem
+                                        type='channel'
+                                        item={item}
+                                        connection={this.connection}
+                                    />
+                                )}
+                                keyExtractor={(item) => item}
+                            />
                         </View>
-                    </View>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            paddingBottom: "5%",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <Score label='Score' number={this.state.user.score} />
-                        <Score label='Pics' number={this.state.user.posts.length} />
-                        <Score label='Rank' number={5} />
-                    </View>
-                    <View style={styles.container}>
-                        <SettingBtn
-                            label='Achievements/ Challenges'
-                            icon='trophy-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Your Profile'
-                            icon='person-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Following'
-                            icon='people-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Leader Board'
-                            icon='bar-chart-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Settings'
-                            icon='settings-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Log Out'
-                            icon='log-out-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                    </View>
-                </SafeAreaView>
+                    )}
+                    <FlatList
+                        data={this.state.DATA}
+                        extraData={this.state.didRefresh}
+                        renderItem={({ item }) => (
+                            <View style={styles.post}>
+                                <Post
+                                    item={item}
+                                    onpressable={this.getID}
+                                    connection={this.connection}
+                                    onLikeBtnPress={this.onLikeBtnPress}
+                                />
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.ID.toString()}
+                        onRefresh={this.onRefresh}
+                        refreshing={this.state.refresh}
+                    />
+                </KeyboardAvoidingView>
             );
         }
     }
 }
-export default Home;
-
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        padding: "1%",
-    },
-    username: {
-        fontSize: 22,
-        paddingBottom: "10%",
-        maxWidth: 200,
-    },
-    info: {
-        fontSize: 18,
-        paddingBottom: "5%",
-    },
-    loadCon: {
         flex: 1,
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "center",
     },
     container1: {
+        flexDirection: "row",
+        backgroundColor: "white",
+    },
+    postCon: {
         flex: 1,
         backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
+    },
+    post: {
+        borderColor: "grey",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+    },
+    searchCon: {
+        width: "85%",
+        backgroundColor: "white",
+        borderTopWidth: 0,
+        borderBottomWidth: 0,
+    },
+    inputContainerStyle: {
+        height: "5%",
+        paddingBottom: "1%",
+    },
+    dropDown: {
+        backgroundColor: "#383d42",
+        paddingBottom: "2%",
+    },
+    ddText: {
+        fontSize: 20,
+        paddingLeft: "2%",
+        color: "white",
     },
 });
