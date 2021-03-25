@@ -29,11 +29,11 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: "#fff",
-        padding: "0%",
+        padding: "1%",
         alignItems: "center",
     },
     text: {
       paddingBottom: "5%",
-      paddingLeft: "0%",
+      paddingLeft: "5%",
     },
 });
