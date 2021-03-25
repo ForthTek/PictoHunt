@@ -17,7 +17,7 @@ import Geocoder from "react-native-geocoding";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import SinglePost from "../singlePost";
-import connection from "../API/Connection";
+import Connection from "../API/Connection";
 
 // NOTE: internal commentary dosn't have spell check, sorry
 
@@ -149,10 +149,13 @@ export default class Map extends Component {
                           />
                       </Pressable>
 
+                    <Text> {this.state.currentSinglePost.title} </Text>
+                    <Text> {this.state.currentSinglePost.ID} </Text>
+                    <Text> By {this.state.currentSinglePost.user} </Text>
+                    <Text> Posted in {this.state.currentSinglePost.channel} </Text>
+                    <Text> Score: {this.state.currentSinglePost.score} </Text>
 
-
-                    <Text> Display singPost selected here somehow idk </Text>
-                    <Text> Post ID: {this.state.currentSinglePost} </Text>
+                    <Text> Idk what im doing </Text>
 
                   </View>
               </View>
@@ -188,7 +191,7 @@ export default class Map extends Component {
                     longitude: m.GPS.longitude,
                   }}
                   key={m.ID}
-                  onPress={() => this.opensinglepost(m.ID)}
+                  onPress={() => this.opensinglepost(m)}
                 >
                   <View
                     style={{
@@ -203,8 +206,7 @@ export default class Map extends Component {
                       style={{ width: 80, height: 80 }}
                     />
                   <Text style={{ backgroundColor: "#fff", fontSize: 11 }}> {m.title} </Text>
-                  <Text style={{ backgroundColor: "#fff", fontSize: 8 }}> By {m.user} in {m.channel} </Text>
-                  <Text style={{ backgroundColor: "#fff", fontSize: 8 }}> Score: {m.score} </Text>
+                  <Text style={{ backgroundColor: "#fff", fontSize: 8 }}> {m.photos.length} post(s) </Text>
                   </View>
                 </MapView.Marker>
               );
