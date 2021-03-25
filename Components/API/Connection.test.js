@@ -8,7 +8,6 @@ const TEST_USERNAME = "Test";
 const TEST_PASSWORD = "password";
 const TEST_CHANNEL = "Test";
 
-
 /*
 
 Tests Index
@@ -55,12 +54,12 @@ describe("1.0 guest tests", () => {
 
   test("1.3 guest getBrowse", async () => {
     // A guest user viewing browse should see all posts
-    const numberOfAllPosts = (await connection.getAllPosts(new Filter())).length;
+    const numberOfAllPosts = (await connection.getAllPosts(new Filter()))
+      .length;
     const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
     expect(numberOfBrowse).toBe(numberOfAllPosts);
   });
 });
-
 
 describe("2.0 signed in tests", () => {
   beforeAll(async () => {
@@ -170,6 +169,13 @@ describe("2.0 signed in tests", () => {
         // }
       });
     });
+
+    describe("5.0 admin tests", () => {
+      test.only("getReportedPosts", async () => {
+        let x = await connection.getAllReportedPosts();
+        //console.log(x.length);
+      });
+    });
   });
 });
 
@@ -177,16 +183,15 @@ let server = new Server();
 describe("5.0 signed in tests", () => {
   describe("5.1 filter tests", () => {
     test("SwearString", async () => {
-      var swear = "shit"
+      var swear = "shit";
       let x = await server.containsSwears(swear);
-      expect(x).toBe(true)
+      expect(x).toBe(true);
     });
 
     test("NoSwearString", async () => {
-      var noSwear = "test string"
+      var noSwear = "test string";
       let x = await server.containsSwears(noSwear);
-      expect(x).toBe(false)
+      expect(x).toBe(false);
     });
   });
-
 });

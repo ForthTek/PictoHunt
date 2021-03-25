@@ -42,6 +42,10 @@ export default class Connection {
     return this.#firebase.currentUser();
   };
 
+  isAdmin = () => {
+    this.auth.currentUser.getIdToken();
+  };
+
   /**
    *
    * @param {string} email
@@ -375,7 +379,13 @@ export default class Connection {
     return await this.#firebase.getChallenges(completed);
   };
 
-  getAllReportedPosts = async () => {
-    return await this.#firebase.getAllReportedPosts();
-  };
+
+/**
+ * 
+ * @param {string} postID 
+ * @returns 
+ */
+  reportPost = (postID) => {
+    return await this.#server.reportPost(postID);
+  }
 }
