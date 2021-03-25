@@ -61,6 +61,8 @@ export default class Server {
     });
   }
 
+  async isAdmin(IDToken) {}
+
   async containsSwears(sentence) {
     return await fetch(`${ADDRESS}/api/isValidString/${sentence}`).then(
       async (res) => {

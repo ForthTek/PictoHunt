@@ -6,10 +6,18 @@ import Server from "./Server.js";
 export default class Connection {
   #firebase;
   #server;
+  #isAdmin;
 
   constructor() {
     this.#firebase = new Firebase();
     this.#server = new Server();
+    this.#isAdmin = false;
+
+    this.addLoginStateListener(async () => {
+      this.#isAdmin = await this.#server.isAdmin(
+        this.#firebase.auth.currentUser.getIdToken()
+      );
+    });
   }
 
   /**
@@ -42,8 +50,12 @@ export default class Connection {
     return this.#firebase.currentUser();
   };
 
+  /**
+   *
+   * @returns
+   */
   isAdmin = () => {
-    this.auth.currentUser.getIdToken();
+    return this.#isAdmin;
   };
 
   /**
