@@ -839,6 +839,8 @@ export default class Firebase {
     const username = this.currentUser().username;
     const refInvited = this.database.collection(`Users/${username}/Challenges`);
 
+    const now = firebase.firestore.Timestamp.now();
+
     let all = await refInvited
       .where("completed", "==", completed)
       .get()
@@ -856,35 +858,44 @@ export default class Firebase {
       const ref = await this.database.doc(`Challenges/${all[i].ID}`).get();
       const data = ref.data();
 
-      let tasks = [];
-      for (let j = 0; j < data.tasks.length; j++) {
-        task = data.tasks[j];
+      if (now > data.deadline) {
+        console.log(
+          `Deadline for challenge has expired. Removing it from the user's challenges`
+        );
+        await this.database
+          .doc(`Users/${username}/Challenges/${all[i].ID}`)
+          .delete();
+      } else {
+        let tasks = [];
+        for (let j = 0; j < data.tasks.length; j++) {
+          task = data.tasks[j];
 
-        let lat = null;
-        let long = null;
-        if (task.GPS) {
-          lat = task.GPS.latitude;
-          long = task.GPS.longitude;
+          let lat = null;
+          let long = null;
+          if (task.GPS) {
+            lat = task.GPS.latitude;
+            long = task.GPS.longitude;
+          }
+
+          tasks.push({
+            description: task.description,
+            channel: task.channel.id,
+            latitude: lat,
+            longitude: long,
+            radius: task.radius,
+            completed: all[i].completed[j],
+          });
         }
 
-        tasks.push({
-          description: task.description,
-          channel: task.channel.id,
-          latitude: lat,
-          longitude: long,
-          radius: task.radius,
-          completed: all[i].completed[j],
-        });
+        challenges[i] = {
+          ID: all[i].ID,
+          description: data.description,
+          deadline: data.deadline.toDate(),
+          score: data.score,
+          tasks: tasks,
+          completed: completed,
+        };
       }
-
-      challenges[i] = {
-        ID: all[i].ID,
-        description: data.description,
-        deadline: data.deadline.toDate(),
-        score: data.score,
-        tasks: tasks,
-        completed: completed,
-      };
     }
 
     return challenges;
