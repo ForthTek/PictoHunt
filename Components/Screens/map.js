@@ -46,8 +46,7 @@ export default class Map extends Component {
 
   opensinglepost = (id) => {
     //let post = connection.getPost(id);
-    let post = "aaaaaaa";
-    this.setState({singlePostOpen: true, currentSinglePost: post})
+    this.setState({singlePostOpen: true, currentSinglePost: id})
   }
 
   closesinglepost = () => {
@@ -153,6 +152,7 @@ export default class Map extends Component {
 
 
                     <Text> Display singPost selected here somehow idk </Text>
+                    <Text> Post ID: {this.state.currentSinglePost} </Text>
 
                   </View>
               </View>
