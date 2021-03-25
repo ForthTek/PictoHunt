@@ -57,11 +57,12 @@ export default class Map extends Component {
     submitButton() {
         return (
             <Button
-                onPress={() =>
-                    Alert.alert(
-                        "Submitt this.state.MarkerLatitude and this.state.MarkerLongitude"
-                    )
-                }
+                onPress={() => {
+                    this.props.onSubmit(
+                        this.state.MarkerLatitude,
+                        this.state.MarkerLongitude
+                    );
+                }}
                 title='Submit Location'
                 color='#111'
                 accessibilityLabel='Submit the indicated location.'
