@@ -129,7 +129,7 @@ export default class challenges extends Component {
             .createChallenge(
                 this.state.modalDesc,
                 this.state.date,
-                this.state.scoreBonus,
+                50,
                 this.state.tasks
             )
             .then((res) => {
@@ -192,15 +192,7 @@ export default class challenges extends Component {
                                     </Pressable>
                                 </View>
                                 <Text style={styles.text}>New Challenge</Text>
-                                <Input
-                                    placeholder='Description'
-                                    onChangeText={(value) =>
-                                        this.setState({ modalDesc: value })
-                                    }
-                                    label='Challenge Description:'
-                                    labelStyle={{ color: "black" }}
-                                    containerStyle={{ paddingTop: "2%" }}
-                                />
+
                                 <View style={styles.container1}>
                                     <Pressable onPress={this.openDatePicker}>
                                         <Text style={styles.pickText}>
@@ -222,30 +214,15 @@ export default class challenges extends Component {
                                         .toString()
                                         .substring(4, 16)}
                                 </Text>
-                                <Text>Score Bonus Upon Completion:</Text>
-
-                                <NumericInput
-                                    value={this.state.scoreBonus}
-                                    onChange={(value) =>
-                                        this.setState({ scoreBonus: value })
+                                <Input
+                                    placeholder='Description'
+                                    onChangeText={(value) =>
+                                        this.setState({ modalDesc: value })
                                     }
-                                    onLimitReached={(isMax, msg) =>
-                                        console.log(isMax, msg)
-                                    }
-                                    totalWidth={240}
-                                    totalHeight={50}
-                                    minValue={1}
-                                    maxValue={100}
-                                    iconSize={25}
-                                    step={1}
-                                    valueType='real'
-                                    rounded
-                                    textColor='black'
-                                    iconStyle={{ color: "white" }}
-                                    rightButtonBackgroundColor='#EA3788'
-                                    leftButtonBackgroundColor='#E56B70'
+                                    label='Challenge Description:'
+                                    labelStyle={{ color: "black" }}
+                                    containerStyle={{ paddingTop: "2%" }}
                                 />
-
                                 <Text style={styles.text1}>
                                     Added Tasks: {this.state.tasks.length}
                                 </Text>
