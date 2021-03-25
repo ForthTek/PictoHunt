@@ -162,13 +162,13 @@ describe("2.0 signed in tests", () => {
       //   let x = await connection.deleteChallenge(c);
       // });
 
-      // test.only("getChallenges", async () => {
-      //   let x = await connection.getChallenges(false);
-      //   console.log(x);
-      //   for (let i = 0; i < x[0].tasks.length; i++) {
-      //     console.log(x[0].tasks[i]);
-      //   }
-      // });
+      test.only("getChallenges", async () => {
+        let x = await connection.getChallenges(false);
+        console.log(x);
+        // for (let i = 0; i < x[0].tasks.length; i++) {
+        //   console.log(x[0].tasks[i]);
+        // }
+      });
     });
   });
 });
