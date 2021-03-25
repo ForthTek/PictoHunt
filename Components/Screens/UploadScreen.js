@@ -12,6 +12,8 @@ import {
 } from "react-native";
 import Upload from "../upload";
 import Ionicon from "react-native-vector-icons/Ionicons";
+import FeatherIcon from "react-native-vector-icons/Feather";
+
 import MapPicker from "../mapPicker";
 import { Modal } from "react-native";
 export default class UploadScreen extends Component {
@@ -27,6 +29,8 @@ export default class UploadScreen extends Component {
         image: null,
         res: null,
         modalVisible: false,
+        lat: null,
+        long: null,
     };
 
     onChangeTitle = (value) => {
@@ -47,13 +51,18 @@ export default class UploadScreen extends Component {
     };
 
     callConnection = async () => {
+        Alert.alert("Post Submitted");
         const res = await fetch(this.state.image.uri);
         const blob = await res.blob();
 
         this.connection
-            .createPost(this.state.title, this.state.channel, null, null, [
-                blob,
-            ])
+            .createPost(
+                this.state.title,
+                this.state.channel,
+                this.state.lat,
+                this.state.long,
+                [blob]
+            )
             .then(
                 (key) => {
                     // Maybe go to single post view now?
@@ -64,6 +73,10 @@ export default class UploadScreen extends Component {
                     Alert.alert(error.message);
                 }
             );
+    };
+
+    handleSubmit = (lat, long) => {
+        this.setState({ lat: lat[0], long: long[0], modalVisible: false });
     };
 
     render() {
@@ -118,12 +131,38 @@ export default class UploadScreen extends Component {
                                 placeholder='Channel'
                             />
                         </View>
+                        <View style={{ paddingLeft: "2%" }}>
+                            <Pressable
+                                onPress={() => {
+                                    this.setState({ modalVisible: true });
+                                    console.log("modal");
+                                }}
+                            >
+                                <View
+                                    style={{
+                                        width: "50%",
+                                        alignItems: "center",
+                                        flexDirection: "row",
+                                    }}
+                                >
+                                    <Text style={styles.text}>
+                                        Add a location
+                                    </Text>
+                                    <Ionicon
+                                        name='add-circle-outline'
+                                        style={styles.icon1}
+                                    />
+                                </View>
+                            </Pressable>
+
+                            <Text style={styles.text}>
+                                lat: {this.state.lat}
+                            </Text>
+                            <Text style={styles.text}>
+                                long: {this.state.long}
+                            </Text>
+                        </View>
                     </View>
-                    <Pressable
-                        onPress={() => this.setState({ modalVisible: true })}
-                    >
-                        <Text>Add a location</Text>
-                    </Pressable>
                     <Modal
                         visible={this.state.modalVisible}
                         animationType='slide'
@@ -131,7 +170,18 @@ export default class UploadScreen extends Component {
                     >
                         <View style={styles.center}>
                             <View style={styles.modalView}>
-                                <MapPicker />
+                                <Pressable
+                                    onPress={() => {
+                                        this.setState({ modalVisible: false });
+                                        console.log("modal");
+                                    }}
+                                >
+                                    <FeatherIcon
+                                        name='x-circle'
+                                        style={styles.icon}
+                                    />
+                                </Pressable>
+                                <MapPicker onSubmit={this.handleSubmit} />
                             </View>
                         </View>
                     </Modal>
@@ -187,5 +237,32 @@ const styles = StyleSheet.create({
         fontSize: 32,
         paddingLeft: "2%",
         paddingBottom: "2%",
+    },
+    center: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    modalView: {
+        margin: 20,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 35,
+        width: "90%",
+        height: "90%",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    icon1: {
+        fontSize: 24,
+    },
+    text: {
+        fontSize: 20,
     },
 });
