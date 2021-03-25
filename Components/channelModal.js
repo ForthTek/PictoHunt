@@ -31,7 +31,11 @@ export default class UserModal extends Component {
     };
 
     handleSinglePost = () => {
-        this.setState({ singlePost: !this.state.singlePost });
+        this.setState({ singlePost: true });
+    };
+    handleSinglePostClose = () => {
+        this.setState({ singlePost: false });
+        this.onRefresh();
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
@@ -141,7 +145,7 @@ export default class UserModal extends Component {
                     <View style={styles.singleView}>
                         <SinglePost
                             item={this.state.postDATA[this.state.singlePostID]}
-                            back={this.handleSinglePost}
+                            back={this.handleSinglePostClose}
                             connection={this.connection}
                             onLikeBtnPress={this.onLikeBtnPress}
                         />

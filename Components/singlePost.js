@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import Ionicon from "react-native-vector-icons/Ionicons";
+import FeatherIcon from "react-native-vector-icons/Feather";
 import LikeBtn from "./likeBtn";
 export default class SinglePost extends Component {
     constructor(props) {
@@ -24,6 +25,8 @@ export default class SinglePost extends Component {
             comments: this.props.item.comments,
             score: this.props.item.score,
             postID: this.props.item.ID,
+            isLiked: this.props.item.liked,
+            isDisliked: this.props.item.disliked,
         };
         this.connection = props.connection;
     }
@@ -50,8 +53,12 @@ export default class SinglePost extends Component {
     updateScore = (id) => {
         this.connection.getPost(id).then(
             (res) => {
-                this.setState({ score: res.score });
-                console.log(res.score);
+                this.setState({
+                    score: res.score,
+                    isLiked: res.liked,
+                    isDisliked: res.disliked,
+                });
+                //console.log(res.score);
             },
             (error) => {
                 Alert.alert(error.message);
@@ -71,12 +78,22 @@ export default class SinglePost extends Component {
 
         return (
             <SafeAreaView style={styles.container}>
-                <Pressable onPress={this.handleBack}>
-                    <Ionicon
-                        name='arrow-back-circle-outline'
-                        style={styles.icon}
-                    />
-                </Pressable>
+                <View
+                    style={{
+                        flexDirection: "row",
+                        justifyContent: "space-between",
+                    }}
+                >
+                    <Pressable onPress={this.handleBack}>
+                        <Ionicon
+                            name='arrow-back-circle-outline'
+                            style={styles.icon}
+                        />
+                    </Pressable>
+                    <Pressable onPress={this.handleBack}>
+                        <FeatherIcon name='flag' style={styles.icon} />
+                    </Pressable>
+                </View>
                 <SafeAreaView
                     style={{
                         flex: 1,
@@ -116,35 +133,59 @@ export default class SinglePost extends Component {
                             </View>
                             <View style={{ flexDirection: "row" }}>
                                 <LikeBtn
-                                    icon='heart-outline'
+                                    icon={
+                                        this.state.isLiked
+                                            ? "heart"
+                                            : "heart-outline"
+                                    }
                                     title='Like'
                                     type='like'
                                     postID={this.state.postID}
                                     onLikeBtnPress={(type, id) => {
-                                        this.props.onLikeBtnPress(
-                                            type,
-                                            id,
-                                            this.updateScore
-                                        );
+                                        if (this.state.isLiked) {
+                                            this.props.onLikeBtnPress(
+                                                "remove",
+                                                id,
+                                                this.updateScore
+                                            );
+                                        } else {
+                                            this.props.onLikeBtnPress(
+                                                type,
+                                                id,
+                                                this.updateScore
+                                            );
+                                        }
                                     }}
                                     connection={this.connection}
                                 />
                                 <Text
-                                    style={{ fontSize: 22, paddingRight: "1%" }}
+                                    style={{ fontSize: 22, paddingRight: "2%" }}
                                 >
                                     {this.state.score}
                                 </Text>
                                 <LikeBtn
-                                    icon='heart-dislike-outline'
+                                    icon={
+                                        this.state.isDisliked
+                                            ? "heart-dislike"
+                                            : "heart-dislike-outline"
+                                    }
                                     title='Dis-Like'
                                     type='dislike'
                                     postID={this.state.postID}
                                     onLikeBtnPress={(type, id) => {
-                                        this.props.onLikeBtnPress(
-                                            type,
-                                            id,
-                                            this.updateScore
-                                        );
+                                        if (this.state.isDisliked) {
+                                            this.props.onLikeBtnPress(
+                                                "remove",
+                                                id,
+                                                this.updateScore
+                                            );
+                                        } else {
+                                            this.props.onLikeBtnPress(
+                                                type,
+                                                id,
+                                                this.updateScore
+                                            );
+                                        }
                                     }}
                                     connection={this.connection}
                                 />
