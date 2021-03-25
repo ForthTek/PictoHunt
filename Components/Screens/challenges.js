@@ -18,7 +18,7 @@ import FeatherIcon from "react-native-vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import ChallengeTask from "../API/ChallengeTask";
 import NewTask from "../newTask";
-import NumericInput from "react-native-numeric-input";
+
 import SearchUser from "../searchUsers";
 export default class challenges extends Component {
     constructor(props) {
