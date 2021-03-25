@@ -14,7 +14,7 @@ class Post extends Component {
             postID: this.props.item.ID,
             type: "",
             isLiked: this.props.item.liked,
-            isDisliked: this.props.item.disliked
+            isDisliked: this.props.item.disliked,
         };
     }
 
