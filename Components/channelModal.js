@@ -2,7 +2,8 @@ import React, { Component } from "react";
 import Score from "./score";
 import Post from "./post";
 import SinglePost from "./singlePost";
-import { Text, StyleSheet, View, FlatList, Alert } from "react-native";
+import { Text, StyleSheet, View, FlatList, Pressable, Alert } from "react-native";
+import FeatherIcon from "react-native-vector-icons/Feather";
 export default class UserModal extends Component {
     constructor(props) {
         super(props);
@@ -15,6 +16,8 @@ export default class UserModal extends Component {
 
         singlePost: false,
         singlePostID: "",
+
+        justFollowed: false,
     };
 
     getID = (id) => {
@@ -73,14 +76,55 @@ export default class UserModal extends Component {
         }
     };
 
+    onFollow = () => {
+        if (this.state.DATA.isFollowing) {
+            this.connection
+                .followChannel(this.state.DATA.name, false)
+                .then(() => {
+                    this.setState({ justFollowed: true });
+                });
+        } else {
+            this.connection
+                .followChannel(this.state.DATA.name, true)
+                .then(() => {
+                    this.setState({ justFollowed: true });
+                });
+        }
+    };
+
 
 
     render() {
         return (
             <View style={styles.bigCon}>
-                <Text style={styles.text}>{this.state.DATA.name}</Text>
-                <Text>{this.state.DATA.description}</Text>
-
+                <View style={styles.container}>
+                  <Text style={styles.text}>{this.state.DATA.name}</Text>
+                  <Text>{this.state.DATA.description}</Text>
+                    {!this.state.DATA.isFollowing && (
+                          <Pressable onPress={this.onFollow}>
+                              <FeatherIcon
+                                  name={
+                                      this.state.justFollowed
+                                          ? "user-check"
+                                          : "user-plus"
+                                  }
+                                  style={{ fontSize: 32, paddingRight: "5%" }}
+                              />
+                          </Pressable>
+                      )}
+                      {this.state.DATA.isFollowing && (
+                          <Pressable onPress={this.onFollow}>
+                              <FeatherIcon
+                                  name={
+                                      this.state.justFollowed
+                                          ? "user-x"
+                                          : "user-minus"
+                                  }
+                                  style={{ fontSize: 32, paddingRight: "5%" }}
+                              />
+                          </Pressable>
+                      )}
+                </View>
                 {!this.state.singlePost && (
                     <FlatList
                         style={styles.list}
@@ -116,10 +160,9 @@ export default class UserModal extends Component {
 }
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        backgroundColor: "#fff",
-        alignItems: "center",
-        justifyContent: "center",
+      flexDirection: "row",
+
+      justifyContent: "space-between",
     },
     bigCon: {
         height: "90%",

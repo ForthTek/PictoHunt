@@ -13,6 +13,8 @@ class Post extends Component {
             score: this.props.item.score,
             postID: this.props.item.ID,
             type: "",
+            isLiked: this.props.item.liked,
+            isDisliked: this.props.item.disliked
         };
     }
 
@@ -24,8 +26,11 @@ class Post extends Component {
     updateScore = (id) => {
         this.connection.getPost(id).then(
             (res) => {
-                this.setState({ score: res.score });
-                //console.log(res.score);
+              this.setState({
+                 score: res.score,
+                 isLiked: res.liked,
+                 isDisliked: res.disliked,
+             });
             },
             (error) => {
                 Alert.alert(error.message);
@@ -60,16 +65,26 @@ class Post extends Component {
                     </Pressable>
                     <View style={styles.likeCon}>
                         <LikeBtn
-                            icon='heart-outline'
+                            icon={
+                                this.state.isLiked ? "heart" : "heart-outline"
+                            }
                             title='Like'
                             type='like'
                             postID={this.state.postID}
                             onLikeBtnPress={(type, id) => {
+                                if (this.state.isLiked) {
+                                     this.props.onLikeBtnPress(
+                                         "remove",
+                                         id,
+                                         this.updateScore
+                                     );
+                                 } else {
                                 this.props.onLikeBtnPress(
                                     type,
                                     id,
                                     this.updateScore
                                 );
+                              }
                             }}
                             connection={this.connection}
                         />
@@ -77,16 +92,28 @@ class Post extends Component {
                             {this.state.score}
                         </Text>
                         <LikeBtn
-                            icon='heart-dislike-outline'
+                            icon={
+                               this.state.isDisliked
+                                   ? "heart-dislike"
+                                   : "heart-dislike-outline"
+                           }
                             title='Dis-Like'
                             type='dislike'
                             postID={this.state.postID}
                             onLikeBtnPress={(type, id) => {
+                                if (this.state.isDisliked) {
+                                    this.props.onLikeBtnPress(
+                                        "remove",
+                                        id,
+                                        this.updateScore
+                                    );
+                                } else {
                                 this.props.onLikeBtnPress(
                                     type,
                                     id,
                                     this.updateScore
                                 );
+                              }
                             }}
                             connection={this.connection}
                         />
