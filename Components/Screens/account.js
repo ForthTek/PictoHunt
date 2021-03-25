@@ -34,7 +34,7 @@ class Account extends Component {
         this.connection.getOurProfile().then(
             (res) => {
                 this.setState({ user: res, isLoading: false });
-                console.log(res);
+                //console.log(res);
             },
             (error) => {
                 console.log(error);

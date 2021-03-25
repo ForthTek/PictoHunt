@@ -44,10 +44,7 @@ export default class Nav extends Component {
                             }}
                         >
                             {(props) => (
-                                <Home
-                                    {...props}
-                                    connection={this.connection}
-                                />
+                                <Home {...props} connection={this.connection} />
                             )}
                         </bButton.Screen>
 
@@ -125,10 +122,12 @@ export default class Nav extends Component {
                             }}
                         >
                             {(props) => (
-                                <Account {...props} connection={this.connection} />
+                                <Account
+                                    {...props}
+                                    connection={this.connection}
+                                />
                             )}
                         </bButton.Screen>
-
                     </bButton.Navigator>
                 </NavigationContainer>
             </SafeAreaView>

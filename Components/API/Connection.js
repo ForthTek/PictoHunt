@@ -362,6 +362,15 @@ export default class Connection {
     await Promise.all(promises);
   };
 
+  /**
+   *
+   * @param {string} challengeID
+   * @returns
+   */
+  deleteChallenge = async (challengeID) => {
+    return await this.#firebase.deleteChallengeRequest(challengeID);
+  };
+
   getChallenges = async (completed = false) => {
     return await this.#firebase.getChallenges(completed);
   };

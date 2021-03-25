@@ -33,6 +33,7 @@ export default class Home extends Component {
         refresh: false,
         filter: new Filter(),
         searching: false,
+        search: "",
         channelDATA: "",
         userDATA: "",
     };
@@ -286,10 +287,7 @@ const styles = StyleSheet.create({
     },
     container1: {
         flexDirection: "row",
-        backgroundColor: "#383d42",
-        borderColor: "black",
-        borderTopWidth: 1,
-        borderBottomWidth: 1,
+        backgroundColor: "white",
     },
     postCon: {
         flex: 1,
@@ -302,9 +300,9 @@ const styles = StyleSheet.create({
     },
     searchCon: {
         width: "85%",
-        borderColor: "black",
-        borderTopWidth: 0.2,
-        borderBottomWidth: 0.1,
+        backgroundColor: "white",
+        borderTopWidth: 0,
+        borderBottomWidth: 0,
     },
     inputContainerStyle: {
         height: "5%",

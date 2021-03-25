@@ -70,7 +70,7 @@ export default class Map extends Component {
 
       // Gets the last known location of the user
       let location = await Location.getLastKnownPositionAsync();
-      console.log({ location });
+      //console.log({ location });
       // Saves it in the state varable
       if (location == null) {
         Alert.alert("'user location = null' error!");
