@@ -114,7 +114,8 @@ export default class Connection {
       .interactWithPost(postID, this.#firebase.PostInteractionType.like)
       .then(
         async () => {
-          return await this.#server.updatePostValues(postID);
+          await this.#server.updatePostValues(postID);
+          return true;
         },
         (error) => {
           console.log(error);
@@ -136,7 +137,8 @@ export default class Connection {
       .interactWithPost(postID, this.#firebase.PostInteractionType.dislike)
       .then(
         async () => {
-          return await this.#server.updatePostValues(postID);
+          await this.#server.updatePostValues(postID);
+          return true;
         },
         (error) => {
           console.log(error);
@@ -158,7 +160,8 @@ export default class Connection {
       .interactWithPost(postID, this.#firebase.PostInteractionType.remove)
       .then(
         async () => {
-          return await this.#server.updatePostValues(postID);
+          await this.#server.updatePostValues(postID);
+          return true;
         },
         (error) => {
           console.log(error);
@@ -275,9 +278,8 @@ export default class Connection {
       .createPost(newTitle, channelName, latitude, longitude, photos)
       .then(async (newKey) => {
         // Get the server to approve the post
-        await this.#server.approvePost(newKey);
-        // Then update the number of likes etc
-        //await this.#server.updatePostValues(newKey);
+        let message = await this.#server.approvePost(newKey);
+        console.log(message);
         return newKey;
       });
   };
@@ -401,6 +403,7 @@ export default class Connection {
    * @returns
    */
   reportPost = async (postID) => {
-    return await this.#server.reportPost(postID);
+    await this.#server.reportPost(postID);
+    return true;
   };
 }
