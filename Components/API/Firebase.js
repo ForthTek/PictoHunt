@@ -186,6 +186,7 @@ export default class Firebase {
         const userData = {
           email: email,
           public: isPublic,
+          challengeScore: 0,
           timestamp: firebase.firestore.Timestamp.now(),
           // Add username as string just for searching
           search: username.toUpperCase(),
@@ -526,6 +527,7 @@ export default class Firebase {
       email: data.email,
       timestamp: data.timestamp.toDate(),
       score: score,
+      challengeScore: data.challengeScore,
       isFollowing: isFollowing,
       posts: posts,
     };
