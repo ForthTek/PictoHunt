@@ -13,11 +13,13 @@ export default class Connection {
     this.#server = new Server();
     this.#isAdmin = false;
 
-    // this.addLoginStateListener(async () => {
-    //   this.#isAdmin = await this.#server.isAdmin(
-    //     this.#firebase.auth.currentUser.getIdToken()
-    //   );
-    // });
+    this.addLoginStateListener(async () => {
+      if (this.#firebase.auth.currentUser) {
+        this.#isAdmin = await this.#server.isAdmin(
+          this.#firebase.auth.currentUser.getIdToken()
+        );
+      }
+    });
   }
 
   /**

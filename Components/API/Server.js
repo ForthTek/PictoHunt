@@ -1,4 +1,4 @@
-import "isomorphic-fetch";
+//import "isomorphic-fetch";
 
 const ADDRESS = "https://pictohunt-server.herokuapp.com";
 const SERVER_ERROR = 400;
@@ -74,7 +74,32 @@ export default class Server {
     );
   }
 
-  async isAdmin(IDToken) {}
+  async isAdmin(IDToken) {
+    console.log(`checking if user is admin`);
+
+    // return await fetch(`${ADDRESS}/api/isAdmin`, {
+    //   method: "POST",
+    //   body: {
+    //     token: IDToken,
+    //   },
+    // })
+    //   .then(async (res) => {
+    //     console.log(res.body);
+
+    //     if (res.status >= SERVER_ERROR) {
+    //       const status = await res.text();
+    //       console.log("Server error:");
+    //       console.log(status);
+    //     } else {
+    //       //console.log(res.body);
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+
+    return false;
+  }
 
   async containsSwears(sentence) {
     return await fetch(`${ADDRESS}/api/isValidString/${sentence}`).then(
