@@ -173,35 +173,37 @@ describe("2.0 signed in tests", () => {
       });
     });
 
-    // describe("5.0 admin tests", () => {
-    //   test("getReportedPosts", async () => {
-    //     let x = await connection.getAllReportedPosts();
-    //     console.log(x.length);
-    //   });
-
-    //   test.only("isAdmin", async () => {
-    //     expect(await connection.isAdmin()).toBe(true);
-    //   });
-    // });
-  });
-});
-
-let server = new Server();
-describe("5.0 signed in tests", () => {
-  describe("5.1 filter tests", () => {
-    test("SwearString", async () => {
-      var swear = "shit";
-      let x = await server.containsSwears(swear);
-      expect(x).toBe(true);
-    });
-
-    test("NoSwearString", async () => {
-      var noSwear = "test string";
-      let x = await server.containsSwears(noSwear);
-      expect(x).toBe(false);
+    describe("5.0 admin tests", () => {
+      // test.only("getReportedPosts", async () => {
+      //   let x = await connection.getAllReportedPosts();
+      //   console.log(x.length);
+      // });
+      // test.only("isAdmin", async () => {
+      //   expect(await connection.isAdmin()).toBe(true);
+      // });
+      // test.only("getSummaryReport", async () => {
+      //   console.log(await connection.getSummeryReport());
+      // });
     });
   });
 });
+
+// let server = new Server();
+// describe("5.0 signed in tests", () => {
+//   describe("5.1 filter tests", () => {
+//     test("SwearString", async () => {
+//       var swear = "shit";
+//       let x = await server.containsSwears(swear);
+//       expect(x).toBe(true);
+//     });
+
+//     test("NoSwearString", async () => {
+//       var noSwear = "test string";
+//       let x = await server.containsSwears(noSwear);
+//       expect(x).toBe(false);
+//     });
+//   });
+// });
 
 // test.only("create sample data", async () => {
 //   try {

@@ -108,11 +108,11 @@ export default class Map extends Component {
         this.setState({ MarkerArray: response });
       })
       .catch((error) => {
+        console.log(error);
         Alert.alert(
           "Error loading pictures!",
           "Could not load the markers from the server."
         );
-        console.log("Error loading pictures!");
       });
   }
 
