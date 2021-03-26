@@ -66,21 +66,6 @@ export default class UserModal extends Component {
     };
     handleSinglePostClose = () => {
         this.setState({ singlePost: false });
-        this.onRefresh();
-    };
-
-    onRefresh = async () => {
-        this.setState({ refresh: true, postDATA: "" });
-        await this.connection.getBrowse(this.state.filter).then(
-            (res) => {
-                this.setState({ postDATA: res });
-                this.setState({ refresh: false });
-            },
-            (error) => {
-                Alert.alert(error.message);
-                this.setState({ refresh: false });
-            }
-        );
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
@@ -192,8 +177,6 @@ export default class UserModal extends Component {
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}
-                        onRefresh={this.onRefresh}
-                        refreshing={this.state.refresh}
                     />
                 )}
                 {this.state.singlePost && (

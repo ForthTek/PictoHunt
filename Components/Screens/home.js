@@ -12,7 +12,6 @@ import SinglePost from "../singlePost";
 import FilterBtn from "../filterBtn";
 import Filter from "../API/Filter";
 import { SearchBar } from "react-native-elements";
-import { Pressable } from "react-native";
 import SearchItem from "../searchItem";
 import Profile from "../profile";
 
@@ -26,9 +25,9 @@ export default class Home extends Component {
     state = {
         isLoading: true,
         isPost: false,
-        isProfile: false,
+
         singlePostID: "",
-        ProfileUser: "",
+
         DATA: "",
         refresh: false,
         filter: new Filter(),
@@ -74,10 +73,6 @@ export default class Home extends Component {
     handleSinglePostClose = () => {
         this.setState({ isPost: false });
         this.onRefresh();
-    };
-
-    handleProfile = () => {
-        this.setState({ isProfile: !this.state.isProfile });
     };
 
     onRefresh = async () => {
@@ -185,16 +180,7 @@ export default class Home extends Component {
                 </View>
             );
         }
-        if (this.state.isProfile) {
-            return (
-                <View style={styles.container}>
-                    <Profile
-                        user={this.state.ProfileUser}
-                        back={this.handleProfile}
-                    />
-                </View>
-            );
-        } else if (this.state.isPost) {
+        if (this.state.isPost) {
             return (
                 <View style={styles.container}>
                     <SinglePost
@@ -254,7 +240,6 @@ export default class Home extends Component {
                     )}
                     <FlatList
                         data={this.state.DATA}
-                        extraData={this.state.didRefresh}
                         renderItem={({ item }) => (
                             <View style={styles.post}>
                                 <Post
@@ -262,7 +247,6 @@ export default class Home extends Component {
                                     onpressable={this.getID}
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
-                                    onProfilePress={this.getUser}
                                 />
                             </View>
                         )}

@@ -3,19 +3,21 @@ import {
     View,
     StyleSheet,
     SafeAreaView,
-    TextInput,
     Image,
     Text,
     Button,
     Pressable,
     Alert,
+    FlatList,
 } from "react-native";
 import Upload from "../upload";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
+import { SearchBar, Input } from "react-native-elements";
 
 import MapPicker from "../mapPicker";
 import { Modal } from "react-native";
+import { KeyboardAvoidingView } from "react-native";
 export default class UploadScreen extends Component {
     constructor(props) {
         super(props);
@@ -31,14 +33,19 @@ export default class UploadScreen extends Component {
         modalVisible: false,
         lat: [],
         long: [],
+        search: "",
+        searching: false,
+        channelDATA: [],
     };
 
     onChangeTitle = (value) => {
         this.setState({ title: value });
     };
-    onChangeChannel = async (value) => {
+    onChangeChannel = (value) => {
         this.setState({ channel: value });
-        console.log(await this.connection.searchChannels(value));
+        this.connection
+            .searchChannels(value)
+            .then((res) => this.setState({ search: res }));
     };
 
     newImage = (value) => {
@@ -50,8 +57,32 @@ export default class UploadScreen extends Component {
         this.setState({ image: null, getImage: true });
     };
 
+    onChangeSearch = (search) => {
+        this.setState({
+            search: search,
+            searching: true,
+        });
+        if (search == "") {
+            this.setState({ searching: false });
+        }
+
+        this.search(search);
+    };
+
+    search = async (search) => {
+        // User Promise.all to send multiple request at the same time
+        this.connection.searchChannels(search).then((res) => {
+            this.setState({
+                channelDATA: res,
+            });
+        });
+    };
+
+    addChannel = (name) => {
+        this.setState({ channel: name });
+    };
+
     callConnection = async () => {
-        Alert.alert("Post Submitted");
         const res = await fetch(this.state.image.uri);
         const blob = await res.blob();
 
@@ -69,6 +100,7 @@ export default class UploadScreen extends Component {
                     //console.log(key);
                     this.setState({ lat: [], long: [] });
                     this.handleBack();
+                    Alert.alert("Post Submitted");
                 },
                 (error) => {
                     console.log(error);
@@ -94,7 +126,10 @@ export default class UploadScreen extends Component {
             );
         } else {
             return (
-                <SafeAreaView style={styles.container}>
+                <KeyboardAvoidingView
+                    behavior={Platform.OS === "ios" ? "padding" : "height"}
+                    style={styles.container}
+                >
                     <Pressable onPress={this.handleBack}>
                         <Ionicon
                             name='arrow-back-circle-outline'
@@ -110,30 +145,78 @@ export default class UploadScreen extends Component {
                     </View>
                     <View style={styles.allInputContainer}>
                         <View style={styles.textInputs}>
-                            <Text style={{ fontSize: 20 }}>Title:</Text>
+                            <Text style={{ fontSize: 20, paddingTop: "2%" }}>
+                                Title:
+                            </Text>
 
-                            <TextInput
-                                style={styles.input}
+                            <Input
+                                containerStyle={styles.input}
                                 onChangeText={(value) =>
                                     this.onChangeTitle(value)
                                 }
-                                value={this.state.text}
+                                value={this.state.title}
                                 placeholder='Post Title'
                             />
                         </View>
-                        <View style={styles.textInputs}>
-                            <Text style={{ fontSize: 20 }}>Channels:</Text>
-
-                            <TextInput
-                                style={styles.input}
-                                onChangeText={(value) =>
-                                    this.onChangeChannel(value)
-                                }
-                                value={this.state.text}
-                                placeholder='Channel'
-                            />
+                        <View
+                            style={{ flexDirection: "row", paddingLeft: "1%" }}
+                        >
+                            <Text style={{ fontSize: 20 }}>Channel:</Text>
+                            <Text style={styles.text}>
+                                {this.state.channel}
+                            </Text>
                         </View>
-                        <View style={{ paddingLeft: "2%" }}>
+                        <View style={styles.textInputs}>
+                            <Text style={{ fontSize: 20, paddingTop: "2%" }}>
+                                Channels:
+                            </Text>
+                            <View style={styles.searchBox}>
+                                <SearchBar
+                                    containerStyle={styles.searchCon}
+                                    inputContainerStyle={
+                                        styles.inputContainerStyle
+                                    }
+                                    value={this.state.search}
+                                    onChangeText={(text) =>
+                                        this.onChangeSearch(text)
+                                    }
+                                    placeholder='Search...'
+                                    round
+                                />
+                                {this.state.searching &&
+                                    this.state.search != "" && (
+                                        <View style={styles.dropDown}>
+                                            <Text style={styles.ddText}>
+                                                ------Channels------
+                                            </Text>
+                                            <FlatList
+                                                data={this.state.channelDATA}
+                                                renderItem={({ item }) => (
+                                                    <View>
+                                                        <Pressable
+                                                            onPress={() =>
+                                                                this.addChannel(
+                                                                    item
+                                                                )
+                                                            }
+                                                        >
+                                                            <Text
+                                                                style={
+                                                                    styles.ddText
+                                                                }
+                                                            >
+                                                                {item}
+                                                            </Text>
+                                                        </Pressable>
+                                                    </View>
+                                                )}
+                                                keyExtractor={(item) => item}
+                                            />
+                                        </View>
+                                    )}
+                            </View>
+                        </View>
+                        <View style={{ paddingLeft: "1%" }}>
                             <Pressable
                                 onPress={() => {
                                     this.setState({ modalVisible: true });
@@ -147,7 +230,7 @@ export default class UploadScreen extends Component {
                                         flexDirection: "row",
                                     }}
                                 >
-                                    <Text style={styles.text}>
+                                    <Text style={{ fontSize: 20 }}>
                                         Add a location
                                     </Text>
                                     <Ionicon
@@ -157,10 +240,10 @@ export default class UploadScreen extends Component {
                                 </View>
                             </Pressable>
 
-                            <Text style={styles.text}>
+                            <Text style={{ fontSize: 20 }}>
                                 lat: {this.state.lat}
                             </Text>
-                            <Text style={styles.text}>
+                            <Text style={{ fontSize: 20 }}>
                                 long: {this.state.long}
                             </Text>
                         </View>
@@ -196,7 +279,7 @@ export default class UploadScreen extends Component {
                             }}
                         />
                     </View>
-                </SafeAreaView>
+                </KeyboardAvoidingView>
             );
         }
     }
@@ -220,15 +303,12 @@ const styles = StyleSheet.create({
         flexDirection: "row",
         padding: "1%",
         justifyContent: "space-between",
-        alignItems: "center",
+        alignItems: "flex-start",
     },
     input: {
         height: 45,
-        borderColor: "gray",
-        borderWidth: 1,
         width: "70%",
         fontSize: 20,
-        color: "gray",
     },
     button: {
         maxWidth: "20%",
@@ -263,8 +343,32 @@ const styles = StyleSheet.create({
     },
     icon1: {
         fontSize: 24,
+        paddingLeft: "2%",
     },
     text: {
         fontSize: 20,
+        paddingLeft: "10%",
+    },
+    searchCon: {
+        backgroundColor: "white",
+        borderTopWidth: 0,
+        borderBottomWidth: 0,
+        paddingBottom: "12%",
+    },
+    inputContainerStyle: {
+        height: "5%",
+    },
+    dropDown: {
+        backgroundColor: "#383d42",
+        paddingBottom: "2%",
+    },
+    ddText: {
+        fontSize: 20,
+        paddingLeft: "2%",
+        color: "white",
+    },
+    searchBox: {
+        width: "70%",
+        paddingBottom: "5%",
     },
 });

@@ -6,10 +6,12 @@ import {
     StyleSheet,
     Button,
     Alert,
+    FlatList,
 } from "react-native";
 import Image from "react-native-scalable-image";
 import Score from "../score";
 import SettingBtn from "../settingBtn";
+import Post from "../post";
 
 class Account extends Component {
     constructor(props) {
@@ -24,6 +26,7 @@ class Account extends Component {
         isLoading: true,
         DATA: "",
         user: null,
+        postDATA: [],
     };
 
     onSignOutPress = () => {
@@ -33,7 +36,11 @@ class Account extends Component {
     componentDidMount() {
         this.connection.getOurProfile().then(
             (res) => {
-                this.setState({ user: res, isLoading: false });
+                this.setState({
+                    user: res,
+                    isLoading: false,
+                    postDATA: res.posts,
+                });
                 //console.log(res);
             },
             (error) => {
@@ -58,69 +65,31 @@ class Account extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.container}>
-                  <View style={{ flexDirection: "row", padding: "5%" }}>
-                      <Image
-                          source={require('../../assets/pfp-placeholder.png')}
-                          width={160}
-                      />
-                      <View style={{ flexDirection: "column", paddingLeft: "3%" }}>
-                          <Text style={styles.username}>{this.state.user.username}</Text>
-                          <Text style={styles.info}>Joined:</Text>
-                          <Text style={styles.info}>{this.state.user.timestamp.toString().substring(4, 15)}</Text>
-                          <Text style={styles.info}>Located:</Text>
-                          <Text style={styles.info}>[TODO]</Text>
-                      </View>
-                  </View>
-                    <View
-                        style={{
-                            flexDirection: "row",
-                            paddingBottom: "5%",
-                            justifyContent: "space-between",
-                        }}
-                    >
-                        <Score label='Score' number={this.state.user.score} />
-                        <Score
-                            label='Pics'
-                            number={this.state.user.posts.length}
+                    <View style={{ flexDirection: "row", paddingLeft: "5%" }}>
+                        <Image
+                            source={require("../../assets/pfp-placeholder.png")}
+                            width={160}
                         />
-                      <Score label='Rank' number={"[TODO]"}/>
+                        <View
+                            style={{
+                                flexDirection: "column",
+                                paddingLeft: "3%",
+                            }}
+                        >
+                            <Text style={styles.username}>
+                                {this.state.user.username}
+                            </Text>
+                            <Text style={styles.info}>Joined:</Text>
+                            <Text style={styles.info}>
+                                {this.state.user.timestamp
+                                    .toString()
+                                    .substring(4, 15)}
+                            </Text>
+                            <Text style={styles.info}>Located:</Text>
+                            <Text style={styles.info}>[TODO]</Text>
+                        </View>
                     </View>
                     <View style={styles.container}>
-                        <SettingBtn
-                            label='Achievements/ Challenges'
-                            icon='trophy-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Your Profile'
-                            icon='person-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Following'
-                            icon='people-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Leader Board'
-                            icon='bar-chart-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                        <SettingBtn
-                            label='Settings'
-                            icon='settings-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
                         <SettingBtn
                             label='Log Out'
                             icon='log-out-outline'
@@ -129,6 +98,43 @@ class Account extends Component {
                             }}
                         />
                     </View>
+                    <View
+                        style={{
+                            flexDirection: "row",
+                            paddingBottom: "2%",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <Score label='Score' number={this.state.user.score} />
+                        <Score
+                            label='Pics'
+                            number={this.state.user.posts.length}
+                        />
+                        <Score
+                            label='Challenge'
+                            number={this.state.user.challengeScore}
+                        />
+                    </View>
+
+                    <FlatList
+                        style={styles.list}
+                        data={this.state.postDATA}
+                        renderItem={({ item }) => (
+                            <View style={styles.post}>
+                                <Post
+                                    item={item}
+                                    onpressable={() => {
+                                        console.log("nothing happens");
+                                    }}
+                                    connection={this.connection}
+                                    onLikeBtnPress={this.onLikeBtnPress}
+                                />
+                            </View>
+                        )}
+                        keyExtractor={(item) => item.ID.toString()}
+                        onRefresh={this.onRefresh}
+                        refreshing={this.state.refresh}
+                    />
                 </SafeAreaView>
             );
         }
@@ -143,13 +149,12 @@ const styles = StyleSheet.create({
         padding: "1%",
     },
     username: {
-      fontSize: 22,
-      paddingBottom: "10%",
-      maxWidth: 200,
+        fontSize: 22,
+        maxWidth: 200,
     },
     info: {
-      fontSize: 18,
-      paddingBottom: "5%",
+        fontSize: 18,
+        paddingBottom: "5%",
     },
     loadCon: {
         flex: 1,
@@ -162,5 +167,9 @@ const styles = StyleSheet.create({
         backgroundColor: "#fff",
         alignItems: "center",
         justifyContent: "center",
+    },
+    list: {
+        height: "45%",
+        paddingTop: "5%",
     },
 });
