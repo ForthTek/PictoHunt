@@ -1,6 +1,5 @@
 import React, { Component } from "react";
-import { Modal } from "react-native";
-import { Text, StyleSheet, View, Image, Pressable, Alert } from "react-native";
+import { Text, StyleSheet, View, Pressable, Alert } from "react-native";
 import LikeBtn from "./likeBtn";
 import CachedImage from "react-native-expo-cached-image";
 

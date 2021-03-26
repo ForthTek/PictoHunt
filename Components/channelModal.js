@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import Score from "./score";
 import Post from "./post";
 import SinglePost from "./singlePost";
 import {

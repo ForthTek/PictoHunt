@@ -53,11 +53,11 @@ export default class Connection {
   /**
    *
    * @param {string} postID
-   * @param {boolean} public
+   * @param {boolean} value
    * @returns
    */
-  setPostPublic = async (postID, public) => {
-    return await this.#firebase.setPostPublic(postID, public);
+  setPostPublic = async (postID, value) => {
+    return await this.#firebase.setPostPublic(postID, value);
   };
 
   /**

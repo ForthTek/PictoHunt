@@ -2,9 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import * as geofire from "geofire-common";
-
 import Upload from "./Upload.js";
-
 import Filter from "./Filter.js";
 import ChallengeTask from "./ChallengeTask.js";
 

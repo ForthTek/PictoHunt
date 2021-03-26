@@ -173,16 +173,16 @@ describe("2.0 signed in tests", () => {
       });
     });
 
-    describe("5.0 admin tests", () => {
-      test("getReportedPosts", async () => {
-        let x = await connection.getAllReportedPosts();
-        console.log(x.length);
-      });
+    // describe("5.0 admin tests", () => {
+    //   test("getReportedPosts", async () => {
+    //     let x = await connection.getAllReportedPosts();
+    //     console.log(x.length);
+    //   });
 
-      test.only("isAdmin", async () => {
-        expect(await connection.isAdmin()).toBe(true);
-      });
-    });
+    //   test.only("isAdmin", async () => {
+    //     expect(await connection.isAdmin()).toBe(true);
+    //   });
+    // });
   });
 });
 
