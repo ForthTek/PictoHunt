@@ -44,24 +44,6 @@ export default class Connection {
 
   /**
    *
-   * @returns
-   */
-  isAdmin = async () => {
-    return await this.#firebase.isAdmin();
-  };
-
-  /**
-   *
-   * @param {string} postID
-   * @param {boolean} value
-   * @returns
-   */
-  setPostPublic = async (postID, value) => {
-    return await this.#firebase.setPostPublic(postID, value);
-  };
-
-  /**
-   *
    * @param {string} email
    * @param {string} password
    * @returns true if successful
@@ -406,5 +388,32 @@ export default class Connection {
   reportPost = async (postID) => {
     await this.#server.reportPost(postID);
     return true;
+  };
+
+  /*
+    ADMIN FUNCTIONS
+    User must be an admin for these to work
+  */
+
+  /**
+   *
+   * @returns
+   */
+  isAdmin = async () => {
+    return await this.#firebase.isAdmin();
+  };
+
+  /**
+   *
+   * @param {string} postID
+   * @param {boolean} value
+   * @returns
+   */
+  setPostPublic = async (postID, value) => {
+    return await this.#firebase.setPostPublic(postID, value);
+  };
+
+  getSummeryReport = async () => {
+    return await this.#firebase.getSummeryReport();
   };
 }
