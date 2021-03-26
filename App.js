@@ -22,7 +22,7 @@ export default class App extends Component {
 
   updateLoginState = () => {
     this.setState({ isLoggedIn: this.connection.isLoggedIn() });
-    console.log(`*Updated login status to be ${this.state.isLoggedIn}`);
+    //console.log(`*Updated login status to be ${this.state.isLoggedIn}`);
   };
 
   render() {

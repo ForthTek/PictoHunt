@@ -81,6 +81,17 @@ export default class Firebase {
     }
   };
 
+  isAdmin = async () => {
+    const username = this.currentUser().username;
+    return await this.database
+      .doc(`Admins/${username}`)
+      .get()
+      .then(
+        () => true,
+        (error) => false
+      );
+  };
+
   /**
    * @returns JSON with .username and .email
    */
