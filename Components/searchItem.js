@@ -45,10 +45,9 @@ export default class SearchItem extends Component {
     };
 
     getUserSI = (val) => {
-
-      this.props.getUserH(val);
-      this.closeModal();
-    }
+        this.props.getUserH(val);
+        this.closeModal();
+    };
 
     render() {
         return (
