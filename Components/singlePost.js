@@ -14,6 +14,7 @@ import Ionicon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import LikeBtn from "./likeBtn";
 import { stopLocationUpdatesAsync } from "expo-location";
+import CachedImage from "react-native-expo-cached-image";
 
 export default class SinglePost extends Component {
     constructor(props) {
@@ -39,6 +40,7 @@ export default class SinglePost extends Component {
     };
 
     _renderItem({ item, index }) {
+        console.log(item);
         return (
             <View
                 style={{
@@ -49,7 +51,7 @@ export default class SinglePost extends Component {
                     marginRight: 25,
                 }}
             >
-                <Image style={styles.Image} source={{ uri: item }} />
+                <CachedImage style={styles.Image} source={{ uri: item }} />
             </View>
         );
     }
@@ -78,15 +80,6 @@ export default class SinglePost extends Component {
     };
 
     render() {
-        const renderComments = ({ item }) => (
-            <View style={{ maxHeight: 50 }}>
-                <Text style={styles.info} numberOfLines={1}>
-                    {item.text}
-                </Text>
-                <Text style={styles.postName}>{item.user}</Text>
-            </View>
-        );
-
         return (
             <View style={styles.container}>
                 <View style={styles.container1}>
@@ -105,6 +98,7 @@ export default class SinglePost extends Component {
                         layout={"tinder"}
                         ref={(ref) => (this.carousel = ref)}
                         data={this.state.photos}
+                        layoutCardOffset={15}
                         sliderWidth={300}
                         itemWidth={300}
                         renderItem={this._renderItem}
@@ -122,7 +116,7 @@ export default class SinglePost extends Component {
                         </Text>
 
                         <Text style={styles.postName}>
-                            Channel: {this.state.channel}
+                            {this.state.channel}
                         </Text>
                         <Text style={styles.postName}>{this.state.user}</Text>
                     </View>

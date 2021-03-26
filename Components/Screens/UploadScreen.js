@@ -14,10 +14,13 @@ import Upload from "../upload";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import { SearchBar, Input } from "react-native-elements";
-
 import MapPicker from "../mapPicker";
 import { Modal } from "react-native";
 import { KeyboardAvoidingView } from "react-native";
+
+import { AssetsSelector } from "expo-images-picker";
+import Carousel from "react-native-snap-carousel";
+
 export default class UploadScreen extends Component {
     constructor(props) {
         super(props);
@@ -28,7 +31,7 @@ export default class UploadScreen extends Component {
         getImage: true,
         title: "",
         channel: "",
-        image: null,
+        image: [],
         res: null,
         modalVisible: false,
         lat: [],
@@ -36,21 +39,23 @@ export default class UploadScreen extends Component {
         search: "",
         searching: false,
         channelDATA: [],
+        imageSelector: false,
+        activeIndex: 0,
+        uris: [],
     };
 
     onChangeTitle = (value) => {
         this.setState({ title: value });
     };
-    onChangeChannel = (value) => {
-        this.setState({ channel: value });
-        this.connection
-            .searchChannels(value)
-            .then((res) => this.setState({ search: res }));
-    };
 
     newImage = (value) => {
+        console.log(value);
         this.setState({ image: value });
-        this.setState({ getImage: false });
+        let newuris = [];
+        for (let i = 0; i < this.state.image.length; i++) {
+            newuris[i] = this.state.image[i].uri;
+        }
+        this.setState({ getImage: false, uris: newuris });
     };
 
     handleBack = () => {
@@ -80,8 +85,16 @@ export default class UploadScreen extends Component {
     };
 
     callConnection = async () => {
-        const res = await fetch(this.state.image.uri);
-        const blob = await res.blob();
+        let images = [];
+        for (let i = 0; i < this.state.uris.length; i++) {
+            const res = await fetch(this.state.uris[i]);
+            const blob = await res.blob();
+            images[i] = blob;
+        }
+
+        // const res = await fetch(this.state.image.uri);
+
+        // const blob = await res.blob();
 
         this.connection
             .createPost(
@@ -89,13 +102,13 @@ export default class UploadScreen extends Component {
                 this.state.channel,
                 this.state.lat,
                 this.state.long,
-                [blob]
+                images // [blob]
             )
             .then(
                 (key) => {
                     // Maybe go to single post view now?
                     //console.log(key);
-                    this.setState({ lat: [], long: [] });
+                    this.setState({ lat: [], long: [], imageSelector: false });
                     this.handleBack();
                     Alert.alert("Post Submitted");
                 },
@@ -110,15 +123,103 @@ export default class UploadScreen extends Component {
         this.setState({ lat: lat[0], long: long[0], modalVisible: false });
     };
 
+    openImageSelector = () => {
+        this.setState({ imageSelector: true });
+    };
+
+    closeImageSelector = () => {
+        this.setState({ imageSelector: false });
+    };
+
+    _renderItem({ item, index }) {
+        console.log(item);
+        return (
+            <View
+                style={{
+                    backgroundColor: "grey",
+                    borderRadius: 5,
+                    height: 250,
+                    width: 250,
+                    marginLeft: 25,
+                    marginRight: 25,
+                }}
+            >
+                <Image
+                    style={{ width: 250, height: 250 }}
+                    source={{ uri: item }}
+                />
+            </View>
+        );
+    }
+
     render() {
         if (this.state.getImage) {
             return (
                 <SafeAreaView style={styles.container}>
-                    <Upload
+                    {/* <Upload
                         newImage={(image) => {
                             this.newImage(image);
                         }}
-                    />
+                    /> */}
+                    {!this.state.imageSelector && (
+                        <View
+                            style={{
+                                paddingLeft: "20%",
+                                paddingTop: "50%",
+                                width: "80%",
+                                justifyContent: "center",
+                                alignItems: "center",
+                            }}
+                        >
+                            <Button
+                                title='Get an image from your library'
+                                onPress={this.openImageSelector}
+                            />
+                        </View>
+                    )}
+                    {this.state.imageSelector && (
+                        <AssetsSelector
+                            options={{
+                                manipulate: {
+                                    width: 512,
+                                    compress: 0.7,
+                                    base64: false,
+                                    saveTo: "jpeg",
+                                },
+                                assetsType: "photo",
+                                maxSelections: 5,
+                                margin: 3,
+                                portraitCols: 4,
+                                landscapeCols: 5,
+                                widgetWidth: 100,
+                                widgetBgColor: "white",
+                                selectedBgColor: "blue",
+                                spinnerColor: "blue",
+                                videoIcon: {
+                                    Component: Ionicon,
+                                    iconName: "ios-videocam",
+                                    color: "white",
+                                    size: 20,
+                                },
+                                selectedIcon: {
+                                    Component: Ionicon,
+                                    iconName: "ios-checkmark-circle-outline",
+                                    color: "tomato",
+                                    bg: "grey",
+                                    size: 20,
+                                },
+                                defaultTopNavigator: {
+                                    continueText: "Finish",
+                                    goBackText: "Back",
+                                    backFunction: this.closeImageSelector,
+                                    doneFunction: (data) => this.newImage(data),
+                                },
+                                noAssets: {
+                                    Component: () => <Text>No images</Text>,
+                                },
+                            }}
+                        />
+                    )}
                 </SafeAreaView>
             );
         } else {
@@ -134,12 +235,30 @@ export default class UploadScreen extends Component {
                         />
                     </Pressable>
 
-                    <View style={styles.imageContainer}>
+                    {/* <View style={styles.imageContainer}>
                         <Image
                             source={{ uri: this.state.image.uri }}
                             style={{ width: 200, height: 200 }}
                         />
+                    </View> */}
+
+                    <View style={styles.container3}>
+                        <Carousel
+                            layoutCardOffset={15}
+                            layout={"tinder"}
+                            ref={(ref) => (this.carousel = ref)}
+                            data={this.state.uris}
+                            layoutCardOffset={20}
+                            sliderWidth={300}
+                            itemWidth={300}
+                            renderItem={this._renderItem}
+                            firstItem={this.state.uris.length - 1}
+                            onSnapToItem={(index) =>
+                                this.setState({ activeIndex: index })
+                            }
+                        />
                     </View>
+
                     <View style={styles.allInputContainer}>
                         <View style={styles.textInputs}>
                             <Text style={{ fontSize: 20, paddingTop: "2%" }}>
@@ -180,36 +299,37 @@ export default class UploadScreen extends Component {
                                     placeholder='Search...'
                                     round
                                 />
-                                {this.state.searching && (
-                                    <View style={styles.dropDown}>
-                                        <Text style={styles.ddText}>
-                                            ------Channels------
-                                        </Text>
-                                        <FlatList
-                                            data={this.state.channelDATA}
-                                            renderItem={({ item }) => (
-                                                <View>
-                                                    <Pressable
-                                                        onPress={() =>
-                                                            this.addChannel(
-                                                                item
-                                                            )
-                                                        }
-                                                    >
-                                                        <Text
-                                                            style={
-                                                                styles.ddText
+                                {this.state.searching &&
+                                    this.state.search != "" && (
+                                        <View style={styles.dropDown}>
+                                            <Text style={styles.ddText}>
+                                                ------Channels------
+                                            </Text>
+                                            <FlatList
+                                                data={this.state.channelDATA}
+                                                renderItem={({ item }) => (
+                                                    <View>
+                                                        <Pressable
+                                                            onPress={() =>
+                                                                this.addChannel(
+                                                                    item
+                                                                )
                                                             }
                                                         >
-                                                            {item}
-                                                        </Text>
-                                                    </Pressable>
-                                                </View>
-                                            )}
-                                            keyExtractor={(item) => item}
-                                        />
-                                    </View>
-                                )}
+                                                            <Text
+                                                                style={
+                                                                    styles.ddText
+                                                                }
+                                                            >
+                                                                {item}
+                                                            </Text>
+                                                        </Pressable>
+                                                    </View>
+                                                )}
+                                                keyExtractor={(item) => item}
+                                            />
+                                        </View>
+                                    )}
                             </View>
                         </View>
                         <View style={{ paddingLeft: "1%" }}>
@@ -285,6 +405,10 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff",
         justifyContent: "space-between",
+    },
+    container3: {
+        height: "40%",
+        alignSelf: "center",
     },
     imageContainer: {
         flex: 1,
@@ -366,5 +490,9 @@ const styles = StyleSheet.create({
     searchBox: {
         width: "70%",
         paddingBottom: "5%",
+    },
+    Image: {
+        width: 250,
+        height: 250,
     },
 });

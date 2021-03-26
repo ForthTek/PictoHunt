@@ -12,7 +12,8 @@ import Image from "react-native-scalable-image";
 import Score from "../score";
 import SettingBtn from "../settingBtn";
 import Post from "../post";
-
+import { Pressable } from "react-native";
+import FeatherIcon from "react-native-vector-icons/Feather";
 class Account extends Component {
     constructor(props) {
         super(props);
@@ -50,6 +51,8 @@ class Account extends Component {
         );
     }
 
+    onDelete = (id) => {};
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -85,19 +88,17 @@ class Account extends Component {
                                     .toString()
                                     .substring(4, 15)}
                             </Text>
-                            <Text style={styles.info}>Located:</Text>
-                            <Text style={styles.info}>[TODO]</Text>
+
+                            <SettingBtn
+                                label='Log Out'
+                                icon='log-out-outline'
+                                onPress={() => {
+                                    this.onSignOutPress();
+                                }}
+                            />
                         </View>
                     </View>
-                    <View style={styles.container}>
-                        <SettingBtn
-                            label='Log Out'
-                            icon='log-out-outline'
-                            onPress={() => {
-                                this.onSignOutPress();
-                            }}
-                        />
-                    </View>
+
                     <View
                         style={{
                             flexDirection: "row",
@@ -129,6 +130,15 @@ class Account extends Component {
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
                                 />
+                                <Pressable onPress={() => this.onDelete(item)}>
+                                    <FeatherIcon
+                                        name='trash-2'
+                                        style={{
+                                            fontSize: 26,
+                                            paddingRight: "1%",
+                                        }}
+                                    />
+                                </Pressable>
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}
@@ -171,5 +181,14 @@ const styles = StyleSheet.create({
     list: {
         height: "45%",
         paddingTop: "5%",
+    },
+    post: {
+        borderColor: "grey",
+        borderTopWidth: 1,
+        borderBottomWidth: 1,
+        borderRightWidth: 1,
+        borderLeftWidth: 1,
+        flexDirection: "row",
+        alignItems: "center",
     },
 });

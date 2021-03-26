@@ -8,7 +8,6 @@ const SettingBtn = (props) => {
             <Pressable style={styles.container} onPress={props.onPress}>
                 <Ionicon name={props.icon} style={styles.icon} />
                 <Text style={styles.text}>{props.label}</Text>
-                <Text style={styles.indicator}> > </Text>
             </Pressable>
         </View>
     );
