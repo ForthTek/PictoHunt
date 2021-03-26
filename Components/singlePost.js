@@ -1,14 +1,5 @@
 import React, { Component } from "react";
-import {
-    Text,
-    StyleSheet,
-    SafeAreaView,
-    View,
-    Pressable,
-    Image,
-    FlatList,
-    Alert,
-} from "react-native";
+import { Text, StyleSheet, View, Pressable, Image, Alert } from "react-native";
 import Carousel from "react-native-snap-carousel";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
