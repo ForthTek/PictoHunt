@@ -75,8 +75,6 @@ export default class UploadScreen extends Component {
         });
     };
 
-
-
     addChannel = (name) => {
         this.setState({ channel: name });
     };
@@ -107,7 +105,7 @@ export default class UploadScreen extends Component {
                     //console.log(key);
                     this.setState({ lat: [], long: [], imageSelector: false });
                     this.handleBack();
-                    Alert.alert("Post Submitted");
+                    Alert.alert("Post Submitted: ", key.message);
                 },
                 (error) => {
                     console.log(error);
