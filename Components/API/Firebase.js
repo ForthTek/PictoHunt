@@ -79,6 +79,23 @@ export default class Firebase {
     }
   };
 
+  isAdmin = async () => {
+    const username = this.currentUser().username;
+    return await this.database
+      .doc(`Admins/${username}`)
+      .get()
+      .then(
+        () => true,
+        (error) => false
+      );
+  };
+
+  async setPostPublic(postID, value) {
+    const ref = this.database.doc(`Posts/${postID}`);
+    await ref.update({ public: value });
+    return `Updated post ${postID} to be public ${value}`;
+  }
+
   /**
    * @returns JSON with .username and .email
    */
@@ -250,7 +267,7 @@ export default class Firebase {
     return await ref.get().then(async (doc) => this.getPostFromDoc(doc));
   };
 
-  getPostFromDoc = async (doc) => {
+  async getPostFromDoc(doc) {
     if (doc.exists) {
       const data = doc.data();
       const user = this.currentUser();
@@ -304,9 +321,9 @@ export default class Firebase {
     else {
       throw new Error(`Doc does not exist`);
     }
-  };
+  }
 
-  getFollowedUserRefs = async (username) => {
+  async getFollowedUserRefs(username) {
     let users = [];
     await this.database
       .collection(`Users/${username}/FollowedUsers`)
@@ -323,9 +340,9 @@ export default class Firebase {
         console.log(error);
       });
     return users;
-  };
+  }
 
-  getFollowedChannelRefs = async (username) => {
+  async getFollowedChannelRefs(username) {
     let channels = [];
     await this.database
       .collection(`Users/${username}/FollowedChannels`)
@@ -342,7 +359,7 @@ export default class Firebase {
         console.log(error);
       });
     return channels;
-  };
+  }
 
   getBrowse = async (filter) => {
     try {
@@ -433,7 +450,7 @@ export default class Firebase {
     }
   };
 
-  comparePost = (post1, post2, filter) => {
+  comparePost(post1, post2, filter) {
     const invert = filter.direction === Filter.DIRECTION_DESC ? -1 : 1;
 
     // Assume asc and use invert if we need to
@@ -457,9 +474,9 @@ export default class Firebase {
           return 0;
         }
     }
-  };
+  }
 
-  getPosts = async (query) => {
+  async getPosts(query) {
     return await query
       .get()
       .then(async (snapshot) => {
@@ -476,7 +493,7 @@ export default class Firebase {
         console.log(error);
         throw new Error(`Failed to load posts (${error.message})`);
       });
-  };
+  }
 
   /**
    *
@@ -585,6 +602,29 @@ export default class Firebase {
     // Set the data
     await ref.set(postData);
     return newKey;
+  };
+
+  createChannel = async (name, description) => {
+    const username = this.currentUser().username;
+    const ref = this.database.doc(`Channels/${name}`);
+    const channel = await ref.get();
+    const userRef = this.database.doc(`Users/${username}`);
+
+    if (channel.exists) {
+      throw new Error(`Channel ${name} already exists`);
+    } else {
+      const data = {
+        description: description,
+        timestamp: firebase.firestore.Timestamp.now(),
+        createdBy: userRef,
+        // Add the name just as a string - for use in search queries
+        search: name.toUpperCase(),
+      };
+
+      await ref.set(data);
+
+      return true;
+    }
   };
 
   getChannel = async (name, filter = new Filter()) => {
@@ -705,7 +745,12 @@ export default class Firebase {
    * @param {Filter} filter
    * @returns
    */
-  searchWithPrefix = async (collection, search, field) => {
+  searchWithPrefix = async (
+    collection,
+    search,
+    field = "search",
+    filter = new Filter()
+  ) => {
     const query = search.toUpperCase();
 
     return await this.database
@@ -733,7 +778,7 @@ export default class Firebase {
    * @param {ChallengeTask[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
    * @returns
    */
-  createChallenge = async (description, deadline, score, tasksPerPost) => {
+  async createChallenge(description, deadline, score, tasksPerPost) {
     const milliseconds = deadline.getTime() - new Date().getTime();
     const hours = milliseconds / 3600000;
     const minDuration = 1;
@@ -801,9 +846,9 @@ export default class Firebase {
 
     await ref.set(data);
     return key;
-  };
+  }
 
-  getChallenges = async (completed = false) => {
+  async getChallenges(completed = false) {
     const username = this.currentUser().username;
     const refInvited = this.database.collection(`Users/${username}/Challenges`);
 
@@ -878,9 +923,9 @@ export default class Firebase {
       console.log(error);
       throw error;
     }
-  };
+  }
 
-  deleteChallengeRequest = async (challengeKey) => {
+  async deleteChallengeRequest(challengeKey) {
     const user = this.currentUser();
     const ref = this.database.doc(
       `Users/${user.username}/Challenges/${challengeKey}`
@@ -888,101 +933,5 @@ export default class Firebase {
 
     await ref.delete();
     return true;
-  };
-
-  /*
-   * ADMIN FUNCTIONS
-     The current user must be an admin for these to work
-   */
-
-  /**
-   *
-   * @returns
-   */
-  isAdmin = async () => {
-    const username = this.currentUser().username;
-    return await this.database
-      .doc(`Admins/${username}`)
-      .get()
-      .then(
-        () => true,
-        (error) => false
-      );
-  };
-
-  /**
-   *
-   * @param {string} postID
-   * @param {boolean} value
-   * @returns
-   */
-  setPostPublic = async (postID, value) => {
-    const ref = this.database.doc(`Posts/${postID}`);
-    await ref.update({ public: value });
-    return `Updated post ${postID} to be public ${value}`;
-  };
-
-  /**
-   *
-   * @returns
-   */
-  getSummaryReport = async () => {
-    const username = this.currentUser().username;
-    await this.database.doc(`Admins/${username}`).get();
-
-    const values = await Promise.all([
-      this.database
-        .collection(`Posts`)
-        .where("public", "==", true)
-        .get()
-        .then((snap) => snap.docs.length),
-      this.database
-        .collection(`Posts`)
-        .where("public", "==", false)
-        .get()
-        .then((snap) => snap.docs.length),
-      this.database
-        .collection(`Users`)
-        .get()
-        .then((snap) => snap.docs.length),
-      this.database
-        .collection(`Channels`)
-        .get()
-        .then((snap) => snap.docs.length),
-      this.database
-        .collection(`Challenges`)
-        .get()
-        .then((snap) => snap.docs.length),
-    ]);
-
-    return {
-      publicPosts: values[0],
-      privatePosts: values[1],
-      users: values[2],
-      channels: values[3],
-      challenges: values[4],
-    };
-  };
-
-  createChannel = async (name, description) => {
-    const username = this.currentUser().username;
-    const ref = this.database.doc(`Channels/${name}`);
-    const channel = await ref.get();
-    const userRef = this.database.doc(`Users/${username}`);
-
-    if (channel.exists) {
-      throw new Error(`Channel ${name} already exists`);
-    } else {
-      const data = {
-        description: description,
-        timestamp: firebase.firestore.Timestamp.now(),
-        createdBy: userRef,
-        // Add the name just as a string - for use in search queries
-        search: name.toUpperCase(),
-      };
-
-      await ref.set(data);
-      return true;
-    }
-  };
+  }
 }
