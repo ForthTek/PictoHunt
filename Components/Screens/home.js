@@ -155,16 +155,35 @@ export default class Home extends Component {
         if (search == "") {
             this.setState({ searching: false });
         }
-
-        Promise.all([
-            this.connection.searchUsers(search),
-            this.connection.searchChannels(search),
-        ]).then(result => {
-            this.setState({
-                userDATA: result[0],
-                channelDATA: result[1],
-            });
-        })
+        this.connection.searchUsers(search).then((result) => {
+            this.setState(
+                {
+                    userDATA: result,
+                },
+                (error) => {
+                    console.log(error.message);
+                }
+            );
+        });
+        this.connection.searchChannels(search).then((result) => {
+            this.setState(
+                {
+                    channelDATA: result,
+                },
+                (error) => {
+                    console.log(error.message);
+                }
+            );
+        });
+        // Promise.all([
+        //     this.connection.searchUsers(search),
+        //     this.connection.searchChannels(search),
+        // ]).then(result => {
+        //     this.setState({
+        //         userDATA: result[0],
+        //         channelDATA: result[1],
+        //     });
+        // })
     };
 
     render() {
