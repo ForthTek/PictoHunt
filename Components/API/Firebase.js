@@ -708,24 +708,22 @@ export default class Firebase {
   searchWithPrefix = async (collection, search, field) => {
     const query = search.toUpperCase();
 
-    return (
-      this.database
-        .collection(collection)
-        .where(field, ">=", query)
-        // Append \uf8ff as it has a high unicode value so pretty much any string with the prefix will match before it
-        // Value is 63,743 so we have a lot of leway
-        .where(field, "<=", query + "\uf8ff")
-        //.orderBy()
-        //.limit()
-        .get()
-        .then((res) => {
-          // Return only the IDs
-          return res.docs.map((x) => x.id);
-        })
-        .catch((error) => {
-          console.log(error);
-        })
-    );
+    return await this.database
+      .collection(collection)
+      .where(field, ">=", query)
+      // Append \uf8ff as it has a high unicode value so pretty much any string with the prefix will match before it
+      // Value is 63,743 so we have a lot of leway
+      .where(field, "<=", query + "\uf8ff")
+      //.orderBy()
+      //.limit()
+      .get()
+      .then((res) => {
+        // Return only the IDs
+        return res.docs.map((x) => x.id);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   /**
