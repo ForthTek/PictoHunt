@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Text, View, FlatList, StyleSheet } from "react-native";
 import Task from "./task";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import AntIcon from "react-native-vector-icons/AntDesign";
 import { Pressable } from "react-native";
 export default class Challenge extends Component {
     constructor(props) {
@@ -70,7 +69,7 @@ export default class Challenge extends Component {
                     <Pressable
                         onPress={() => this.props.delete(this.state.DATA.ID)}
                     >
-                        <AntIcon name='delete' style={styles.icon} />
+                        <FeatherIcon name='trash-2' style={styles.icon} />
                     </Pressable>
                 </View>
             </View>
