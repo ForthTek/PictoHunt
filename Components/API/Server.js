@@ -61,8 +61,8 @@ export default class Server {
     });
   }
 
-  async userCreated(username) {
-    return await fetch(`${ADDRESS}/api/userCreated/${username}`).then(
+  async getNewChallenges(username) {
+    return await fetch(`${ADDRESS}/api/getChallenges/${username}`).then(
       async (res) => {
         if (res.status >= SERVER_ERROR) {
           const status = await res.text();

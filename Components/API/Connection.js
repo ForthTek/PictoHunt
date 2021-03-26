@@ -97,16 +97,11 @@ export default class Connection {
       throw new Error(`Username ${username} contains a swear`);
     }
 
-    let x = await this.#firebase.createProfile(
-      email,
-      username,
-      password,
-      isPublic
-    );
+    await this.#firebase.createProfile(email, username, password, isPublic);
 
-    await this.#server.userCreated(username);
+    await this.#server.getNewChallenges(username);
 
-    return x;
+    return true;
   };
 
   /**
