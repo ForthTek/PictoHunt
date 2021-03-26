@@ -52,6 +52,16 @@ export default class Connection {
 
   /**
    *
+   * @param {string} postID
+   * @param {boolean} public
+   * @returns
+   */
+  setPostPublic = async (postID, public) => {
+    return await this.#firebase.setPostPublic(postID, public);
+  };
+
+  /**
+   *
    * @param {string} email
    * @param {string} password
    * @returns true if successful

@@ -92,6 +92,12 @@ export default class Firebase {
       );
   };
 
+  async setPostPublic(postID, value) {
+    const ref = this.database.doc(`Posts/${postID}`);
+    await ref.update({ public: value });
+    return `Updated post ${postID} to be public ${value}`;
+  }
+
   /**
    * @returns JSON with .username and .email
    */
