@@ -1,7 +1,16 @@
 import React, { Component } from "react";
 import ChallengeTask from "./API/ChallengeTask";
 
-import { Text, View, StyleSheet, FlatList, Pressable } from "react-native";
+import {
+    Text,
+    View,
+    SafeAreaView,
+    StyleSheet,
+    Alert,
+    FlatList,
+    Pressable,
+    Modal,
+} from "react-native";
 import { Input, SearchBar } from "react-native-elements";
 import FeatherIcon from "react-native-vector-icons/Feather";
 export default class NewTask extends Component {
