@@ -30,13 +30,8 @@ export default class NewTask extends Component {
             this.setState({ searching: false });
         }
 
-        this.search(search);
-    };
-
-    search = async (search) => {
-        // User Promise.all to send multiple request at the same time
-        this.connection.searchUsers(search).then((res) => {
-            this.setState({ userDATA: res });
+        this.connection.searchUsers(search).then((result) => {
+            this.setState({ userDATA: result });
         });
     };
 

@@ -156,19 +156,15 @@ export default class Home extends Component {
             this.setState({ searching: false });
         }
 
-        this.search(search);
-    };
-
-    search = async (search) => {
-        // User Promise.all to send multiple request at the same time
-        const result = await Promise.all([
+        Promise.all([
             this.connection.searchUsers(search),
             this.connection.searchChannels(search),
-        ]);
-        this.setState({
-            userDATA: result[0],
-            channelDATA: result[1],
-        });
+        ]).then(result => {
+            this.setState({
+                userDATA: result[0],
+                channelDATA: result[1],
+            });
+        })
     };
 
     render() {

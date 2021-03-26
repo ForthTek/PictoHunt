@@ -718,15 +718,13 @@ export default class Firebase {
         //.orderBy()
         //.limit()
         .get()
-        .then(
-          (res) => {
-            // Return only the IDs
-            return res.docs.map((x) => x.id);
-          },
-          (error) => {
-            console.log(error);
-          }
-        )
+        .then((res) => {
+          // Return only the IDs
+          return res.docs.map((x) => x.id);
+        })
+        .catch((error) => {
+          console.log(error);
+        })
     );
   };
 
