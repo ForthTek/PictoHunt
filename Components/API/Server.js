@@ -61,6 +61,22 @@ export default class Server {
     });
   }
 
+  async getNewChallenges(username) {
+    return await fetch(`${ADDRESS}/api/getChallenges/${username}`).then(
+      async (res) => {
+        if (res.status >= SERVER_ERROR) {
+          const status = await res.text();
+          console.log("Server error:");
+          console.log(status);
+        } else {
+          return true;
+        }
+      }
+    );
+  }
+
+  async isAdmin(IDToken) {}
+
   async containsSwears(sentence) {
     return await fetch(`${ADDRESS}/api/isValidString/${sentence}`).then(
       async (res) => {
