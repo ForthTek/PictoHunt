@@ -44,11 +44,6 @@ export default class SearchItem extends Component {
         this.setState({ modalOpen: false });
     };
 
-    getUserSI = (val) => {
-        this.props.getUserH(val);
-        this.closeModal();
-    };
-
     render() {
         return (
             <View>
@@ -78,7 +73,6 @@ export default class SearchItem extends Component {
                                 <UserModal
                                     DATA={this.state.DATA}
                                     connection={this.connection}
-                                    getUserSI={this.getUserSI}
                                 />
                             )}
                             {this.state.type == "channel" && (

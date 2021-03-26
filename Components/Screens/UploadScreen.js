@@ -29,8 +29,8 @@ export default class UploadScreen extends Component {
         image: null,
         res: null,
         modalVisible: false,
-        lat: null,
-        long: null,
+        lat: [],
+        long: [],
     };
 
     onChangeTitle = (value) => {
@@ -67,6 +67,8 @@ export default class UploadScreen extends Component {
                 (key) => {
                     // Maybe go to single post view now?
                     //console.log(key);
+                    this.setState({ lat: [], long: [] });
+                    this.handleBack();
                 },
                 (error) => {
                     console.log(error);

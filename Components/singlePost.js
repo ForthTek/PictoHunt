@@ -25,7 +25,7 @@ export default class SinglePost extends Component {
             dislikes: this.props.item.dislikes,
             photos: this.props.item.photos,
             activeIndex: 0,
-            comments: this.props.item.comments,
+
             score: this.props.item.score,
             postID: this.props.item.ID,
             isLiked: this.props.item.liked,
@@ -35,11 +35,6 @@ export default class SinglePost extends Component {
     }
     handleBack = () => {
         this.props.back();
-    };
-
-    getuserprofile = () => {
-        let val = this.props.item.user;
-        this.props.onProfilePress(val);
     };
 
     _renderItem({ item, index }) {
@@ -124,11 +119,8 @@ export default class SinglePost extends Component {
                         <Text style={styles.title} numberOfLines={3}>
                             {this.state.title}
                         </Text>
-                        <Pressable onPress={this.getuserprofile}>
-                            <Text style={styles.postName}>
-                                {this.state.user}
-                            </Text>
-                        </Pressable>
+
+                        <Text style={styles.postName}>{this.state.user}</Text>
                     </View>
 
                     <View style={{ flexDirection: "row" }}>
@@ -186,13 +178,6 @@ export default class SinglePost extends Component {
                             connection={this.connection}
                         />
                     </View>
-                </View>
-                <View style={styles.comments}>
-                    <FlatList
-                        data={this.state.comments}
-                        renderItem={renderComments}
-                        keyExtractor={(item) => item.time}
-                    />
                 </View>
             </View>
         );

@@ -76,11 +76,6 @@ export default class Home extends Component {
         this.onRefresh();
     };
 
-    getUser = (user) => {
-      this.setState({ ProfileUser: user });
-      this.handleProfile();
-    }
-
     handleProfile = () => {
         this.setState({ isProfile: !this.state.isProfile });
     };
@@ -194,8 +189,8 @@ export default class Home extends Component {
             return (
                 <View style={styles.container}>
                     <Profile
-                      user={this.state.ProfileUser}
-                      back={this.handleProfile}
+                        user={this.state.ProfileUser}
+                        back={this.handleProfile}
                     />
                 </View>
             );
@@ -207,11 +202,10 @@ export default class Home extends Component {
                         back={this.handleSinglePostClose}
                         connection={this.connection}
                         onLikeBtnPress={this.onLikeBtnPress}
-                        onProfilePress={this.getUser}
                     />
                 </View>
             );
-        } else  {
+        } else {
             return (
                 <KeyboardAvoidingView
                     style={styles.postCon}
@@ -238,7 +232,6 @@ export default class Home extends Component {
                                         type='user'
                                         item={item}
                                         connection={this.connection}
-                                        getUserH={this.getUser}
                                     />
                                 )}
                                 keyExtractor={(item) => item}

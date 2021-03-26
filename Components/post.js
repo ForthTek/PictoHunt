@@ -17,6 +17,7 @@ class Post extends Component {
             type: "",
             isLiked: this.props.item.liked,
             isDisliked: this.props.item.disliked,
+            modalOpen: false,
         };
     }
 
@@ -40,11 +41,6 @@ class Post extends Component {
         );
     };
 
-    getuserprofile = () => {
-        let val = this.props.item.user;
-        this.props.onProfilePress(val);
-    };
-
     render() {
         return (
             <View style={styles.container}>
@@ -60,9 +56,9 @@ class Post extends Component {
                     <Text style={styles.title} numberOfLines={1}>
                         {this.state.title}
                     </Text>
-                    <Pressable onPress={this.getuserprofile}>
-                        <Text style={styles.postName}>{this.state.user}</Text>
-                    </Pressable>
+
+                    <Text style={styles.postName}>{this.state.user}</Text>
+
                     <View style={styles.likeCon}>
                         <LikeBtn
                             icon={
@@ -154,26 +150,5 @@ const styles = StyleSheet.create({
         flex: 1,
         justifyContent: "center",
         flexDirection: "row",
-    },
-    center: {
-        flex: 1,
-        alignItems: "center",
-        justifyContent: "center",
-    },
-    modalView: {
-        margin: 5,
-        backgroundColor: "white",
-        borderRadius: 20,
-        padding: 5,
-        width: "90%",
-        height: "90%",
-        shadowColor: "#000",
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
     },
 });

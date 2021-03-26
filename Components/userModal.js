@@ -2,7 +2,14 @@ import React, { Component } from "react";
 import Score from "./score";
 import Post from "./post";
 import SinglePost from "./singlePost";
-import { Text, StyleSheet, View, FlatList, Pressable, Alert } from "react-native";
+import {
+    Text,
+    StyleSheet,
+    View,
+    FlatList,
+    Pressable,
+    Alert,
+} from "react-native";
 import FeatherIcon from "react-native-vector-icons/Feather";
 
 export default class UserModal extends Component {
@@ -115,24 +122,20 @@ export default class UserModal extends Component {
     };
 
     onFollow = () => {
-      if (this.state.DATA.isFollowing) {
-         this.connection
-             .followUser(this.state.DATA.username, false)
-             .then(() => {
-                 this.setState({ justFollowed: true });
-             });
-     } else {
-         this.connection
-             .followUser(this.state.DATA.username, true)
-             .then(() => {
-                 this.setState({ justFollowed: true });
-             });
-     }
+        if (this.state.DATA.isFollowing) {
+            this.connection
+                .followUser(this.state.DATA.username, false)
+                .then(() => {
+                    this.setState({ justFollowed: true });
+                });
+        } else {
+            this.connection
+                .followUser(this.state.DATA.username, true)
+                .then(() => {
+                    this.setState({ justFollowed: true });
+                });
+        }
     };
-
-    getUserUM = (val) => {
-      this.props.getUserSI(val);
-    }
 
     render() {
         return (
@@ -140,29 +143,29 @@ export default class UserModal extends Component {
                 <View style={styles.container}>
                     <Text style={styles.text}>{this.state.DATA.username}</Text>
                     {!this.state.DATA.isFollowing && (
-                    <Pressable onPress={this.onFollow}>
-                        <FeatherIcon
-                          name={
-                                  this.state.justFollowed
-                                      ? "user-check"
-                                      : "user-plus"
-                              }
-                            style={{ fontSize: 32, paddingRight: "5%" }}
-                        />
-                    </Pressable>
-                  )}
-                  {this.state.DATA.isFollowing && (
-                      <Pressable onPress={this.onFollow}>
-                          <FeatherIcon
-                              name={
-                                  this.state.justFollowed
-                                      ? "user-x"
-                                      : "user-minus"
-                              }
-                              style={{ fontSize: 32, paddingRight: "5%" }}
-                          />
-                      </Pressable>
-                  )}
+                        <Pressable onPress={this.onFollow}>
+                            <FeatherIcon
+                                name={
+                                    this.state.justFollowed
+                                        ? "user-check"
+                                        : "user-plus"
+                                }
+                                style={{ fontSize: 32, paddingRight: "5%" }}
+                            />
+                        </Pressable>
+                    )}
+                    {this.state.DATA.isFollowing && (
+                        <Pressable onPress={this.onFollow}>
+                            <FeatherIcon
+                                name={
+                                    this.state.justFollowed
+                                        ? "user-x"
+                                        : "user-minus"
+                                }
+                                style={{ fontSize: 32, paddingRight: "5%" }}
+                            />
+                        </Pressable>
+                    )}
                 </View>
                 <View style={styles.container}>
                     <Score label='Score' number={this.state.DATA.score} />
@@ -185,7 +188,6 @@ export default class UserModal extends Component {
                                     onpressable={this.getID}
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
-                                    onProfilePress={this.getUserUM}
                                 />
                             </View>
                         )}
@@ -201,7 +203,6 @@ export default class UserModal extends Component {
                             back={this.handleSinglePostClose}
                             connection={this.connection}
                             onLikeBtnPress={this.onLikeBtnPress}
-                            onProfilePress={this.getUserUM}
                         />
                     </View>
                 )}
