@@ -9,9 +9,6 @@ export default class Filter {
     this.direction = DIRECTION_DESC;
     this.followedUsers = true;
     this.followedChannels = true;
-    this.postsByMe = false;
-    this.useLimit = false;
-    this.limit = 10;
   }
 
   static get ORDER_BY_TIME() {
