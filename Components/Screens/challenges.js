@@ -32,7 +32,7 @@ export default class challenges extends Component {
         refresh: false,
         modal: false,
         modalDisc: "",
-        date: new Date(1598051730000),
+        date: new Date(),
         datePicker: false,
         mode: "date",
         tasks: [],
@@ -46,9 +46,10 @@ export default class challenges extends Component {
         this.connection.getChallenges().then(
             (data) => {
                 this.setState({ DATA: data, isLoading: false });
-                console.log(this.state.DATA[0]);
+                //console.log(this.state.DATA[0]);
             },
             (error) => {
+                console.log(error);
                 Alert.alert(error.message);
             }
         );
@@ -62,6 +63,7 @@ export default class challenges extends Component {
                 this.setState({ refresh: false });
             },
             (error) => {
+                console.log(error);
                 Alert.alert(error.message);
                 this.setState({ refresh: false });
             }

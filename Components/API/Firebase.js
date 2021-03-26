@@ -841,64 +841,75 @@ export default class Firebase {
 
     const now = firebase.firestore.Timestamp.now();
 
-    let all = await refInvited
-      .where("completed", "==", completed)
-      .get()
-      .then((snapshot) => {
-        let all = [];
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          all.push({ ID: doc.id, completed: data.tasks });
+    try {
+      let all = await refInvited
+        .where("completed", "==", completed)
+        .get()
+        .then((snapshot) => {
+          let all = [];
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            all.push({ ID: doc.id, completed: data.tasks });
+          });
+          return all;
         });
-        return all;
-      });
 
-    let challenges = [];
-    for (let i = 0; i < all.length; i++) {
-      const ref = await this.database.doc(`Challenges/${all[i].ID}`).get();
-      const data = ref.data();
+      let challenges = [];
+      for (let i = 0; i < all.length; i++) {
+        const ref = await this.database.doc(`Challenges/${all[i].ID}`).get();
+        const data = ref.data();
 
-      if (now > data.deadline && !data.completed) {
-        console.log(
-          `Deadline for challenge has expired. Removing it from the user's challenges`
-        );
-        await this.database
-          .doc(`Users/${username}/Challenges/${all[i].ID}`)
-          .delete();
-      } else {
-        let tasks = [];
-        for (let j = 0; j < data.tasks.length; j++) {
-          task = data.tasks[j];
+        // Challenge has expired
+        if (!data.completed && now > data.deadline) {
+          console.log(
+            `Deadline for challenge has expired. Removing it from the user's challenges`
+          );
+          await this.database
+            .doc(`Users/${username}/Challenges/${all[i].ID}`)
+            .delete();
+        }
+        // Valid challenge
+        else {
+          let tasks = [];
+          for (let j = 0; j < data.tasks.length; j++) {
+            task = data.tasks[j];
 
-          let lat = null;
-          let long = null;
-          if (task.GPS) {
-            lat = task.GPS.latitude;
-            long = task.GPS.longitude;
+            let lat = null;
+            let long = null;
+            if (task.GPS) {
+              lat = task.GPS.latitude;
+              long = task.GPS.longitude;
+            }
+
+            tasks.push({
+              description: task.description,
+              channel: task.channel.id,
+              latitude: lat,
+              longitude: long,
+              radius: task.radius,
+              completed: all[i].completed[j],
+            });
           }
 
-          tasks.push({
-            description: task.description,
-            channel: task.channel.id,
-            latitude: lat,
-            longitude: long,
-            radius: task.radius,
-            completed: all[i].completed[j],
+          challenges.push({
+            ID: all[i].ID,
+            description: data.description,
+            deadline: data.deadline.toDate(),
+            score: data.score,
+            tasks: tasks,
+            completed: completed,
           });
         }
-
-        challenges[i] = {
-          ID: all[i].ID,
-          description: data.description,
-          deadline: data.deadline.toDate(),
-          score: data.score,
-          tasks: tasks,
-          completed: completed,
-        };
       }
-    }
 
-    return challenges;
+      // Sort by deadline
+      challenges.sort((x, y) => x.deadline >= y.deadline);
+
+      return challenges;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
 
   async deleteChallengeRequest(challengeKey) {

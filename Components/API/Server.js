@@ -28,8 +28,7 @@ export default class Server {
         console.log(status);
         throw new Error(`Server failed to update post`);
       } else {
-        res.text();
-        return true;
+        return res.text();
       }
     });
   }
@@ -56,7 +55,7 @@ export default class Server {
         console.log(status);
         throw new Error(`Server failed to invite user to challenge`);
       } else {
-        return true;
+        return res;
       }
     });
   }
