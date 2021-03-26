@@ -30,6 +30,7 @@ export default class SinglePost extends Component {
             postID: this.props.item.ID,
             isLiked: this.props.item.liked,
             isDisliked: this.props.item.disliked,
+            channel: this.props.item.channel,
         };
         this.connection = this.props.connection;
     }
@@ -120,6 +121,9 @@ export default class SinglePost extends Component {
                             {this.state.title}
                         </Text>
 
+                        <Text style={styles.postName}>
+                            Channel: {this.state.channel}
+                        </Text>
                         <Text style={styles.postName}>{this.state.user}</Text>
                     </View>
 
@@ -225,7 +229,6 @@ const styles = StyleSheet.create({
     postName: {
         fontSize: 12,
         color: "grey",
-        paddingBottom: "10%",
     },
     likeCon: {
         flex: 1,

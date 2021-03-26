@@ -62,9 +62,6 @@ export default class UploadScreen extends Component {
             search: search,
             searching: true,
         });
-        if (search == "") {
-            this.setState({ searching: false });
-        }
 
         this.search(search);
     };
@@ -183,37 +180,36 @@ export default class UploadScreen extends Component {
                                     placeholder='Search...'
                                     round
                                 />
-                                {this.state.searching &&
-                                    this.state.search != "" && (
-                                        <View style={styles.dropDown}>
-                                            <Text style={styles.ddText}>
-                                                ------Channels------
-                                            </Text>
-                                            <FlatList
-                                                data={this.state.channelDATA}
-                                                renderItem={({ item }) => (
-                                                    <View>
-                                                        <Pressable
-                                                            onPress={() =>
-                                                                this.addChannel(
-                                                                    item
-                                                                )
+                                {this.state.searching && (
+                                    <View style={styles.dropDown}>
+                                        <Text style={styles.ddText}>
+                                            ------Channels------
+                                        </Text>
+                                        <FlatList
+                                            data={this.state.channelDATA}
+                                            renderItem={({ item }) => (
+                                                <View>
+                                                    <Pressable
+                                                        onPress={() =>
+                                                            this.addChannel(
+                                                                item
+                                                            )
+                                                        }
+                                                    >
+                                                        <Text
+                                                            style={
+                                                                styles.ddText
                                                             }
                                                         >
-                                                            <Text
-                                                                style={
-                                                                    styles.ddText
-                                                                }
-                                                            >
-                                                                {item}
-                                                            </Text>
-                                                        </Pressable>
-                                                    </View>
-                                                )}
-                                                keyExtractor={(item) => item}
-                                            />
-                                        </View>
-                                    )}
+                                                            {item}
+                                                        </Text>
+                                                    </Pressable>
+                                                </View>
+                                            )}
+                                            keyExtractor={(item) => item}
+                                        />
+                                    </View>
+                                )}
                             </View>
                         </View>
                         <View style={{ paddingLeft: "1%" }}>

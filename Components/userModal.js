@@ -155,7 +155,10 @@ export default class UserModal extends Component {
                 <View style={styles.container}>
                     <Score label='Score' number={this.state.DATA.score} />
                     <Score label='Pics' number={this.state.postDATA.length} />
-                    <Score label='Rank' number={"[TODO]"} />
+                    <Score
+                        label='Challenge'
+                        number={this.state.DATA.challengeScore}
+                    />
                 </View>
                 {this.state.noPosts && (
                     <Text style={styles.text1}>

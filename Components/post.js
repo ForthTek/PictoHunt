@@ -18,6 +18,7 @@ class Post extends Component {
             isLiked: this.props.item.liked,
             isDisliked: this.props.item.disliked,
             modalOpen: false,
+            channel: this.props.item.channel,
         };
     }
 
@@ -57,8 +58,10 @@ class Post extends Component {
                         {this.state.title}
                     </Text>
 
+                    <Text style={styles.postName}>
+                        Channel: {this.state.channel}
+                    </Text>
                     <Text style={styles.postName}>{this.state.user}</Text>
-
                     <View style={styles.likeCon}>
                         <LikeBtn
                             icon={
@@ -144,7 +147,6 @@ const styles = StyleSheet.create({
     postName: {
         fontSize: 12,
         color: "grey",
-        paddingBottom: "10%",
     },
     likeCon: {
         flex: 1,

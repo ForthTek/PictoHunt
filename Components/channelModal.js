@@ -42,7 +42,6 @@ export default class UserModal extends Component {
     };
     handleSinglePostClose = () => {
         this.setState({ singlePost: false });
-        this.onRefresh();
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
@@ -104,7 +103,7 @@ export default class UserModal extends Component {
             <View style={styles.bigCon}>
                 <View style={styles.container}>
                     <Text style={styles.text}>{this.state.DATA.name}</Text>
-                    <Text>{this.state.DATA.description}</Text>
+
                     {!this.state.DATA.isFollowing && (
                         <Pressable onPress={this.onFollow}>
                             <FeatherIcon
@@ -130,7 +129,9 @@ export default class UserModal extends Component {
                         </Pressable>
                     )}
                 </View>
-                <Text>{this.state.DATA.description}</Text>
+                <Text stlye={{ maxWidth: "90%" }} numberOfLines={3}>
+                    {this.state.DATA.description}
+                </Text>
                 {!this.state.singlePost && (
                     <FlatList
                         style={styles.list}
