@@ -1,20 +1,15 @@
 // Imports all the stuff needed
-import React, { useState, useEffect, Component } from "react";
+import React, { Component } from "react";
 import {
     Text,
     StyleSheet,
     SafeAreaView,
     View,
-    Image,
     Alert,
     Button,
 } from "react-native";
 import MapView, { Marker } from "react-native-maps";
 import * as Location from "expo-location";
-import * as Permissions from "expo-permissions";
-import Geocoder from "react-native-geocoding";
-import * as firebase from "firebase/app";
-import "firebase/firestore";
 
 // NOTE: internal commentary dosn't have spell check, sorry
 

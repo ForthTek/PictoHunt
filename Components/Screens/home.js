@@ -13,7 +13,6 @@ import FilterBtn from "../filterBtn";
 import Filter from "../API/Filter";
 import { SearchBar } from "react-native-elements";
 import SearchItem from "../searchItem";
-import Profile from "../profile";
 
 export default class Home extends Component {
     constructor(props) {

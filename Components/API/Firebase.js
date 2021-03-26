@@ -2,9 +2,7 @@ import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
 import * as geofire from "geofire-common";
-
 import Upload from "./Upload.js";
-
 import Filter from "./Filter.js";
 import ChallengeTask from "./ChallengeTask.js";
 
@@ -80,6 +78,23 @@ export default class Firebase {
       return false;
     }
   };
+
+  isAdmin = async () => {
+    const username = this.currentUser().username;
+    return await this.database
+      .doc(`Admins/${username}`)
+      .get()
+      .then(
+        () => true,
+        (error) => false
+      );
+  };
+
+  async setPostPublic(postID, value) {
+    const ref = this.database.doc(`Posts/${postID}`);
+    await ref.update({ public: value });
+    return `Updated post ${postID} to be public ${value}`;
+  }
 
   /**
    * @returns JSON with .username and .email

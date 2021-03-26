@@ -1,9 +1,8 @@
-import React, { Component, Animated } from "react";
+import React, { Component } from "react";
 
 import {
     Text,
     View,
-    SafeAreaView,
     StyleSheet,
     Alert,
     FlatList,

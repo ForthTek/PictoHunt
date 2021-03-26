@@ -11,10 +11,8 @@ import {
     Pressable,
     Modal,
 } from "react-native";
-import { Input, Slider, SearchBar } from "react-native-elements";
-import IonIcon from "react-native-vector-icons/Ionicons";
+import { Input, SearchBar } from "react-native-elements";
 import FeatherIcon from "react-native-vector-icons/Feather";
-import SearchItem from "./searchItem";
 export default class NewTask extends Component {
     constructor(props) {
         super(props);

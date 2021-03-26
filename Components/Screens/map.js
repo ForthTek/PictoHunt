@@ -1,5 +1,5 @@
 // Imports all the stuff needed
-import React, { useState, useEffect, Component } from "react";
+import React, { Component } from "react";
 import {
   Text,
   StyleSheet,
@@ -10,14 +10,11 @@ import {
   Modal,
   Pressable,
 } from "react-native";
-import MapView, { Marker } from "react-native-maps";
+import MapView from "react-native-maps";
 import * as Location from "expo-location";
-import * as Permissions from "expo-permissions";
-import Geocoder from "react-native-geocoding";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Ionicon from "react-native-vector-icons/Ionicons";
-import SinglePost from "../singlePost";
-import Connection from "../API/Connection";
+
 
 // NOTE: internal commentary dosn't have spell check, sorry
 

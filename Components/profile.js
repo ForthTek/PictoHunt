@@ -10,8 +10,6 @@ import {
     Modal,
 } from "react-native";
 import Image from "react-native-scalable-image";
-import Score from "./score";
-import SettingBtn from "./settingBtn";
 import ScoreComp from "./scoreComp";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import Connection from "./API/Connection";
