@@ -9,7 +9,6 @@ import {
     Alert,
     Image,
 } from "react-native";
-import * as firebase from "firebase";
 
 export default class SignUp extends Component {
     constructor(props) {

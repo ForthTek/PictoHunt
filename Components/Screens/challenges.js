@@ -10,7 +10,7 @@ import {
     Modal,
     KeyboardAvoidingView,
 } from "react-native";
-import { Input, Slider, SearchBar } from "react-native-elements";
+import { Input } from "react-native-elements";
 import Challenge from "../challenge";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";

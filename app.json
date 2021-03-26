@@ -23,7 +23,8 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/ForthTek.png",
         "backgroundColor": "#00a8f3"
-      }
+      },
+      "package": "app.pictohunt"
     },
     "web": {
       "favicon": "./assets/favicon.png"
