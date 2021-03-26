@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import { Modal } from "react-native";
 import { Text, StyleSheet, View, Image, Pressable, Alert } from "react-native";
 import LikeBtn from "./likeBtn";
+import CachedImage from "react-native-expo-cached-image";
 
 class Post extends Component {
     constructor(props) {
@@ -48,7 +49,7 @@ class Post extends Component {
         return (
             <View style={styles.container}>
                 <Pressable onPress={this.handleSinglePost}>
-                    <Image
+                    <CachedImage
                         style={styles.Image}
                         source={{
                             uri: this.state.photos[0],
