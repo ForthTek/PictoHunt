@@ -68,14 +68,17 @@ export default class UploadScreen extends Component {
             searching: true,
         });
 
-        this.connection.searchChannels(search).then((result) => {
+        this.search(search);
+    };
+
+    search = async (search) => {
+        // User Promise.all to send multiple request at the same time
+        this.connection.searchChannels(search).then((res) => {
             this.setState({
-                channelDATA: result,
+                channelDATA: res,
             });
         });
     };
-
-
 
     addChannel = (name) => {
         this.setState({ channel: name });
