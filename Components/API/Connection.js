@@ -279,8 +279,7 @@ export default class Connection {
       .then(async (newKey) => {
         // Get the server to approve the post
         let message = await this.#server.approvePost(newKey);
-        console.log(message);
-        return newKey;
+        return { ID: newKey, message: message.message };
       });
   };
 
