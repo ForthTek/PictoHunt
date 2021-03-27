@@ -827,6 +827,62 @@ export default class Firebase {
     }
   }
 
+  // async getChallengesByMe() {
+  //   const username = this.currentUser().username;
+  //   const ref = this.database.doc(`Users/${username}`);
+
+  //   try {
+  //     let all = await this.database
+  //       .collection("Challenges")
+  //       .where("createdBy", "==", ref)
+  //       .get()
+  //       .then((snapshot) => {
+  //         let challenges = [];
+  //         snapshot.forEach((doc) => {
+  //           const data = doc.data();
+  //           let tasks = [];
+  //           for (let j = 0; j < data.tasks.length; j++) {
+  //             task = data.tasks[j];
+
+  //             let lat = null;
+  //             let long = null;
+  //             if (task.GPS) {
+  //               lat = task.GPS.latitude;
+  //               long = task.GPS.longitude;
+  //             }
+
+  //             tasks.push({
+  //               description: task.description,
+  //               channel: task.channel.id,
+  //               latitude: lat,
+  //               longitude: long,
+  //               radius: task.radius,
+  //               completed: all[i].completed[j],
+  //             });
+  //           }
+
+  //           challenges.push({
+  //             ID: all[i].ID,
+  //             description: data.description,
+  //             deadline: data.deadline.toDate(),
+  //             score: data.score,
+  //             tasks: tasks,
+  //             completed: completed,
+  //           });
+  //         });
+  //         return all;
+  //       });
+
+  //     // Sort by deadline
+  //     challenges.sort((x, y) => x.deadline >= y.deadline);
+
+  //     return challenges;
+  //   } catch (error) {
+  //     console.log(error);
+  //     throw error;
+  //   }
+  // }
+
   async deleteChallengeRequest(challengeKey) {
     const user = this.currentUser();
     const ref = this.database.doc(
