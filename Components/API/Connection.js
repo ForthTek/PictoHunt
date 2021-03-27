@@ -221,13 +221,34 @@ export default class Connection {
    *
    * @returns
    */
-  getMap = async () => {
-    return await this.#firebase.getPosts(
-      this.#firebase.database
-        .collection("Posts")
-        .where("public", "==", true)
-        .where("GPS", "!=", null)
-    );
+  getMap = async (filter = new Filter()) => {
+    //const limit = filter.useLimit ? filter.limit : 100;
+    const limit = 20;
+
+    // Posts by the user
+    if (filter.postsByMe) {
+      const username = this.currentUser().username;
+      const user = this.#firebase.database.doc(`Users/${username}`);
+
+      return await this.#firebase.getPosts(
+        this.#firebase.database
+          .collection("Posts")
+          .where("public", "==", true)
+          .where("GPS", "!=", null)
+          .where("createdBy", "==", user)
+          .limit(limit)
+      );
+    }
+    // All posts
+    else {
+      return await this.#firebase.getPosts(
+        this.#firebase.database
+          .collection("Posts")
+          .where("public", "==", true)
+          .where("GPS", "!=", null)
+          .limit(limit)
+      );
+    }
   };
 
   /**
@@ -283,24 +304,6 @@ export default class Connection {
         let message = await this.#server.approvePost(newKey);
         return { ID: newKey, message: message.message };
       });
-  };
-
-  /**
-   *
-   * @param {string} name
-   * @param {string} description
-   * @returns
-   */
-  createChannel = async (name, description) => {
-    // Ensure that the channel name and description is clean
-    if (await this.#server.containsSwears(name)) {
-      throw new Error(`Channel name ${name} contains a swear`);
-    }
-    if (await this.#server.containsSwears(description)) {
-      throw new Error(`Channel description ${description} contains a swear`);
-    }
-
-    return await this.#firebase.createChannel(name, description);
   };
 
   /**
@@ -406,5 +409,54 @@ export default class Connection {
   reportPost = async (postID) => {
     await this.#server.reportPost(postID);
     return true;
+  };
+
+  /*
+    ADMIN FUNCTIONS
+    User must be an admin for these to work
+  */
+
+  /**
+   *
+   * @returns
+   */
+  isAdmin = async () => {
+    return await this.#firebase.isAdmin();
+  };
+
+  /**
+   *
+   * @param {string} postID
+   * @param {boolean} value
+   * @returns
+   */
+  setPostPublic = async (postID, value = true) => {
+    return await this.#firebase.setPostPublic(postID, value);
+  };
+
+  /**
+   *
+   * @returns
+   */
+  getSummaryReport = async () => {
+    return await this.#firebase.getSummeryReport();
+  };
+
+  /**
+   *
+   * @param {string} name
+   * @param {string} description
+   * @returns
+   */
+  createChannel = async (name, description) => {
+    // Ensure that the channel name and description is clean
+    if (await this.#server.containsSwears(name)) {
+      throw new Error(`Channel name ${name} contains a swear`);
+    }
+    if (await this.#server.containsSwears(description)) {
+      throw new Error(`Channel description ${description} contains a swear`);
+    }
+
+    return await this.#firebase.createChannel(name, description);
   };
 }

@@ -79,23 +79,6 @@ export default class Firebase {
     }
   };
 
-  isAdmin = async () => {
-    const username = this.currentUser().username;
-    return await this.database
-      .doc(`Admins/${username}`)
-      .get()
-      .then(
-        () => true,
-        (error) => false
-      );
-  };
-
-  async setPostPublic(postID, value) {
-    const ref = this.database.doc(`Posts/${postID}`);
-    await ref.update({ public: value });
-    return `Updated post ${postID} to be public ${value}`;
-  }
-
   /**
    * @returns JSON with .username and .email
    */
@@ -745,12 +728,7 @@ export default class Firebase {
    * @param {Filter} filter
    * @returns
    */
-  searchWithPrefix = async (
-    collection,
-    search,
-    field = "search",
-    filter = new Filter()
-  ) => {
+  searchWithPrefix = async (collection, search, field = "search") => {
     const query = search.toUpperCase();
 
     return await this.database
@@ -934,4 +912,100 @@ export default class Firebase {
     await ref.delete();
     return true;
   }
+
+  /*
+   * ADMIN FUNCTIONS
+     The current user must be an admin for these to work
+   */
+
+  /**
+   *
+   * @returns
+   */
+  isAdmin = async () => {
+    const username = this.currentUser().username;
+    return await this.database
+      .doc(`Admins/${username}`)
+      .get()
+      .then(
+        () => true,
+        (error) => false
+      );
+  };
+
+  /**
+   *
+   * @param {string} postID
+   * @param {boolean} value
+   * @returns
+   */
+  setPostPublic = async (postID, value) => {
+    const ref = this.database.doc(`Posts/${postID}`);
+    await ref.update({ public: value });
+    return `Updated post ${postID} to be public ${value}`;
+  };
+
+  /**
+   *
+   * @returns
+   */
+  getSummaryReport = async () => {
+    const username = this.currentUser().username;
+    await this.database.doc(`Admins/${username}`).get();
+
+    const values = await Promise.all([
+      this.database
+        .collection(`Posts`)
+        .where("public", "==", true)
+        .get()
+        .then((snap) => snap.docs.length),
+      this.database
+        .collection(`Posts`)
+        .where("public", "==", false)
+        .get()
+        .then((snap) => snap.docs.length),
+      this.database
+        .collection(`Users`)
+        .get()
+        .then((snap) => snap.docs.length),
+      this.database
+        .collection(`Channels`)
+        .get()
+        .then((snap) => snap.docs.length),
+      this.database
+        .collection(`Challenges`)
+        .get()
+        .then((snap) => snap.docs.length),
+    ]);
+
+    return {
+      publicPosts: values[0],
+      privatePosts: values[1],
+      users: values[2],
+      channels: values[3],
+      challenges: values[4],
+    };
+  };
+
+  createChannel = async (name, description) => {
+    const username = this.currentUser().username;
+    const ref = this.database.doc(`Channels/${name}`);
+    const channel = await ref.get();
+    const userRef = this.database.doc(`Users/${username}`);
+
+    if (channel.exists) {
+      throw new Error(`Channel ${name} already exists`);
+    } else {
+      const data = {
+        description: description,
+        timestamp: firebase.firestore.Timestamp.now(),
+        createdBy: userRef,
+        // Add the name just as a string - for use in search queries
+        search: name.toUpperCase(),
+      };
+
+      await ref.set(data);
+      return true;
+    }
+  };
 }

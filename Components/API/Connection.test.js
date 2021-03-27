@@ -91,117 +91,119 @@ describe("2.0 signed in tests", () => {
       await connection.login(TEST_EMAIL, TEST_PASSWORD);
       // If this test fails, the test account could be locked/suspended
     });
+  });
 
-    describe("2.3 profile tests", () => {
-      test("getProfile", async () => {
-        let user = await connection.getProfile(TEST_USERNAME);
-        //console.log(user);
-      });
-
-      // test("likePost", async () => {
-      //   let x = await connection.likePost(TEST_POST);
-      //   // Like, dislike and remove interaction
-      // });
-
-      test("2.4 followUser", async () => {
-        await connection.followUser(TEST_USERNAME, true);
-      });
-
-      test("2.5 followChannel", async () => {
-        await connection.followChannel(TEST_CHANNEL, true);
-      });
+  describe("2.3 profile tests", () => {
+    test("getProfile", async () => {
+      let user = await connection.getProfile(TEST_USERNAME);
+      //console.log(user);
     });
 
-    describe("3.0 channel tests", () => {
-      test("getChannel", async () => {
-        let channel = await connection.getChannel(TEST_CHANNEL);
-        //console.log(channel);
-      });
+    // test("likePost", async () => {
+    //   let x = await connection.likePost(TEST_POST);
+    //   // Like, dislike and remove interaction
+    // });
+
+    test("2.4 followUser", async () => {
+      await connection.followUser(TEST_USERNAME, true);
     });
 
-    describe("3.1 browse tests", () => {
-      beforeEach(async () => {
-        await connection.login(TEST_EMAIL, TEST_PASSWORD);
-      });
+    test("2.5 followChannel", async () => {
+      await connection.followChannel(TEST_CHANNEL, true);
+    });
+  });
 
-      test("3.2 getGetAllPosts", async () => {
-        let x = await connection.getAllPosts();
-        //console.log(x.length);
-      });
+  describe("3.0 channel tests", () => {
+    test("getChannel", async () => {
+      let channel = await connection.getChannel(TEST_CHANNEL);
+      //console.log(channel);
+    });
+  });
 
-      test("3.3 getBrowse", async () => {
-        let x = await connection.getBrowse();
-        //console.log(x.length);
-      });
+  describe("3.1 browse tests", () => {
+    beforeEach(async () => {
+      await connection.login(TEST_EMAIL, TEST_PASSWORD);
     });
 
-    describe("3.4 map tests", () => {
-      test("getMap", async () => {
-        let x = await connection.getMap();
-        //console.log(x.length);
-      });
+    test("3.2 getGetAllPosts", async () => {
+      let x = await connection.getAllPosts();
+      //console.log(x.length);
     });
 
-    describe("4.0 challenge tests", () => {
-      // test.only("createChallenge", async () => {
-      //   let x = await connection.createChallenge(
-      //     "photograph two dogs",
-      //     new Date("2021-04-17T03:24:00"),
-      //     100,
-      //     [
-      //       new ChallengeTask("picture of a pug", "Test"),
-      //       new ChallengeTask("cute golden pls", "Test2", 1, 2),
-      //     ]
-      //   );
-      // });
-
-      const c = "UXlZhJc8sQGub94WGpiR";
-      // test.only("inviteUsersToChallenge", async () => {
-      //   let x = await connection.inviteUsersToChallenge(c, ["Test"]);
-      // });
-
-      // test.only("deleteChallengeRequest", async () => {
-      //   let x = await connection.deleteChallenge(c);
-      // });
-
-      test("getChallenges", async () => {
-        let x = await connection.getChallenges(false);
-        //console.log(x);
-        // for (let i = 0; i < x[0].tasks.length; i++) {
-        //   console.log(x[0].tasks[i]);
-        // }
-      });
+    test("3.3 getBrowse", async () => {
+      let x = await connection.getBrowse();
+      //console.log(x.length);
     });
+  });
 
-    // describe("5.0 admin tests", () => {
-    //   test("getReportedPosts", async () => {
-    //     let x = await connection.getAllReportedPosts();
-    //     console.log(x.length);
-    //   });
+  describe("3.4 map tests", () => {
+    test("getMap", async () => {
+      let x = await connection.getMap();
+      //console.log(x.length);
+    });
+  });
 
-    //   test.only("isAdmin", async () => {
-    //     expect(await connection.isAdmin()).toBe(true);
-    //   });
+  describe("4.0 challenge tests", () => {
+    // test.only("createChallenge", async () => {
+    //   let x = await connection.createChallenge(
+    //     "photograph two dogs",
+    //     new Date("2021-04-17T03:24:00"),
+    //     100,
+    //     [
+    //       new ChallengeTask("picture of a pug", "Test"),
+    //       new ChallengeTask("cute golden pls", "Test2", 1, 2),
+    //     ]
+    //   );
+    // });
+
+    const c = "UXlZhJc8sQGub94WGpiR";
+    // test.only("inviteUsersToChallenge", async () => {
+    //   let x = await connection.inviteUsersToChallenge(c, ["Test"]);
+    // });
+
+    // test.only("deleteChallengeRequest", async () => {
+    //   let x = await connection.deleteChallenge(c);
+    // });
+
+    test("getChallenges", async () => {
+      let x = await connection.getChallenges(false);
+      //console.log(x);
+      // for (let i = 0; i < x[0].tasks.length; i++) {
+      //   console.log(x[0].tasks[i]);
+      // }
+    });
+  });
+
+  describe("5.0 admin tests", () => {
+    // test.only("getReportedPosts", async () => {
+    //   let x = await connection.getAllReportedPosts();
+    //   console.log(x.length);
+    // });
+    // test.only("isAdmin", async () => {
+    //   expect(await connection.isAdmin()).toBe(true);
+    // });
+    // test.only("getSummaryReport", async () => {
+    //   console.log(await connection.getSummeryReport());
     // });
   });
 });
 
-let server = new Server();
-describe("5.0 signed in tests", () => {
-  describe("5.1 filter tests", () => {
-    test("SwearString", async () => {
-      var swear = "shit";
-      let x = await server.containsSwears(swear);
-      expect(x).toBe(true);
-    });
+// let server = new Server();
+// describe("5.0 signed in tests", () => {
+//   describe("5.1 filter tests", () => {
+//     test("SwearString", async () => {
+//       var swear = "shit";
+//       let x = await server.containsSwears(swear);
+//       expect(x).toBe(true);
+//     });
 
-    test("NoSwearString", async () => {
-      var noSwear = "test string";
-      let x = await server.containsSwears(noSwear);
-      expect(x).toBe(false);
-    });
-  });
-});
+//     test("NoSwearString", async () => {
+//       var noSwear = "test string";
+//       let x = await server.containsSwears(noSwear);
+//       expect(x).toBe(false);
+//     });
+//   });
+// });
 
 // test.only("create sample data", async () => {
 //   try {
