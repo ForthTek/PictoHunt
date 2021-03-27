@@ -196,7 +196,7 @@ export default class Firebase {
       // Catch any errors
       .catch((error) => {
         console.log(error);
-        //throw error;
+        throw error;
       });
 
     return true;
@@ -579,6 +579,9 @@ export default class Firebase {
       score: 0,
       createdBy: userRef,
       timestamp: firebase.firestore.Timestamp.now(),
+      public: false,
+      checkedChallenge: false,
+      uid: this.auth.currentUser.uid,
     };
 
     // Set the data
@@ -942,6 +945,12 @@ export default class Firebase {
     const ref = this.database.doc(`Posts/${postID}`);
     await ref.update({ public: value });
     return `Updated post ${postID} to be public ${value}`;
+  };
+
+  deletePost = async (postID) => {
+    const ref = this.database.doc(`Posts/${postID}`);
+    await ref.delete();
+    return `Deleted post ${postID}`;
   };
 
   /**

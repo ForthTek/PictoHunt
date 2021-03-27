@@ -185,6 +185,9 @@ describe("2.0 signed in tests", () => {
     // test.only("getSummaryReport", async () => {
     //   console.log(await connection.getSummeryReport());
     // });
+    // test.only("createChannel", async () => {
+    //   console.log(await connection.createChannel(TEST_CHANNEL, "description here"));
+    // });
   });
 });
 

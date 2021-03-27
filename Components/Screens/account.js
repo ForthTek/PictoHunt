@@ -51,7 +51,11 @@ class Account extends Component {
         );
     }
 
-    onDelete = (id) => {};
+    onDelete = (id) => {
+        this.connection.deletePost(id).then(res => {
+            Alert.alert(res)
+        }).catch(error => Alert.alert(error.message))
+    };
 
     render() {
         if (this.state.isLoading) {
