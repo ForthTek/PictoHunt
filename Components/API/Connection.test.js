@@ -209,6 +209,8 @@ describe("2.0 signed in tests", () => {
 // });
 
 // test.only("create sample data", async () => {
+
+//   await connection.login(TEST_EMAIL, TEST_PASSWORD);
 //   try {
 //     await connection.createProfile(
 //       TEST_EMAIL,

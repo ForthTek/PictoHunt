@@ -4,7 +4,6 @@ import "firebase/firestore";
 import * as geofire from "geofire-common";
 import Upload from "./Upload.js";
 import Filter from "./Filter.js";
-import ChallengeTask from "./ChallengeTask.js";
 
 const config = {
   apiKey: "AIzaSyCvQv_waR8vtFZIrmHlgVexp0VrrGNwGBE",
@@ -750,83 +749,6 @@ export default class Firebase {
         console.log(error);
       });
   };
-
-  /**
-   *
-   * @param {Date} deadline
-   * @param {number} score
-   * @param {ChallengeTask[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
-   * @returns
-   */
-  async createChallenge(description, deadline, score, tasksPerPost) {
-    const milliseconds = deadline.getTime() - new Date().getTime();
-    const hours = milliseconds / 3600000;
-    const minDuration = 1;
-    const minRadius = 25;
-    const minScore = 10;
-
-    if (milliseconds < 0 || hours <= 1) {
-      console.log(
-        `Trying to create challenge with duration of ${hours} hours (${milliseconds}ms)`
-      );
-      throw new Error(
-        `Challange duration must be more than ${minDuration} hour`
-      );
-    }
-    if (tasksPerPost.length == 0) {
-      throw new Error(`Challenge must contain at least one task`);
-    }
-
-    let tasks = [];
-    for (let i = 0; i < tasksPerPost.length; i++) {
-      const channelName = tasksPerPost[i].channel;
-      const channelRef = this.database.doc(`Channels/${channelName}`);
-      const channelData = await channelRef.get();
-
-      if (!channelData.exists) {
-        throw new Error(`Channel ${channelName} does not exist`);
-      }
-
-      const GPS =
-        tasksPerPost[i].latitude != null && tasksPerPost[i].longitude != null
-          ? (GPS = new firebase.firestore.GeoPoint(
-              tasksPerPost[i].latitude,
-              tasksPerPost[i].longitude
-            ))
-          : null;
-      if (GPS != null && tasksPerPost[i].radius < minRadius) {
-        throw new Error(`Radius must be at least ${minRadius}`);
-      }
-
-      tasks.push({
-        description: tasksPerPost[i].description,
-        channel: channelRef,
-        GPS: GPS,
-        radius: tasksPerPost[i].radius,
-      });
-    }
-
-    if (score < minScore) {
-      throw new Error(`Reward score must be at least ${minScore}`);
-    }
-
-    const ref = this.database.collection("Challenges").doc();
-    const key = ref.id;
-
-    const username = this.currentUser().username;
-    const userRef = this.database.doc(`Users/${username}`);
-
-    const data = {
-      description: description,
-      deadline: firebase.firestore.Timestamp.fromDate(deadline),
-      score: score,
-      createdBy: userRef,
-      tasks: tasks,
-    };
-
-    await ref.set(data);
-    return key;
-  }
 
   async getChallenges(completed = false) {
     const username = this.currentUser().username;

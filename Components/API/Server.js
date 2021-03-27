@@ -60,6 +60,31 @@ export default class Server {
     });
   }
 
+  async createChallenge(username, description, deadline, tasks) {
+    console.log("CALLED CREATE FOR SERVER")
+
+    return await fetch(`${ADDRESS}/api/createChallenge`, {
+      method: "POST",
+      body: {
+        username: username,
+        description: description,
+        deadline: deadline,
+        tasks: tasks,
+      },
+    }).then(async (res) => {
+      console.log(await res.json())
+
+      if (res.status >= SERVER_ERROR) {
+        const status = await res.text();
+        console.log("Server error:");
+        console.log(status);
+        throw new Error(`Server failed to create challenge`);
+      } else {
+        //return res;
+      }
+    });
+  }
+
   async getNewChallenges(username) {
     return await fetch(`${ADDRESS}/api/getChallenges/${username}`).then(
       async (res) => {

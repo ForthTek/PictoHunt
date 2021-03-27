@@ -1,4 +1,3 @@
-import ChallengeTask from "./ChallengeTask.js";
 import Filter from "./Filter.js";
 import Firebase from "./Firebase.js";
 import Server from "./Server.js";
@@ -355,22 +354,17 @@ export default class Connection {
    *
    * @param {Date} deadline
    * @param {number} score
-   * @param {ChallengeTask[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
+   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
    * @returns
    */
-  createChallenge = async (description, deadline, score, tasksPerPost) => {
+  createChallenge = async (description, deadline, tasksPerPost) => {
     const newDescription = await this.#server.filterSwears(description);
+    const username = this.#firebase.currentUser().username;
 
-    for (let i = 0; i < tasksPerPost.length; i++) {
-      tasksPerPost[i].description = await this.#server.filterSwears(
-        tasksPerPost[i].description
-      );
-    }
-
-    return await this.#firebase.createChallenge(
+    return await this.#server.createChallenge(
+      username,
       newDescription,
       deadline,
-      score,
       tasksPerPost
     );
   };

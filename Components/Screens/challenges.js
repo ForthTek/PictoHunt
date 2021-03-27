@@ -15,7 +15,6 @@ import Challenge from "../challenge";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import ChallengeTask from "../API/ChallengeTask";
 import NewTask from "../newTask";
 
 import SearchUser from "../searchUsers";
@@ -109,13 +108,12 @@ export default class challenges extends Component {
 
     addTask = (desc, chan, long, lat, rad) => {
         const taskArrays = this.state.tasks;
-        taskArrays[taskArrays.length] = new ChallengeTask(
-            desc,
-            chan,
-            long,
-            lat,
-            rad
-        );
+        taskArrays[taskArrays.length] = {
+            channel: chan,
+            latitude: lat,
+            longitude: long,
+            radius: rad,
+        }
         this.setState({ tasks: taskArrays, taskDD: false });
         console.log(this.state.tasks);
     };
@@ -130,13 +128,12 @@ export default class challenges extends Component {
             .createChallenge(
                 this.state.modalDesc,
                 this.state.date,
-                50,
                 this.state.tasks
             )
-            .then((res) => {
-                this.setState({ modal: false });
-                this.connection.inviteUsersToChallenge(res, this.state.users);
-            });
+            // .then((res) => {
+            //     this.setState({ modal: false });
+            //     this.connection.inviteUsersToChallenge(res, this.state.users);
+            // });
     };
 
     render() {
