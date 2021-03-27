@@ -187,7 +187,7 @@ export default class Firebase {
           timestamp: firebase.firestore.Timestamp.now(),
           // Add username as string just for searching
           search: username.toUpperCase(),
-          uid: this.auth.currentUser.uid,
+          UID: this.auth.currentUser.uid,
         };
 
         // Now we should create the profile
@@ -581,7 +581,7 @@ export default class Firebase {
       timestamp: firebase.firestore.Timestamp.now(),
       public: false,
       checkedChallenge: false,
-      uid: this.auth.currentUser.uid,
+      UID: this.auth.currentUser.uid,
     };
 
     // Set the data
