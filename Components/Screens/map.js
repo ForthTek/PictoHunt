@@ -14,6 +14,7 @@ import MapView from "react-native-maps";
 import * as Location from "expo-location";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Ionicon from "react-native-vector-icons/Ionicons";
+import { PROVIDER_GOOGLE } from "react-native-maps";
 
 
 // NOTE: internal commentary dosn't have spell check, sorry
@@ -170,7 +171,7 @@ export default class Map extends Component {
 
           <MapView
             style={StyleSheet.absoluteFillObject}
-            provider={MapView.PROVIDER_GOOGLE}
+            provider={PROVIDER_GOOGLE}
             initialRegion={{
               latitude: this.state.latitude,
               longitude: this.state.longitude,
