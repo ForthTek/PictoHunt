@@ -9,8 +9,6 @@ export default class NewTask extends Component {
         this.connection = this.props.connection;
     }
     state = {
-        newTask: new ChallengeTask(),
-        newTaskDesc: "",
         newTaskChannel: "",
         newTaskLong: "",
         newTaskLat: "",
@@ -67,17 +65,6 @@ export default class NewTask extends Component {
                             <Text style={{ fontSize: 18 }}>Cancel</Text>
                         </View>
                     </Pressable>
-                    <Input
-                        placeholder='Description'
-                        onChangeText={(value) =>
-                            this.setState({
-                                newTaskDesc: value,
-                            })
-                        }
-                        value={this.state.newTaskDesc}
-                        label='Task Description:'
-                        labelStyle={{ color: "black" }}
-                    />
 
                     <SearchBar
                         label='Add a channel:'
@@ -123,7 +110,6 @@ export default class NewTask extends Component {
                     <Pressable
                         onPress={() =>
                             this.props.addTask(
-                                this.state.newTaskDesc,
                                 this.state.newTaskChannel,
                                 null,
                                 null,

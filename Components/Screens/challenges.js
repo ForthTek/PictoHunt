@@ -106,14 +106,14 @@ export default class challenges extends Component {
         this.setState({ userDD: false });
     };
 
-    addTask = (desc, chan, long, lat, rad) => {
+    addTask = (chan, long, lat, rad) => {
         const taskArrays = this.state.tasks;
         taskArrays[taskArrays.length] = {
             channel: chan,
             latitude: lat,
             longitude: long,
             radius: rad,
-        }
+        };
         this.setState({ tasks: taskArrays, taskDD: false });
         console.log(this.state.tasks);
     };
@@ -130,10 +130,16 @@ export default class challenges extends Component {
                 this.state.date,
                 this.state.tasks
             )
-            // .then((res) => {
-            //     this.setState({ modal: false });
-            //     this.connection.inviteUsersToChallenge(res, this.state.users);
-            // });
+            .then(
+                (res) => {
+                    this.setState({ modal: false });
+                    this.connection.inviteUsersToChallenge(
+                        res,
+                        this.state.users
+                    );
+                },
+                (error) => Alert.alert(error.message)
+            );
     };
 
     render() {
