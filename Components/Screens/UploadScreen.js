@@ -34,8 +34,8 @@ export default class UploadScreen extends Component {
         image: [],
         res: null,
         modalVisible: false,
-        lat: [],
-        long: [],
+        lat: null,
+        long: null,
         search: "",
         searching: false,
         channelDATA: [],
@@ -103,7 +103,11 @@ export default class UploadScreen extends Component {
                 (key) => {
                     // Maybe go to single post view now?
                     //console.log(key);
-                    this.setState({ lat: [], long: [], imageSelector: false });
+                    this.setState({
+                        lat: null,
+                        long: null,
+                        imageSelector: false,
+                    });
                     this.handleBack();
                     Alert.alert("Post Submitted: ", key.message);
                 },
