@@ -134,7 +134,7 @@ class Account extends Component {
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
                                 />
-                                <Pressable onPress={() => this.onDelete(item)}>
+                                <Pressable onPress={() => this.onDelete(item.ID)}>
                                     <FeatherIcon
                                         name='trash-2'
                                         style={{

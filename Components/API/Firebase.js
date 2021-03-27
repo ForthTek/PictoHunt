@@ -947,9 +947,19 @@ export default class Firebase {
     return `Updated post ${postID} to be public ${value}`;
   };
 
+  /**
+   *
+   * @param {string} postID
+   * @returns
+   */
   deletePost = async (postID) => {
-    const ref = this.database.doc(`Posts/${postID}`);
-    await ref.delete();
+    // Delete likes and dislikes
+    // Can't delete collections from here
+    // await this.database.collection(`Posts/${postID}/Likes`).delete();
+    // await this.database.collection(`Posts/${postID}/Dislikes`).delete();
+
+    // Delete the post
+    await this.database.doc(`Posts/${postID}`).delete();
     return `Deleted post ${postID}`;
   };
 
