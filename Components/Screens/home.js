@@ -13,7 +13,9 @@ import FilterBtn from "../filterBtn";
 import Filter from "../API/Filter";
 import { SearchBar } from "react-native-elements";
 import SearchItem from "../searchItem";
-
+import { Pressable } from "react-native";
+import IonIcon from "react-native-vector-icons/Ionicons";
+import NewChannel from "../newChannel";
 export default class Home extends Component {
     constructor(props) {
         super(props);
@@ -34,6 +36,8 @@ export default class Home extends Component {
         search: "",
         channelDATA: "",
         userDATA: "",
+
+        newChannel: false,
     };
 
     componentDidMount() {
@@ -159,12 +163,22 @@ export default class Home extends Component {
         Promise.all([
             this.connection.searchUsers(search),
             this.connection.searchChannels(search),
-        ]).then(result => {
+        ]).then((result) => {
             this.setState({
                 userDATA: result[0],
                 channelDATA: result[1],
             });
-        })
+        });
+    };
+
+    openNewChannel = () => {
+        console.log("newChannel");
+        this.setState({ newChannel: true });
+    };
+
+    closeNewChannel = () => {
+        console.log("newChannel");
+        this.setState({ newChannel: false });
     };
 
     render() {
@@ -220,6 +234,24 @@ export default class Home extends Component {
                             <Text style={styles.ddText}>
                                 ------Channels------
                             </Text>
+                            <Pressable onPress={this.openNewChannel}>
+                                <View style={{ padingLeft: "5%" }}>
+                                    <IonIcon
+                                        name='add-circle-outline'
+                                        style={{
+                                            fontSize: 28,
+                                            color: "white",
+                                        }}
+                                    />
+                                </View>
+                            </Pressable>
+
+                            {this.state.newChannel && (
+                                <NewChannel
+                                    connection={this.connection}
+                                    closeModal={this.closeNewChannel}
+                                />
+                            )}
                             <FlatList
                                 data={this.state.channelDATA}
                                 renderItem={({ item }) => (
