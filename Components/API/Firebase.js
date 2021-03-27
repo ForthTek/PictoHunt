@@ -170,10 +170,9 @@ export default class Firebase {
     await this.auth
       // Create the user
       .createUserWithEmailAndPassword(email, password)
-      .then(() => this.auth.currentUser)
       // Set their display name
-      .then((user) =>
-        user.updateProfile({
+      .then(() =>
+        this.auth.currentUser.updateProfile({
           displayName: username,
         })
       )
@@ -197,7 +196,7 @@ export default class Firebase {
       // Catch any errors
       .catch((error) => {
         console.log(error);
-        throw error;
+        //throw error;
       });
 
     return true;
@@ -429,7 +428,7 @@ export default class Firebase {
       return posts;
     } catch (error) {
       console.log(error);
-      throw Error(`Failed to get browse (${error.message})`);
+      throw Error(error.message);
     }
   };
 

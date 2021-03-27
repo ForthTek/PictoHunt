@@ -63,6 +63,7 @@ export default class SignUp extends Component {
                 this.state.password
             )
             .catch((error) => {
+                console.log(error);
                 Alert.alert(error.message);
             });
     };
