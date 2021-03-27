@@ -15,6 +15,7 @@ import * as Location from "expo-location";
 import FeatherIcon from "react-native-vector-icons/Feather";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import { PROVIDER_GOOGLE } from "react-native-maps";
+import SinglePost from "../singlePost";
 
 
 // NOTE: internal commentary dosn't have spell check, sorry
@@ -37,6 +38,7 @@ export default class Map extends Component {
       // The current post being displayed as a single post
       singlePostOpen: false,
       currentSinglePost: [],
+      refresh: false,
     };
 
     this.connection = props.connection;
@@ -49,7 +51,46 @@ export default class Map extends Component {
 
   closesinglepost = () => {
     this.setState({singlePostOpen: false, currentSinglePost: []})
+
   }
+
+  onLikeBtnPress = (type, id, updateScore) => {
+      if (type === "like") {
+          this.connection.likePost(id).then(
+              () => {
+                  updateScore(id);
+              },
+              (error) => {
+                  Alert.alert(error.message);
+              }
+          );
+      }
+      if (type === "dislike") {
+          this.connection
+              .dislikePost(id)
+              .then(
+                  () => {
+                      updateScore(id);
+                  },
+                  (error) => {
+                      Alert.alert(error.message);
+                  }
+              )
+              .catch((error) => {
+                  Alert.alert(error.message);
+              });
+      }
+      if (type === "remove") {
+          this.connection.removeInteractionFromPost(id).then(
+              () => {
+                  updateScore(id);
+              },
+              (error) => {
+                  Alert.alert(error.message);
+              }
+          );
+      }
+  };
 
   async componentDidMount() {
     try {
@@ -136,24 +177,13 @@ export default class Map extends Component {
           >
               <View style={styles.center}>
                   <View style={styles.modalView}>
-                      <Pressable
-                          onPress={() => {
-                              this.closesinglepost();
-                          }}
-                      >
-                          <FeatherIcon
-                              name='x-circle'
-                              style={styles.icon1}
-                          />
-                      </Pressable>
 
-                    <Text> {this.state.currentSinglePost.title} </Text>
-                    <Text> {this.state.currentSinglePost.ID} </Text>
-                    <Text> By {this.state.currentSinglePost.user} </Text>
-                    <Text> Posted in {this.state.currentSinglePost.channel} </Text>
-                    <Text> Score: {this.state.currentSinglePost.score} </Text>
-
-                    <Text> Idk what im doing </Text>
+                      <SinglePost
+                          item={this.state.currentSinglePost}
+                          back={this.closesinglepost}
+                          connection={this.connection}
+                          onLikeBtnPress={this.onLikeBtnPress}
+                      />
 
                   </View>
               </View>
