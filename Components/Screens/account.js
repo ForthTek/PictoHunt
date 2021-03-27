@@ -28,6 +28,7 @@ class Account extends Component {
         DATA: "",
         user: null,
         postDATA: [],
+        refresh: false,
     };
 
     onSignOutPress = () => {
@@ -51,11 +52,69 @@ class Account extends Component {
         );
     }
 
+    onRefresh = () => {
+        this.setState({ refresh: true, postDATA: [] });
+        this.connection.getOurProfile().then(
+            (res) => {
+                this.setState({
+                    postDATA: res.posts,
+                    refresh: false,
+                });
+                //console.log(res);
+            },
+            (error) => {
+                console.log(error);
+                Alert.alert(error.message);
+            }
+        );
+    };
+
     onDelete = (id) => {
         //this.connection.isAdmin().then((x) => console.log(x));
-        this.connection.deletePost(id).then(res => {
-            Alert.alert(res)
-        }).catch(error => Alert.alert(error.message))
+        this.connection
+            .deletePost(id)
+            .then((res) => {
+                Alert.alert(res);
+            })
+            .catch((error) => Alert.alert(error.message));
+    };
+
+    onLikeBtnPress = (type, id, updateScore) => {
+        if (type === "like") {
+            this.connection.likePost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
+        if (type === "dislike") {
+            this.connection
+                .dislikePost(id)
+                .then(
+                    () => {
+                        updateScore(id);
+                    },
+                    (error) => {
+                        Alert.alert(error.message);
+                    }
+                )
+                .catch((error) => {
+                    Alert.alert(error.message);
+                });
+        }
+        if (type === "remove") {
+            this.connection.removeInteractionFromPost(id).then(
+                () => {
+                    updateScore(id);
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                }
+            );
+        }
     };
 
     render() {
@@ -135,7 +194,9 @@ class Account extends Component {
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
                                 />
-                                <Pressable onPress={() => this.onDelete(item.ID)}>
+                                <Pressable
+                                    onPress={() => this.onDelete(item.ID)}
+                                >
                                     <FeatherIcon
                                         name='trash-2'
                                         style={{
