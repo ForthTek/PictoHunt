@@ -158,7 +158,7 @@ export default class Firebase {
    * @param {boolean} isPublic
    * @returns true if succesful
    */
-  createProfile = async (email, username, password, isPublic = true) => {
+  createProfile = async (email, username, password) => {
     const ref = this.database.doc(`Users/${username}`);
     const data = await ref.get();
 
@@ -181,7 +181,6 @@ export default class Firebase {
       .then(async () => {
         const userData = {
           email: email,
-          public: isPublic,
           challengeScore: 0,
           timestamp: firebase.firestore.Timestamp.now(),
           // Add username as string just for searching

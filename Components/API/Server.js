@@ -61,7 +61,7 @@ export default class Server {
   }
 
   async createChallenge(username, description, deadline, tasks) {
-    console.log("CALLED CREATE FOR SERVER")
+    console.log("CALLED CREATE FOR SERVER");
 
     return await fetch(`${ADDRESS}/api/createChallenge`, {
       method: "POST",
@@ -72,7 +72,7 @@ export default class Server {
         tasks: tasks,
       },
     }).then(async (res) => {
-      console.log(await res.json())
+      console.log(await res.json());
 
       if (res.status >= SERVER_ERROR) {
         const status = await res.text();
@@ -83,20 +83,6 @@ export default class Server {
         //return res;
       }
     });
-  }
-
-  async getNewChallenges(username) {
-    return await fetch(`${ADDRESS}/api/getChallenges/${username}`).then(
-      async (res) => {
-        if (res.status >= SERVER_ERROR) {
-          const status = await res.text();
-          console.log("Server error:");
-          console.log(status);
-        } else {
-          return true;
-        }
-      }
-    );
   }
 
   async containsSwears(sentence) {

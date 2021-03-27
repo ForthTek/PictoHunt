@@ -43,24 +43,6 @@ export default class Connection {
 
   /**
    *
-   * @returns
-   */
-  isAdmin = async () => {
-    return await this.#firebase.isAdmin();
-  };
-
-  /**
-   *
-   * @param {string} postID
-   * @param {boolean} value
-   * @returns
-   */
-  setPostPublic = async (postID, value) => {
-    return await this.#firebase.setPostPublic(postID, value);
-  };
-
-  /**
-   *
    * @param {string} email
    * @param {string} password
    * @returns true if successful
@@ -93,14 +75,12 @@ export default class Connection {
    * @param {boolean} isPublic
    * @returns true if succesful
    */
-  createProfile = async (email, username, password, isPublic = true) => {
+  createProfile = async (email, username, password) => {
     if (await this.#server.containsSwears(username)) {
       throw new Error(`Username ${username} contains a swear`);
     }
 
-    await this.#firebase.createProfile(email, username, password, isPublic);
-
-    await this.#server.getNewChallenges(username);
+    await this.#firebase.createProfile(email, username, password);
 
     return true;
   };
