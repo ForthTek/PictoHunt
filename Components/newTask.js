@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import ChallengeTask from "./API/ChallengeTask";
 
 import { Text, View, StyleSheet, FlatList, Pressable } from "react-native";
 import { Input, SearchBar } from "react-native-elements";
