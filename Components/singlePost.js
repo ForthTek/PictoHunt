@@ -92,7 +92,7 @@ export default class SinglePost extends Component {
                         sliderWidth={300}
                         itemWidth={300}
                         renderItem={this._renderItem}
-                        firstItem={this.state.photos.length - 1}
+                        firstItem={0}
                         onSnapToItem={(index) =>
                             this.setState({ activeIndex: index })
                         }
