@@ -52,6 +52,7 @@ class Account extends Component {
     }
 
     onDelete = (id) => {
+        //this.connection.isAdmin().then((x) => console.log(x));
         this.connection.deletePost(id).then(res => {
             Alert.alert(res)
         }).catch(error => Alert.alert(error.message))

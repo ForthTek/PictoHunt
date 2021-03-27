@@ -930,7 +930,7 @@ export default class Firebase {
       .doc(`Admins/${username}`)
       .get()
       .then(
-        () => true,
+        (res) => true,
         (error) => false
       );
   };
