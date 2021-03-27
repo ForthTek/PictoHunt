@@ -17,14 +17,23 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "app.pictohunt",
+      "config": {
+        "googleMapsApiKey": "AIzaSyCOIl5joZXH8Am8YAzISO4-AQNr2Hgl01Y"
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/ForthTek.png",
         "backgroundColor": "#00a8f3"
       },
-      "package": "app.pictohunt"
+      "package": "app.pictohunt",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyA7vpM7ACG9n75v1jkfNoJ79TMkLFwwDUQ"
+        }
+      }
     },
     "web": {
       "favicon": "./assets/favicon.png"
