@@ -1,4 +1,3 @@
-import ChallengeTask from "./ChallengeTask.js";
 import Connection from "./Connection.js";
 import Filter from "./Filter.js";
 import Server from "./Server.js";
@@ -27,39 +26,39 @@ afterAll(() => {
 });
 
 // Tests when the user is a guest
-describe("1.0 guest tests", () => {
-  beforeAll(async () => {
-    await connection.logout();
-  });
+// describe("1.0 guest tests", () => {
+//   beforeAll(async () => {
+//     await connection.logout();
+//   });
 
-  test("1.1 guest isLoggedIn", async () => {
-    let x = connection.isLoggedIn();
-    expect(x).toBe(false);
-  });
+//   test("1.1 guest isLoggedIn", async () => {
+//     let x = connection.isLoggedIn();
+//     expect(x).toBe(false);
+//   });
 
-  test("1.2 guest getAllPosts", async () => {
-    let x = await connection.getAllPosts(new Filter());
-    expect(x.length).toBeGreaterThan(0);
-  });
+//   test("1.2 guest getAllPosts", async () => {
+//     let x = await connection.getAllPosts(new Filter());
+//     expect(x.length).toBeGreaterThan(0);
+//   });
 
-  // test("guest getAllPosts", async () => {
-  //   let x = await connection.getAllPosts();
-  //   expect(x.length).toBeGreaterThan(0);
-  // });
+//   // test("guest getAllPosts", async () => {
+//   //   let x = await connection.getAllPosts();
+//   //   expect(x.length).toBeGreaterThan(0);
+//   // });
 
-  // test("guest getAllPosts", async () => {
-  //   let x = await connection.getAllPosts();
-  //   expect(x.length).toBeGreaterThan(0);
-  // });
+//   // test("guest getAllPosts", async () => {
+//   //   let x = await connection.getAllPosts();
+//   //   expect(x.length).toBeGreaterThan(0);
+//   // });
 
-  test("1.3 guest getBrowse", async () => {
-    // A guest user viewing browse should see all posts
-    const numberOfAllPosts = (await connection.getAllPosts(new Filter()))
-      .length;
-    const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
-    expect(numberOfBrowse).toBe(numberOfAllPosts);
-  });
-});
+//   test("1.3 guest getBrowse", async () => {
+//     // A guest user viewing browse should see all posts
+//     const numberOfAllPosts = (await connection.getAllPosts(new Filter()))
+//       .length;
+//     const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
+//     expect(numberOfBrowse).toBe(numberOfAllPosts);
+//   });
+// });
 
 describe("2.0 signed in tests", () => {
   beforeAll(async () => {
@@ -144,16 +143,20 @@ describe("2.0 signed in tests", () => {
   });
 
   describe("4.0 challenge tests", () => {
+    // beforeAll(async () => {
+    //   await connection.login(TEST_EMAIL, TEST_PASSWORD);
+    // });
+
     // test.only("createChallenge", async () => {
     //   let x = await connection.createChallenge(
-    //     "photograph two dogs",
+    //     "a description",
     //     new Date("2021-04-17T03:24:00"),
-    //     100,
     //     [
-    //       new ChallengeTask("picture of a pug", "Test"),
-    //       new ChallengeTask("cute golden pls", "Test2", 1, 2),
+    //       { channel: "Test", latitude: null, longitude: null, radius: 100 },
+    //       { channel: "Test", latitude: 1, longitude: 2, radius: 100 },
     //     ]
     //   );
+    //   console.log(x);
     // });
 
     const c = "UXlZhJc8sQGub94WGpiR";

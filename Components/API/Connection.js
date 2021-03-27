@@ -332,18 +332,18 @@ export default class Connection {
 
   /**
    *
+   * @param {string} description
    * @param {Date} deadline
-   * @param {number} score
    * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
    * @returns
    */
   createChallenge = async (description, deadline, tasksPerPost) => {
-    const newDescription = await this.#server.filterSwears(description);
+    // Don't need to censor description as server will do that there
     const username = this.#firebase.currentUser().username;
 
     return await this.#server.createChallenge(
       username,
-      newDescription,
+      description,
       deadline,
       tasksPerPost
     );
