@@ -70,7 +70,7 @@ export default class challenges extends Component {
     };
 
     onDelete = (challengeID) => {
-        console.log("delete");
+        //console.log("delete");
         this.connection.deleteChallenge(challengeID).then(() => {
             Alert.alert("Challenge Deleted");
         });

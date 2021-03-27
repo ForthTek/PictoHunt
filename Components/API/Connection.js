@@ -434,6 +434,10 @@ export default class Connection {
     return await this.#firebase.setPostPublic(postID, value);
   };
 
+  deletePost = async (postID) => {
+    return await this.#firebase.deletePost(postID);
+  };
+
   /**
    *
    * @returns
