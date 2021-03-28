@@ -14,6 +14,7 @@ import SettingBtn from "../settingBtn";
 import Post from "../post";
 import { Pressable } from "react-native";
 import FeatherIcon from "react-native-vector-icons/Feather";
+import Stats from "../stats";
 class Account extends Component {
     constructor(props) {
         super(props);
@@ -29,6 +30,8 @@ class Account extends Component {
         user: null,
         postDATA: [],
         refresh: false,
+        isAdmin: false,
+        stats: false,
     };
 
     onSignOutPress = () => {
@@ -43,12 +46,19 @@ class Account extends Component {
                     isLoading: false,
                     postDATA: res.posts,
                 });
-                //console.log(res);
+                console.log(res);
             },
             (error) => {
                 console.log(error);
                 Alert.alert(error.message);
             }
+        );
+        this.connection.isAdmin().then(
+            (res) => {
+                this.setState({ isAdmin: res });
+                console.log(res);
+            },
+            (error) => Alert.alert(error.message)
         );
     }
 
@@ -120,6 +130,14 @@ class Account extends Component {
         }
     };
 
+    openStats = () => {
+        console.log("stats");
+        this.setState({ stats: true });
+    };
+    closeStats = () => {
+        this.setState({ stats: false });
+    };
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -156,6 +174,15 @@ class Account extends Component {
                                     .substring(4, 15)}
                             </Text>
 
+                            {this.state.isAdmin && (
+                                <SettingBtn
+                                    label='App Stats'
+                                    icon='stats-chart-outline'
+                                    onPress={() => {
+                                        this.openStats();
+                                    }}
+                                />
+                            )}
                             <SettingBtn
                                 label='Log Out'
                                 icon='log-out-outline'
@@ -164,6 +191,12 @@ class Account extends Component {
                                 }}
                             />
                         </View>
+                        {this.state.stats && (
+                            <Stats
+                                back={this.closeStats}
+                                connection={this.connection}
+                            />
+                        )}
                     </View>
 
                     <View
@@ -233,7 +266,7 @@ const styles = StyleSheet.create({
     },
     info: {
         fontSize: 18,
-        paddingBottom: "5%",
+        paddingBottom: "2%",
     },
     loadCon: {
         flex: 1,

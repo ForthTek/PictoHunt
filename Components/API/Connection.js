@@ -3,483 +3,490 @@ import Firebase from "./Firebase.js";
 import Server from "./Server.js";
 
 export default class Connection {
-  #firebase;
-  #server;
-  #cachedChannels;
-  #cachedUsers;
+    #firebase;
+    #server;
+    #cachedChannels;
+    #cachedUsers;
 
-  constructor() {
-    this.#firebase = new Firebase();
-    this.#server = new Server();
+    constructor() {
+        this.#firebase = new Firebase();
+        this.#server = new Server();
 
-    this.#cachedChannels = {};
-    this.#cachedUsers = {};
-  }
-
-  /**
-   * Closes the connection to Firebase
-   */
-  close = () => {
-    this.#firebase.close();
-  };
-
-  /**
-   * Invokes the function with no parameters, whenever the login state of the user changes
-   *
-   * @param {function} callback
-   */
-  addLoginStateListener = (callback) => {
-    return this.#firebase.addLoginStateListener(callback);
-  };
-
-  /**
-   * @returns true if there is a user logged in
-   */
-  isLoggedIn = () => {
-    return this.#firebase.isLoggedIn();
-  };
-
-  /**
-   * @returns JSON with .username and .email
-   */
-  currentUser = () => {
-    return this.#firebase.currentUser();
-  };
-
-  /**
-   *
-   * @param {string} email
-   * @param {string} password
-   * @returns true if successful
-   */
-  login = async (email, password) => {
-    return await this.#firebase.login(email, password);
-  };
-
-  /**
-   * @returns true if succesful
-   */
-  logout = async () => {
-    return await this.#firebase.logout();
-  };
-
-  /**
-   *
-   * @param {string} email
-   * @returns true if succesful
-   */
-  resetPassword = async (email) => {
-    return await this.#firebase.resetPassword(email);
-  };
-
-  /**
-   *
-   * @param {string} email
-   * @param {string} username
-   * @param {string} password
-   * @param {boolean} isPublic
-   * @returns true if succesful
-   */
-  createProfile = async (email, username, password) => {
-    if (await this.#server.containsSwears(username)) {
-      throw new Error(`Username ${username} contains a swear`);
+        this.#cachedChannels = {};
+        this.#cachedUsers = {};
     }
 
-    await this.#firebase.createProfile(email, username, password);
+    /**
+     * Closes the connection to Firebase
+     */
+    close = () => {
+        this.#firebase.close();
+    };
 
-    return true;
-  };
+    /**
+     * Invokes the function with no parameters, whenever the login state of the user changes
+     *
+     * @param {function} callback
+     */
+    addLoginStateListener = (callback) => {
+        return this.#firebase.addLoginStateListener(callback);
+    };
 
-  /**
-   *
-   * @param {string} postID
-   * @returns
-   */
-  likePost = async (postID) => {
-    return await this.#firebase
-      .interactWithPost(postID, this.#firebase.PostInteractionType.like)
-      .then(
-        async () => {
-          await this.#server.updatePostValues(postID);
-          return true;
-        },
-        (error) => {
-          console.log(error);
-          throw new Error(`Server failed to update post ${postID}`);
+    /**
+     * @returns true if there is a user logged in
+     */
+    isLoggedIn = () => {
+        return this.#firebase.isLoggedIn();
+    };
+
+    /**
+     * @returns JSON with .username and .email
+     */
+    currentUser = () => {
+        return this.#firebase.currentUser();
+    };
+
+    /**
+     *
+     * @param {string} email
+     * @param {string} password
+     * @returns true if successful
+     */
+    login = async (email, password) => {
+        return await this.#firebase.login(email, password);
+    };
+
+    /**
+     * @returns true if succesful
+     */
+    logout = async () => {
+        return await this.#firebase.logout();
+    };
+
+    /**
+     *
+     * @param {string} email
+     * @returns true if succesful
+     */
+    resetPassword = async (email) => {
+        return await this.#firebase.resetPassword(email);
+    };
+
+    /**
+     *
+     * @param {string} email
+     * @param {string} username
+     * @param {string} password
+     * @param {boolean} isPublic
+     * @returns true if succesful
+     */
+    createProfile = async (email, username, password) => {
+        if (await this.#server.containsSwears(username)) {
+            throw new Error(`Username ${username} contains a swear`);
         }
-      )
-      .then(async (res) => {
-        return this.#firebase.getPost(postID);
-      });
-  };
 
-  /**
-   *
-   * @param {string} postID
-   * @returns
-   */
-  dislikePost = async (postID) => {
-    return await this.#firebase
-      .interactWithPost(postID, this.#firebase.PostInteractionType.dislike)
-      .then(
-        async () => {
-          await this.#server.updatePostValues(postID);
-          return true;
-        },
-        (error) => {
-          console.log(error);
-          throw new Error(`Server failed to update post ${postID}`);
+        await this.#firebase.createProfile(email, username, password);
+
+        return true;
+    };
+
+    /**
+     *
+     * @param {string} postID
+     * @returns
+     */
+    likePost = async (postID) => {
+        return await this.#firebase
+            .interactWithPost(postID, this.#firebase.PostInteractionType.like)
+            .then(
+                async () => {
+                    await this.#server.updatePostValues(postID);
+                    return true;
+                },
+                (error) => {
+                    console.log(error);
+                    throw new Error(`Server failed to update post ${postID}`);
+                }
+            )
+            .then(async (res) => {
+                return this.#firebase.getPost(postID);
+            });
+    };
+
+    /**
+     *
+     * @param {string} postID
+     * @returns
+     */
+    dislikePost = async (postID) => {
+        return await this.#firebase
+            .interactWithPost(
+                postID,
+                this.#firebase.PostInteractionType.dislike
+            )
+            .then(
+                async () => {
+                    await this.#server.updatePostValues(postID);
+                    return true;
+                },
+                (error) => {
+                    console.log(error);
+                    throw new Error(`Server failed to update post ${postID}`);
+                }
+            )
+            .then(async (res) => {
+                return this.#firebase.getPost(postID);
+            });
+    };
+
+    /**
+     *
+     * @param {string} postID
+     * @returns
+     */
+    removeInteractionFromPost = async (postID) => {
+        return await this.#firebase
+            .interactWithPost(postID, this.#firebase.PostInteractionType.remove)
+            .then(
+                async () => {
+                    await this.#server.updatePostValues(postID);
+                    return true;
+                },
+                (error) => {
+                    console.log(error);
+                    throw new Error(`Server failed to update post ${postID}`);
+                }
+            )
+            .then(async (res) => {
+                return this.#firebase.getPost(postID);
+            });
+    };
+
+    /**
+     *
+     * @param {string} postID
+     * @returns
+     */
+    getPost = async (postID) => {
+        return await this.#firebase.getPost(postID);
+    };
+
+    /**
+     *
+     * @param {Filter} filter
+     * @returns
+     */
+    getBrowse = async (filter = new Filter()) => {
+        const user = this.currentUser();
+        const filterFollowing = filter.followedUsers || filter.followedChannels;
+
+        // If there is no user, or filter specifies to load all posts
+        if (!user || !filterFollowing) {
+            return await this.getAllPosts(filter);
         }
-      )
-      .then(async (res) => {
-        return this.#firebase.getPost(postID);
-      });
-  };
-
-  /**
-   *
-   * @param {string} postID
-   * @returns
-   */
-  removeInteractionFromPost = async (postID) => {
-    return await this.#firebase
-      .interactWithPost(postID, this.#firebase.PostInteractionType.remove)
-      .then(
-        async () => {
-          await this.#server.updatePostValues(postID);
-          return true;
-        },
-        (error) => {
-          console.log(error);
-          throw new Error(`Server failed to update post ${postID}`);
+        // Otherwise do browse
+        else {
+            return await this.#firebase.getBrowse(filter);
         }
-      )
-      .then(async (res) => {
-        return this.#firebase.getPost(postID);
-      });
-  };
+    };
 
-  /**
-   *
-   * @param {string} postID
-   * @returns
-   */
-  getPost = async (postID) => {
-    return await this.#firebase.getPost(postID);
-  };
+    /**
+     *
+     * @param {Filter} filter
+     * @returns
+     */
+    getAllPosts = async (filter = new Filter()) => {
+        return await this.#firebase.getPosts(
+            this.#firebase.database
+                .collection("Posts")
+                .where("public", "==", true)
+                .orderBy(filter.orderBy, filter.direction)
+        );
+    };
 
-  /**
-   *
-   * @param {Filter} filter
-   * @returns
-   */
-  getBrowse = async (filter = new Filter()) => {
-    const user = this.currentUser();
-    const filterFollowing = filter.followedUsers || filter.followedChannels;
+    /**
+     *
+     * @returns
+     */
+    getMap = async (filter = new Filter()) => {
+        //const limit = filter.useLimit ? filter.limit : 100;
+        const limit = 20;
 
-    // If there is no user, or filter specifies to load all posts
-    if (!user || !filterFollowing) {
-      return await this.getAllPosts(filter);
-    }
-    // Otherwise do browse
-    else {
-      return await this.#firebase.getBrowse(filter);
-    }
-  };
+        // Posts by the user
+        if (filter.postsByMe) {
+            const username = this.currentUser().username;
+            const user = this.#firebase.database.doc(`Users/${username}`);
 
-  /**
-   *
-   * @param {Filter} filter
-   * @returns
-   */
-  getAllPosts = async (filter = new Filter()) => {
-    return await this.#firebase.getPosts(
-      this.#firebase.database
-        .collection("Posts")
-        .where("public", "==", true)
-        .orderBy(filter.orderBy, filter.direction)
-    );
-  };
+            return await this.#firebase.getPosts(
+                this.#firebase.database
+                    .collection("Posts")
+                    .where("public", "==", true)
+                    .where("GPS", "!=", null)
+                    .where("createdBy", "==", user)
+                    .limit(limit)
+            );
+        }
+        // All posts
+        else {
+            return await this.#firebase.getPosts(
+                this.#firebase.database
+                    .collection("Posts")
+                    .where("public", "==", true)
+                    .where("GPS", "!=", null)
+                    .limit(limit)
+            );
+        }
+    };
 
-  /**
-   *
-   * @returns
-   */
-  getMap = async (filter = new Filter()) => {
-    //const limit = filter.useLimit ? filter.limit : 100;
-    const limit = 20;
+    /**
+     *
+     * @param {Filter} filter
+     * @returns
+     */
+    getAllReportedPosts = async (filter = new Filter()) => {
+        return await this.#firebase.getPosts(
+            this.#firebase.database
+                .collection("Posts")
+                .where("public", "==", false)
+                .orderBy(filter.orderBy, filter.direction)
+        );
+    };
 
-    // Posts by the user
-    if (filter.postsByMe) {
-      const username = this.currentUser().username;
-      const user = this.#firebase.database.doc(`Users/${username}`);
+    /**
+     *
+     * @returns
+     */
+    getOurProfile = async () => {
+        const user = this.#firebase.currentUser();
+        return await this.getProfile(user.username);
+    };
 
-      return await this.#firebase.getPosts(
-        this.#firebase.database
-          .collection("Posts")
-          .where("public", "==", true)
-          .where("GPS", "!=", null)
-          .where("createdBy", "==", user)
-          .limit(limit)
-      );
-    }
-    // All posts
-    else {
-      return await this.#firebase.getPosts(
-        this.#firebase.database
-          .collection("Posts")
-          .where("public", "==", true)
-          .where("GPS", "!=", null)
-          .limit(limit)
-      );
-    }
-  };
+    /**
+     *
+     * @param {string} username
+     * @param {boolean} loadFollowedFeeds
+     */
+    getProfile = async (username, filter = new Filter()) => {
+        return await this.#firebase.getProfile(username, filter);
+    };
 
-  /**
-   *
-   * @param {Filter} filter
-   * @returns
-   */
-  getAllReportedPosts = async (filter = new Filter()) => {
-    return await this.#firebase.getPosts(
-      this.#firebase.database
-        .collection("Posts")
-        .where("public", "==", false)
-        .orderBy(filter.orderBy, filter.direction)
-    );
-  };
+    /**
+     *
+     * @param {string} title
+     * @param {string} channelName
+     * @param {number} latitude
+     * @param {number} longitude
+     * @param {Blob[]} photos
+     * @returns
+     */
+    createPost = async (title, channelName, latitude, longitude, photos) => {
+        // Filter any swears from the title
+        const newTitle = await this.#server.filterSwears(title);
 
-  /**
-   *
-   * @returns
-   */
-  getOurProfile = async () => {
-    const user = this.#firebase.currentUser();
-    return await this.getProfile(user.username);
-  };
+        return await this.#firebase
+            // Create the post
+            .createPost(newTitle, channelName, latitude, longitude, photos)
+            .then(async (newKey) => {
+                // Get the server to approve the post
+                let message = await this.#server.approvePost(newKey);
+                return { ID: newKey, message: message.message };
+            });
+    };
 
-  /**
-   *
-   * @param {string} username
-   * @param {boolean} loadFollowedFeeds
-   */
-  getProfile = async (username, filter = new Filter()) => {
-    return await this.#firebase.getProfile(username, filter);
-  };
+    /**
+     *
+     * @param {string} name
+     * @returns
+     */
+    getChannel = async (name, filter = new Filter()) => {
+        return await this.#firebase.getChannel(name, filter);
+    };
 
-  /**
-   *
-   * @param {string} title
-   * @param {string} channelName
-   * @param {number} latitude
-   * @param {number} longitude
-   * @param {Blob[]} photos
-   * @returns
-   */
-  createPost = async (title, channelName, latitude, longitude, photos) => {
-    // Filter any swears from the title
-    const newTitle = await this.#server.filterSwears(title);
+    /**
+     *
+     * @param {string} usernameToFollow
+     * @param {boolean} value
+     */
+    followUser = async (usernameToFollow, value) => {
+        return await this.#firebase.followUser(usernameToFollow, value);
+    };
 
-    return await this.#firebase
-      // Create the post
-      .createPost(newTitle, channelName, latitude, longitude, photos)
-      .then(async (newKey) => {
-        // Get the server to approve the post
-        let message = await this.#server.approvePost(newKey);
-        return { ID: newKey, message: message.message };
-      });
-  };
+    /**
+     *
+     * @param {string} channelNameToFollow
+     * @param {boolean} value
+     */
+    followChannel = async (channelNameToFollow, value) => {
+        return await this.#firebase.followChannel(channelNameToFollow, value);
+    };
 
-  /**
-   *
-   * @param {string} name
-   * @returns
-   */
-  getChannel = async (name, filter = new Filter()) => {
-    return await this.#firebase.getChannel(name, filter);
-  };
+    /**
+     *
+     * @param {string} text
+     * @returns
+     */
+    searchChannels = (text) => {
+        const search = text.toUpperCase();
 
-  /**
-   *
-   * @param {string} usernameToFollow
-   * @param {boolean} value
-   */
-  followUser = async (usernameToFollow, value) => {
-    return await this.#firebase.followUser(usernameToFollow, value);
-  };
+        let results = [];
+        for (let channel in this.#cachedChannels) {
+            if (channel.toUpperCase().startsWith(search)) {
+                results.push(channel);
+            }
+        }
 
-  /**
-   *
-   * @param {string} channelNameToFollow
-   * @param {boolean} value
-   */
-  followChannel = async (channelNameToFollow, value) => {
-    return await this.#firebase.followChannel(channelNameToFollow, value);
-  };
+        return results;
+    };
 
-  /**
-   *
-   * @param {string} text
-   * @returns
-   */
-  searchChannels = (text) => {
-    const search = text.toUpperCase();
+    /**
+     *
+     * @param {string} text
+     * @returns
+     */
+    searchUsers = (text) => {
+        const search = text.toUpperCase();
 
-    let results = [];
-    for (let channel in this.#cachedChannels) {
-      if (channel.toUpperCase().startsWith(search)) {
-        results.push(channel);
-      }
-    }
+        let results = [];
+        for (let user in this.#cachedUsers) {
+            if (user.toUpperCase().startsWith(search)) {
+                results.push(user);
+            }
+        }
 
-    return results;
-  };
+        return results;
+    };
 
-  /**
-   *
-   * @param {string} text
-   * @returns
-   */
-  searchUsers = (text) => {
-    const search = text.toUpperCase();
+    loadChannelsSearch = async () => {
+        await this.#firebase.database
+            .collection("Channels")
+            .get()
+            .then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    this.#cachedChannels[doc.id] = true;
+                });
+            });
+    };
 
-    let results = [];
-    for (let user in this.#cachedUsers) {
-      if (user.toUpperCase().startsWith(search)) {
-        results.push(user);
-      }
-    }
+    loadUsersSearch = async () => {
+        await this.#firebase.database
+            .collection("Users")
+            .get()
+            .then((snapshot) => {
+                snapshot.forEach((doc) => {
+                    this.#cachedUsers[doc.id] = true;
+                });
+            });
+    };
 
-    return results;
-  };
+    /**
+     *
+     * @param {string} description
+     * @param {Date} deadline
+     * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
+     * @returns
+     */
+    createChallenge = async (description, deadline, tasksPerPost) => {
+        // Don't need to censor description as server will do that there
+        const username = this.#firebase.currentUser().username;
 
-  loadChannelsSearch = async () => {
-    await this.#firebase.database
-      .collection("Channels")
-      .get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          this.#cachedChannels[doc.id] = true;
-        });
-      });
-  };
+        return await this.#server.createChallenge(
+            username,
+            description,
+            deadline,
+            tasksPerPost
+        );
+    };
 
-  loadUsersSearch = async () => {
-    await this.#firebase.database
-      .collection("Users")
-      .get()
-      .then((snapshot) => {
-        snapshot.forEach((doc) => {
-          this.#cachedUsers[doc.id] = true;
-        });
-      });
-  };
+    inviteUsersToChallenge = async (challenge, users) => {
+        let promises = [];
+        for (let i = 0; i < users.length; i++) {
+            promises.push(
+                this.#server.inviteUserToChallenge(challenge, users[i])
+            );
+        }
+        await Promise.all(promises);
+    };
 
-  /**
-   *
-   * @param {string} description
-   * @param {Date} deadline
-   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
-   * @returns
-   */
-  createChallenge = async (description, deadline, tasksPerPost) => {
-    // Don't need to censor description as server will do that there
-    const username = this.#firebase.currentUser().username;
+    /**
+     *
+     * @param {string} challengeID
+     * @returns
+     */
+    deleteChallenge = async (challengeID) => {
+        return await this.#firebase.deleteChallengeRequest(challengeID);
+    };
 
-    return await this.#server.createChallenge(
-      username,
-      description,
-      deadline,
-      tasksPerPost
-    );
-  };
+    /**
+     *
+     * @param {boolean} completed
+     * @returns
+     */
+    getChallenges = async (completed = false) => {
+        return await this.#firebase.getChallenges(completed);
+    };
 
-  inviteUsersToChallenge = async (challenge, users) => {
-    let promises = [];
-    for (let i = 0; i < users.length; i++) {
-      promises.push(this.#server.inviteUserToChallenge(challenge, users[i]));
-    }
-    await Promise.all(promises);
-  };
+    /**
+     *
+     * @param {string} postID
+     * @returns
+     */
+    reportPost = async (postID) => {
+        await this.#server.reportPost(postID);
+        return true;
+    };
 
-  /**
-   *
-   * @param {string} challengeID
-   * @returns
-   */
-  deleteChallenge = async (challengeID) => {
-    return await this.#firebase.deleteChallengeRequest(challengeID);
-  };
-
-  /**
-   *
-   * @param {boolean} completed
-   * @returns
-   */
-  getChallenges = async (completed = false) => {
-    return await this.#firebase.getChallenges(completed);
-  };
-
-  /**
-   *
-   * @param {string} postID
-   * @returns
-   */
-  reportPost = async (postID) => {
-    await this.#server.reportPost(postID);
-    return true;
-  };
-
-  /*
+    /*
     ADMIN FUNCTIONS
     User must be an admin for these to work
   */
 
-  /**
-   *
-   * @returns
-   */
-  isAdmin = async () => {
-    return await this.#firebase.isAdmin();
-  };
+    /**
+     *
+     * @returns
+     */
+    isAdmin = async () => {
+        return await this.#firebase.isAdmin();
+    };
 
-  /**
-   *
-   * @param {string} postID
-   * @param {boolean} value
-   * @returns
-   */
-  setPostPublic = async (postID, value = true) => {
-    return await this.#firebase.setPostPublic(postID, value);
-  };
+    /**
+     *
+     * @param {string} postID
+     * @param {boolean} value
+     * @returns
+     */
+    setPostPublic = async (postID, value = true) => {
+        return await this.#firebase.setPostPublic(postID, value);
+    };
 
-  deletePost = async (postID) => {
-    return await this.#firebase.deletePost(postID);
-  };
+    deletePost = async (postID) => {
+        return await this.#firebase.deletePost(postID);
+    };
 
-  /**
-   *
-   * @returns
-   */
-  getSummaryReport = async () => {
-    return await this.#firebase.getSummeryReport();
-  };
+    /**
+     *
+     * @returns
+     */
+    getSummaryReport = async () => {
+        return await this.#firebase.getSummaryReport();
+    };
 
-  /**
-   *
-   * @param {string} name
-   * @param {string} description
-   * @returns
-   */
-  createChannel = async (name, description) => {
-    // Ensure that the channel name and description is clean
-    if (await this.#server.containsSwears(name)) {
-      throw new Error(`Channel name ${name} contains a swear`);
-    }
-    if (await this.#server.containsSwears(description)) {
-      throw new Error(`Channel description ${description} contains a swear`);
-    }
+    /**
+     *
+     * @param {string} name
+     * @param {string} description
+     * @returns
+     */
+    createChannel = async (name, description) => {
+        // Ensure that the channel name and description is clean
+        if (await this.#server.containsSwears(name)) {
+            throw new Error(`Channel name ${name} contains a swear`);
+        }
+        if (await this.#server.containsSwears(description)) {
+            throw new Error(
+                `Channel description ${description} contains a swear`
+            );
+        }
 
-    return await this.#firebase.createChannel(name, description);
-  };
+        return await this.#firebase.createChannel(name, description);
+    };
 }
