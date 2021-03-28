@@ -112,6 +112,13 @@ export default class Home extends Component {
         if (type === "like") {
             this.connection.likePost(id).then(
                 () => {
+                    for (let i = 0; i < this.state.DATA.length; i++) {
+                        if (id == this.state.DATA[i].ID) {
+                            this.connection
+                                .getPost(id)
+                                .then((res) => (this.state.DATA[i] = res));
+                        }
+                    }
                     updateScore(id);
                 },
                 (error) => {
@@ -124,6 +131,13 @@ export default class Home extends Component {
                 .dislikePost(id)
                 .then(
                     () => {
+                        for (let i = 0; i < this.state.DATA.length; i++) {
+                            if (id == this.state.DATA[i].ID) {
+                                this.connection
+                                    .getPost(id)
+                                    .then((res) => (this.state.DATA[i] = res));
+                            }
+                        }
                         updateScore(id);
                     },
                     (error) => {
@@ -137,6 +151,13 @@ export default class Home extends Component {
         if (type === "remove") {
             this.connection.removeInteractionFromPost(id).then(
                 () => {
+                    for (let i = 0; i < this.state.DATA.length; i++) {
+                        if (id == this.state.DATA[i].ID) {
+                            this.connection
+                                .getPost(id)
+                                .then((res) => (this.state.DATA[i] = res));
+                        }
+                    }
                     updateScore(id);
                 },
                 (error) => {
