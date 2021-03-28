@@ -6,6 +6,7 @@ import {
     FlatList,
     Alert,
     KeyboardAvoidingView,
+    Modal,
 } from "react-native";
 import Post from "../post";
 import SinglePost from "../singlePost";
@@ -66,8 +67,6 @@ export default class Home extends Component {
                 Alert.alert(error.message);
             }
         );
-
-
     }
 
     getID = (id) => {
@@ -88,23 +87,25 @@ export default class Home extends Component {
         this.onRefresh();
     };
 
-    onRefresh = async () => {
-        this.setState({ refresh: true, DATA: "", isHidden: false });
-        await this.connection.getBrowse(this.state.filter).then(
-            (res) => {
-                this.setState({ DATA: res });
-                this.setState({ refresh: false });
+    onRefresh = () => {
+        this.setState({ refresh: true, DATA: "" });
+        if (!this.state.isHidden) {
+            this.connection.getBrowse(this.state.filter).then(
+                (res) => {
+                    this.setState({ DATA: res });
+                    this.setState({ refresh: false });
 
-                this.connection.loadChannelsSearch();
-                this.connection.loadUsersSearch();
-            },
-            (error) => {
-                Alert.alert(error.message);
-                this.setState({ refresh: false });
-            }
-        );
-
-        
+                    this.connection.loadChannelsSearch();
+                    this.connection.loadUsersSearch();
+                },
+                (error) => {
+                    Alert.alert(error.message);
+                    this.setState({ refresh: false });
+                }
+            );
+        } else {
+            this.getHiddenPosts();
+        }
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
@@ -154,6 +155,7 @@ export default class Home extends Component {
         hiddenPosts
     ) => {
         //console.log(byTime, byScore, usersFollowed, channelsFollowed);
+        this.state.isHidden = hiddenPosts;
         this.state.filter.followedChannels = channelsFollowed;
         this.state.filter.followedUsers = usersFollowed;
         if (byTime) {
@@ -162,16 +164,13 @@ export default class Home extends Component {
         if (byScore) {
             this.state.filter.orderBy = Filter.ORDER_BY_SCORE;
         }
-        if (anyChanged && !hiddenPosts) {
+
+        if (anyChanged) {
             this.onRefresh();
-        }
-        if (anyChanged && hiddenPosts) {
-            this.getHiddenPosts();
         }
     };
 
     getHiddenPosts = () => {
-        this.setState({ refresh: true, DATA: "", isHidden: true });
         this.connection.getAllReportedPosts().then(
             (res) => {
                 this.setState({ DATA: res });
@@ -197,7 +196,6 @@ export default class Home extends Component {
             userDATA: this.connection.searchUsers(search),
             channelDATA: this.connection.searchChannels(search),
         });
-
     };
 
     openNewChannel = () => {
@@ -251,13 +249,25 @@ export default class Home extends Component {
         if (this.state.isPost) {
             return (
                 <View style={styles.container}>
-                    <SinglePost
-                        item={this.state.DATA[this.state.singlePostID]}
-                        back={this.handleSinglePostClose}
-                        connection={this.connection}
-                        onLikeBtnPress={this.onLikeBtnPress}
-                        isHidden={this.state.isHidden}
-                    />
+                    <Modal
+                        visible={this.state.isPost}
+                        animationType='slide'
+                        transparent={true}
+                    >
+                        <View style={styles.center}>
+                            <View style={styles.modalView}>
+                                <SinglePost
+                                    item={
+                                        this.state.DATA[this.state.singlePostID]
+                                    }
+                                    back={this.handleSinglePostClose}
+                                    connection={this.connection}
+                                    onLikeBtnPress={this.onLikeBtnPress}
+                                    isHidden={this.state.isHidden}
+                                />
+                            </View>
+                        </View>
+                    </Modal>
                 </View>
             );
         } else {
@@ -402,5 +412,30 @@ const styles = StyleSheet.create({
         fontSize: 20,
         paddingLeft: "2%",
         color: "white",
+    },
+    center: {
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+    },
+    modalView: {
+        margin: 5,
+        backgroundColor: "white",
+        borderRadius: 20,
+        padding: 5,
+        width: "90%",
+        height: "90%",
+        shadowColor: "#000",
+        shadowOffset: {
+            width: 0,
+            height: 2,
+        },
+        shadowOpacity: 0.25,
+        shadowRadius: 4,
+        elevation: 5,
+    },
+    icon1: {
+        fontSize: 32,
+        paddingBottom: "5%",
     },
 });
