@@ -1,7 +1,9 @@
 import React, { Component } from "react";
 import Score from "./score";
+import ScoreComp from "./scoreComp";
 import Post from "./post";
 import SinglePost from "./singlePost";
+import Connection from "./API/Connection";
 import {
     Text,
     StyleSheet,
@@ -21,6 +23,16 @@ export default class UserModal extends Component {
                 DATA: this.props.DATA,
                 postDATA: this.props.DATA.posts,
 
+                userScore: "",
+                userPosts: "",
+                userChallenges: "",
+
+                scorediff: "",
+                picsdiff: "",
+                challangediff: "",
+
+                isLoading: true,
+
                 singlePost: false,
                 singlePostID: "",
 
@@ -32,6 +44,16 @@ export default class UserModal extends Component {
             this.state = {
                 DATA: this.props.DATA,
                 postDATA: this.props.DATA.posts,
+
+                userScore: "",
+                userPosts: "",
+                userChallenges: "",
+
+                scorediff: "",
+                picsdiff: "",
+                challangediff: "",
+
+                isLoading: true,
 
                 singlePost: false,
                 singlePostID: "",
@@ -122,7 +144,32 @@ export default class UserModal extends Component {
         }
     };
 
+    async componentDidMount() {
+      const connection = new Connection();
+      try {
+        let user = await connection.getOurProfile();
+        this.setState({
+          userScore: user.score,
+          userPosts: user.posts.length,
+          userChallenges: user.challengeScore,
+
+          scorediff: this.state.DATA.score - user.score,
+          picsdiff: this.state.postDATA.length - user.posts.length,
+          challangediff: this.state.DATA.challengeScore - user.challengeScore,
+        });
+
+      } catch (e) {
+          console.error("Error getting user Profile Info!");
+      } finally {
+          this.setState({ isLoading: false });
+      }
+
+    }
+
     render() {
+      if(this.state.isLoading == true){
+        return  <Text> Loading {this.state.DATA.username}'s Profile... </Text>
+      } else {
         return (
             <View style={styles.bigCon}>
                 <View style={styles.container}>
@@ -152,14 +199,28 @@ export default class UserModal extends Component {
                         </Pressable>
                     )}
                 </View>
-                <View style={styles.container}>
-                    <Score label='Score' number={this.state.DATA.score} />
-                    <Score label='Pics' number={this.state.postDATA.length} />
-                    <Score
-                        label='Challenge'
-                        number={this.state.DATA.challengeScore}
-                    />
-                </View>
+                <ScoreComp
+                    usernumber={this.state.userScore}
+                    othernumber={this.state.DATA.score}
+                    numberdiff={this.state.DATA.score}
+                    label1='Score'
+                    label2='points'
+                />
+                <ScoreComp
+                    usernumber={this.state.userPosts}
+                    othernumber={this.state.postDATA.length}
+                    numberdiff={this.state.postDATA.length}
+                    label1='Posts'
+                    label2='posts'
+                />
+                <ScoreComp
+                    usernumber={this.state.scorediff}
+                    othernumber={this.state.picsdiff}
+                    numberdiff={this.state.challangediff}
+                    label1='Challenge'
+                    label2='challenge points'
+                />
+
                 {this.state.noPosts && (
                     <Text style={styles.text1}>
                         This user hasn't posted yet :/
@@ -195,6 +256,7 @@ export default class UserModal extends Component {
             </View>
         );
     }
+  }
 }
 const styles = StyleSheet.create({
     container: {
