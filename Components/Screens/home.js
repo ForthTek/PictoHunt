@@ -245,31 +245,6 @@ export default class Home extends Component {
                     <Text>Loading Home Page...</Text>
                 </View>
             );
-        }
-        if (this.state.isPost) {
-            return (
-                <View style={styles.container}>
-                    <Modal
-                        visible={this.state.isPost}
-                        animationType='slide'
-                        transparent={true}
-                    >
-                        <View style={styles.center}>
-                            <View style={styles.modalView}>
-                                <SinglePost
-                                    item={
-                                        this.state.DATA[this.state.singlePostID]
-                                    }
-                                    back={this.handleSinglePostClose}
-                                    connection={this.connection}
-                                    onLikeBtnPress={this.onLikeBtnPress}
-                                    isHidden={this.state.isHidden}
-                                />
-                            </View>
-                        </View>
-                    </Modal>
-                </View>
-            );
         } else {
             return (
                 <KeyboardAvoidingView
@@ -367,6 +342,26 @@ export default class Home extends Component {
                         onRefresh={this.onRefresh}
                         refreshing={this.state.refresh}
                     />
+
+                    <Modal
+                        visible={this.state.isPost}
+                        animationType='slide'
+                        transparent={true}
+                    >
+                        <View style={styles.center}>
+                            <View style={styles.modalView}>
+                                <SinglePost
+                                    item={
+                                        this.state.DATA[this.state.singlePostID]
+                                    }
+                                    back={this.handleSinglePostClose}
+                                    connection={this.connection}
+                                    onLikeBtnPress={this.onLikeBtnPress}
+                                    isHidden={this.state.isHidden}
+                                />
+                            </View>
+                        </View>
+                    </Modal>
                 </KeyboardAvoidingView>
             );
         }
@@ -424,7 +419,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 5,
         width: "90%",
-        height: "90%",
+        height: "75%",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
