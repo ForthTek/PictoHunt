@@ -13,6 +13,8 @@ export default class FilterBtn extends Component {
         onlyFollowedChannelsCheck: false,
         anyChanged: false,
         search: "",
+        isAdmin: this.props.isAdmin,
+        hiddenPosts: false,
     };
 
     openFilterModal = () => {
@@ -46,7 +48,8 @@ export default class FilterBtn extends Component {
                                         this.state.orderByScoreCheck,
                                         this.state.onlyFollowedUsersCheck,
                                         this.state.onlyFollowedChannelsCheck,
-                                        this.state.anyChanged
+                                        this.state.anyChanged,
+                                        this.state.hiddenPosts
                                     );
                                 }}
                             >
@@ -126,6 +129,24 @@ export default class FilterBtn extends Component {
                                     }
                                 />
                             </View>
+                            {this.state.isAdmin && (
+                                <View style={styles.container1}>
+                                    <CheckBox
+                                        title='See reported and hidden posts'
+                                        iconType='material'
+                                        checkedIcon='clear'
+                                        uncheckedIcon='add'
+                                        onPress={() =>
+                                            this.setState({
+                                                hiddenPosts: !this.state
+                                                    .hiddenPosts,
+                                                anyChanged: true,
+                                            })
+                                        }
+                                        checked={this.state.hiddenPosts}
+                                    />
+                                </View>
+                            )}
                         </View>
                     </View>
                 </Modal>

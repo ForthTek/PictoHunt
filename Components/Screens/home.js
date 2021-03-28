@@ -16,6 +16,7 @@ import SearchItem from "../searchItem";
 import { Pressable } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import NewChannel from "../newChannel";
+import FeatherIcon from "react-native-vector-icons/Feather";
 export default class Home extends Component {
     constructor(props) {
         super(props);
@@ -38,17 +39,21 @@ export default class Home extends Component {
         userDATA: "",
 
         newChannel: false,
+        isAdmin: false,
+        isHidden: false,
     };
 
     componentDidMount() {
-        // update filter using:
-        // filter.orderBy = Filter.ORDER_BY_SCORE or filter.orderBy = Filter.ORDER_BY_TIME
-        // Probs want to keep direction desc
-        // filter.followedUsers = true and filter.followedChannels = true
         this.state.filter.orderBy = Filter.ORDER_BY_TIME;
         this.state.filter.followedChannels = false;
         this.state.filter.followedUsers = false;
-
+        this.connection.isAdmin().then(
+            (res) => {
+                this.setState({ isAdmin: res });
+                console.log(res);
+            },
+            (error) => Alert.alert(error.message)
+        );
         this.connection.getBrowse(this.state.filter).then(
             (posts) => {
                 this.setState({ DATA: posts });
@@ -79,7 +84,7 @@ export default class Home extends Component {
     };
 
     onRefresh = async () => {
-        this.setState({ refresh: true, DATA: "" });
+        this.setState({ refresh: true, DATA: "", isHidden: false });
         await this.connection.getBrowse(this.state.filter).then(
             (res) => {
                 this.setState({ DATA: res });
@@ -135,7 +140,8 @@ export default class Home extends Component {
         byScore,
         usersFollowed,
         channelsFollowed,
-        anyChanged
+        anyChanged,
+        hiddenPosts
     ) => {
         //console.log(byTime, byScore, usersFollowed, channelsFollowed);
         this.state.filter.followedChannels = channelsFollowed;
@@ -146,9 +152,26 @@ export default class Home extends Component {
         if (byScore) {
             this.state.filter.orderBy = Filter.ORDER_BY_SCORE;
         }
-        if (anyChanged) {
+        if (anyChanged && !hiddenPosts) {
             this.onRefresh();
         }
+        if (anyChanged && hiddenPosts) {
+            this.getHiddenPosts();
+        }
+    };
+
+    getHiddenPosts = () => {
+        this.setState({ refresh: true, DATA: "", isHidden: true });
+        this.connection.getAllReportedPosts().then(
+            (res) => {
+                this.setState({ DATA: res });
+                this.setState({ refresh: false });
+            },
+            (error) => {
+                Alert.alert(error.message);
+                this.setState({ refresh: false });
+            }
+        );
     };
 
     onChangeSearch = (search) => {
@@ -181,6 +204,36 @@ export default class Home extends Component {
         this.setState({ newChannel: false });
     };
 
+    onDelete = (id) => {
+        //this.connection.isAdmin().then((x) => console.log(x));
+
+        Alert.alert(
+            "Admin Delete",
+            "This will delete this post forever. Are you sure you want to continue?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => {
+                        return;
+                    },
+                },
+                {
+                    text: "Delete Post",
+                    onPress: () => {
+                        this.connection
+                            .deletePost(id)
+                            .then((res) => {
+                                Alert.alert(res);
+                            })
+                            .catch((error) => {
+                                Alert.alert(error.message);
+                            });
+                    },
+                },
+            ]
+        );
+    };
+
     render() {
         if (this.state.isLoading) {
             return (
@@ -197,6 +250,7 @@ export default class Home extends Component {
                         back={this.handleSinglePostClose}
                         connection={this.connection}
                         onLikeBtnPress={this.onLikeBtnPress}
+                        isHidden={this.state.isHidden}
                     />
                 </View>
             );
@@ -215,7 +269,10 @@ export default class Home extends Component {
                             placeholder='Search...'
                             round
                         />
-                        <FilterBtn updateFilter={this.updateFilter} />
+                        <FilterBtn
+                            updateFilter={this.updateFilter}
+                            isAdmin={this.state.isAdmin}
+                        />
                     </View>
                     {this.state.searching && this.state.search != "" && (
                         <View style={styles.dropDown}>
@@ -275,6 +332,19 @@ export default class Home extends Component {
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
                                 />
+                                {this.state.isAdmin && (
+                                    <Pressable
+                                        onPress={() => this.onDelete(item.ID)}
+                                    >
+                                        <FeatherIcon
+                                            name='trash-2'
+                                            style={{
+                                                fontSize: 26,
+                                                paddingRight: "1%",
+                                            }}
+                                        />
+                                    </Pressable>
+                                )}
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}
@@ -305,6 +375,8 @@ const styles = StyleSheet.create({
         borderColor: "grey",
         borderTopWidth: 1,
         borderBottomWidth: 1,
+        flexDirection: "row",
+        alignItems: "center",
     },
     searchCon: {
         width: "85%",

@@ -63,8 +63,9 @@ class Account extends Component {
                 //console.log(res);
             },
             (error) => {
-                console.log(error);
+                console.log(error.message);
                 Alert.alert(error.message);
+                this.setState({ refresh: false });
             }
         );
     };
@@ -76,7 +77,9 @@ class Account extends Component {
             .then((res) => {
                 Alert.alert(res);
             })
-            .catch((error) => Alert.alert(error.message));
+            .catch((error) => {
+                Alert.alert(error.message);
+            });
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
