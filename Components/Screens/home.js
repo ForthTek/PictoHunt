@@ -208,35 +208,35 @@ export default class Home extends Component {
         this.setState({ newChannel: false });
     };
 
-    onDelete = (id) => {
-        //this.connection.isAdmin().then((x) => console.log(x));
+    // onDelete = (id) => {
+    //     //this.connection.isAdmin().then((x) => console.log(x));
 
-        Alert.alert(
-            "Admin Delete",
-            "This will delete this post forever. Are you sure you want to continue?",
-            [
-                {
-                    text: "Cancel",
-                    onPress: () => {
-                        return;
-                    },
-                },
-                {
-                    text: "Delete Post",
-                    onPress: () => {
-                        this.connection
-                            .deletePost(id)
-                            .then((res) => {
-                                Alert.alert(res);
-                            })
-                            .catch((error) => {
-                                Alert.alert(error.message);
-                            });
-                    },
-                },
-            ]
-        );
-    };
+    //     Alert.alert(
+    //         "Admin Delete",
+    //         "This will delete this post forever. Are you sure you want to continue?",
+    //         [
+    //             {
+    //                 text: "Cancel",
+    //                 onPress: () => {
+    //                     return;
+    //                 },
+    //             },
+    //             {
+    //                 text: "Delete Post",
+    //                 onPress: () => {
+    //                     this.connection
+    //                         .deletePost(id)
+    //                         .then((res) => {
+    //                             Alert.alert(res);
+    //                         })
+    //                         .catch((error) => {
+    //                             Alert.alert(error.message);
+    //                         });
+    //                 },
+    //             },
+    //         ]
+    //     );
+    // };
 
     render() {
         if (this.state.isLoading) {
@@ -323,7 +323,7 @@ export default class Home extends Component {
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
                                 />
-                                {this.state.isAdmin && (
+                                {/* {this.state.isAdmin && (
                                     <Pressable
                                         onPress={() => this.onDelete(item.ID)}
                                     >
@@ -335,7 +335,7 @@ export default class Home extends Component {
                                             }}
                                         />
                                     </Pressable>
-                                )}
+                                )} */}
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}
@@ -419,7 +419,7 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 5,
         width: "90%",
-        height: "75%",
+        height: "85%",
         shadowColor: "#000",
         shadowOffset: {
             width: 0,
