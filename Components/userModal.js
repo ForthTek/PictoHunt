@@ -202,20 +202,20 @@ export default class UserModal extends Component {
                 <ScoreComp
                     usernumber={this.state.userScore}
                     othernumber={this.state.DATA.score}
-                    numberdiff={this.state.DATA.score}
+                    numberdiff={this.state.scorediff}
                     label1='Score'
                     label2='points'
                 />
                 <ScoreComp
                     usernumber={this.state.userPosts}
                     othernumber={this.state.postDATA.length}
-                    numberdiff={this.state.postDATA.length}
+                    numberdiff={this.state.picsdiff}
                     label1='Posts'
                     label2='posts'
                 />
                 <ScoreComp
-                    usernumber={this.state.scorediff}
-                    othernumber={this.state.picsdiff}
+                    usernumber={this.state.userChallenges}
+                    othernumber={this.state.DATA.challengeScore}
                     numberdiff={this.state.challangediff}
                     label1='Challenge'
                     label2='challenge points'
