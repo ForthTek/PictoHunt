@@ -204,21 +204,21 @@ export default class UserModal extends Component {
                     othernumber={this.state.DATA.score}
                     numberdiff={this.state.scorediff}
                     label1='Score'
-                    label2='points'
+                    label2='point(s)'
                 />
                 <ScoreComp
                     usernumber={this.state.userPosts}
                     othernumber={this.state.postDATA.length}
                     numberdiff={this.state.picsdiff}
                     label1='Posts'
-                    label2='posts'
+                    label2='post(s)'
                 />
                 <ScoreComp
                     usernumber={this.state.userChallenges}
                     othernumber={this.state.DATA.challengeScore}
                     numberdiff={this.state.challangediff}
                     label1='Challenge'
-                    label2='challenge points'
+                    label2='challenge point(s)'
                 />
 
                 {this.state.noPosts && (
