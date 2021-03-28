@@ -124,6 +124,9 @@ export default class UploadScreen extends Component {
 
     openImageSelector = () => {
         this.setState({ imageSelector: true });
+
+        // Load all channels
+        this.connection.loadChannelsSearch();
     };
 
     closeImageSelector = () => {
