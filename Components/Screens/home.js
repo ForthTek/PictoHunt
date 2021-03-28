@@ -17,7 +17,7 @@ import SearchItem from "../searchItem";
 import { Pressable } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import NewChannel from "../newChannel";
-import FeatherIcon from "react-native-vector-icons/Feather";
+
 export default class Home extends Component {
     constructor(props) {
         super(props);
