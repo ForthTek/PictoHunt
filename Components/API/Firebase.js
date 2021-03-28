@@ -922,13 +922,17 @@ export default class Firebase {
    * @returns
    */
   deletePost = async (postID) => {
-    // Delete likes and dislikes
-    // Can't delete collections from here
-    // await this.database.collection(`Posts/${postID}/Likes`).delete();
-    // await this.database.collection(`Posts/${postID}/Dislikes`).delete();
+    try {
+      // Try to delete the photos
+      // An admin won't have permission to do this so it could fail
+      const data = await this.database.doc(`Posts/${postID}`).get();
+      const photos = data.data().photos.length;
+      await this.upload.deleteImagesForPost(postID, photos);
+    } catch (error) {}
 
     // Delete the post
     await this.database.doc(`Posts/${postID}`).delete();
+
     return `Deleted post ${postID}`;
   };
 
