@@ -175,7 +175,7 @@ class Account extends Component {
                     >
                         <Score label='Score' number={this.state.user.score} />
                         <Score
-                            label='Pics'
+                            label='Posts'
                             number={this.state.user.posts.length}
                         />
                         <Score
