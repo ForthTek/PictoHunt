@@ -50,6 +50,7 @@ export default class Map extends Component {
 
     closesinglepost = () => {
         this.setState({ singlePostOpen: false, currentSinglePost: [] });
+        this.onRefresh();
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
