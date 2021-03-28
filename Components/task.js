@@ -5,6 +5,7 @@ export default class Challenge extends Component {
     constructor(props) {
         super(props);
         this.connection = this.props.connection;
+        console.log(this.props.data);
     }
 
     state = {
@@ -15,7 +16,7 @@ export default class Challenge extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Text>{this.state.DATA.description}</Text>
+                <Text>Post To Channel: {this.state.DATA.channel}</Text>
                 <FeatherIcon
                     name={this.state.isComplete ? "check" : "x"}
                     style={
