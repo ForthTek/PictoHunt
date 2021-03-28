@@ -1,18 +1,14 @@
 import React, { Component } from "react";
+import { Alert } from "react-native";
 
-import {
-    Text,
-    View,
-    StyleSheet,
-    FlatList,
-    Pressable,
-} from "react-native";
+import { Text, View, StyleSheet, FlatList, Pressable } from "react-native";
 import { SearchBar } from "react-native-elements";
 import FeatherIcon from "react-native-vector-icons/Feather";
 export default class NewTask extends Component {
     constructor(props) {
         super(props);
         this.connection = this.props.connection;
+        this.connection.loadUsersSearch();
     }
     state = {
         newUsers: [],
@@ -30,9 +26,7 @@ export default class NewTask extends Component {
             this.setState({ searching: false });
         }
 
-        this.connection.searchUsers(search).then((result) => {
-            this.setState({ userDATA: result });
-        });
+        this.setState({ userDATA: this.connection.searchUsers(search) });
     };
 
     addUser = (item) => {

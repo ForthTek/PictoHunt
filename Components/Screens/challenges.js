@@ -45,9 +45,6 @@ export default class challenges extends Component {
             (data) => {
                 this.setState({ DATA: data, isLoading: false });
                 //console.log(this.state.DATA[0]);
-
-                this.connection.loadChannelsSearch();
-                this.connection.loadUsersSearch();
             },
             (error) => {
                 console.log(error);
@@ -62,9 +59,6 @@ export default class challenges extends Component {
             (res) => {
                 this.setState({ DATA: res });
                 this.setState({ refresh: false });
-
-                this.connection.loadChannelsSearch();
-                this.connection.loadUsersSearch();
             },
             (error) => {
                 console.log(error);

@@ -7,6 +7,7 @@ export default class NewTask extends Component {
     constructor(props) {
         super(props);
         this.connection = this.props.connection;
+        this.connection.loadChannelsSearch();
     }
     state = {
         newTaskChannel: "",
@@ -27,15 +28,15 @@ export default class NewTask extends Component {
             this.setState({ searching: false });
         }
 
-        this.search(search);
+        this.setState({ channelDATA: this.connection.searchChannels(search) });
     };
 
-    search = async (search) => {
-        // User Promise.all to send multiple request at the same time
-        this.connection.searchChannels(search).then((res) => {
-            this.setState({ channelDATA: res });
-        });
-    };
+    // search = async (search) => {
+    //     // User Promise.all to send multiple request at the same time
+    //     this.connection.searchChannels(search).then((res) => {
+    //         this.setState({ channelDATA: res });
+    //     });
+    // };
 
     addChannel = (item) => {
         this.setState({ newTaskChannel: item, searching: false });
