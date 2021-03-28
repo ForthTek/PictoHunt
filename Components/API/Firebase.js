@@ -180,7 +180,6 @@ export default class Firebase {
       // Now create their profile in the database
       .then(async () => {
         const userData = {
-          email: email,
           challengeScore: 0,
           timestamp: firebase.firestore.Timestamp.now(),
           // Add username as string just for searching
@@ -260,24 +259,16 @@ export default class Firebase {
         };
       }
 
-      // See if the user has interacted with the post
-      let liked = false;
-      let disliked = false;
-      if (user) {
-        liked = (
-          await this.database
-            .doc(`Posts/${doc.id}/Likes/${user.username}`)
-            .get()
-        ).exists;
+      let values = await Promise.all([
+        await this.database.doc(`Posts/${doc.id}/Likes/${user.username}`).get(),
+        await this.database
+          .doc(`Posts/${doc.id}/Dislikes/${user.username}`)
+          .get(),
+      ]);
 
-        if (!liked) {
-          disliked = (
-            await this.database
-              .doc(`Posts/${doc.id}/Dislikes/${user.username}`)
-              .get()
-          ).exists;
-        }
-      }
+      // See if the user has interacted with the post
+      let liked = values[0].exists;
+      let disliked = values[1].exists;
 
       // Return the data in a nice format
       let post = {
