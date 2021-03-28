@@ -58,11 +58,16 @@ export default class Home extends Component {
             (posts) => {
                 this.setState({ DATA: posts });
                 this.setState({ isLoading: false });
+
+                this.connection.loadChannelsSearch();
+                this.connection.loadUsersSearch();
             },
             (error) => {
                 Alert.alert(error.message);
             }
         );
+
+
     }
 
     getID = (id) => {
@@ -89,12 +94,17 @@ export default class Home extends Component {
             (res) => {
                 this.setState({ DATA: res });
                 this.setState({ refresh: false });
+
+                this.connection.loadChannelsSearch();
+                this.connection.loadUsersSearch();
             },
             (error) => {
                 Alert.alert(error.message);
                 this.setState({ refresh: false });
             }
         );
+
+        
     };
 
     onLikeBtnPress = (type, id, updateScore) => {
@@ -183,15 +193,11 @@ export default class Home extends Component {
             this.setState({ searching: false });
         }
 
-        Promise.all([
-            this.connection.searchUsers(search),
-            this.connection.searchChannels(search),
-        ]).then((result) => {
-            this.setState({
-                userDATA: result[0],
-                channelDATA: result[1],
-            });
+        this.setState({
+            userDATA: this.connection.searchUsers(search),
+            channelDATA: this.connection.searchChannels(search),
         });
+
     };
 
     openNewChannel = () => {

@@ -721,6 +721,7 @@ export default class Firebase {
    */
   searchWithPrefix = async (collection, search, field = "search") => {
     const query = search.toUpperCase();
+    const LIMIT = 5;
 
     return await this.database
       .collection(collection)
@@ -729,7 +730,7 @@ export default class Firebase {
       // Value is 63,743 so we have a lot of leway
       .where(field, "<=", query + "\uf8ff")
       //.orderBy()
-      //.limit()
+      .limit(LIMIT)
       .get()
       .then((res) => {
         // Return only the IDs

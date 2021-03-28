@@ -5,10 +5,15 @@ import Server from "./Server.js";
 export default class Connection {
   #firebase;
   #server;
+  #cachedChannels;
+  #cachedUsers;
 
   constructor() {
     this.#firebase = new Firebase();
     this.#server = new Server();
+
+    this.#cachedChannels = {};
+    this.#cachedUsers = {};
   }
 
   /**
@@ -317,8 +322,17 @@ export default class Connection {
    * @param {string} text
    * @returns
    */
-  searchChannels = async (text) => {
-    return await this.#firebase.searchWithPrefix("Channels", text);
+  searchChannels = (text) => {
+    const search = text.toUpperCase();
+
+    let results = [];
+    for (let channel in this.#cachedChannels) {
+      if (channel.toUpperCase().startsWith(search)) {
+        results.push(channel);
+      }
+    }
+
+    return results;
   };
 
   /**
@@ -326,8 +340,39 @@ export default class Connection {
    * @param {string} text
    * @returns
    */
-  searchUsers = async (text) => {
-    return await this.#firebase.searchWithPrefix("Users", text);
+  searchUsers = (text) => {
+    const search = text.toUpperCase();
+
+    let results = [];
+    for (let user in this.#cachedUsers) {
+      if (user.toUpperCase().startsWith(search)) {
+        results.push(user);
+      }
+    }
+
+    return results;
+  };
+
+  loadChannelsSearch = async () => {
+    await this.#firebase.database
+      .collection("Channels")
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          this.#cachedChannels[doc.id] = true;
+        });
+      });
+  };
+
+  loadUsersSearch = async () => {
+    await this.#firebase.database
+      .collection("Users")
+      .get()
+      .then((snapshot) => {
+        snapshot.forEach((doc) => {
+          this.#cachedUsers[doc.id] = true;
+        });
+      });
   };
 
   /**

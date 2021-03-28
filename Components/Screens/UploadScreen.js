@@ -68,11 +68,11 @@ export default class UploadScreen extends Component {
             searching: true,
         });
 
-        this.connection.searchChannels(search).then((result) => {
-            this.setState({
-                channelDATA: result,
-            });
+        this.setState({
+            channelDATA: this.connection.searchChannels(search),
         });
+
+
     };
 
     addChannel = (name) => {
