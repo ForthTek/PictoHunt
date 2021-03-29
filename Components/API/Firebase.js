@@ -1006,8 +1006,6 @@ export default class Firebase {
         let posts = [];
         let all = {};
 
-        console.log(snapshot.docs.length);
-
         // Each report
         snapshot.forEach((doc) => {
           const data = doc.data();
@@ -1025,11 +1023,13 @@ export default class Firebase {
         let loaded = await Promise.all(posts);
 
         // Remove all public posts
-        for(let i = 0; i < loaded.length; i++) {
-          if(!loaded[i].public) {
+        for (let i = 0; i < loaded.length; i++) {
+          if (!loaded[i].public) {
             loaded.splice(i, 1);
           }
         }
+
+        loaded.sort((x, y) => this.comparePost(x, y, filter));
 
         return loaded;
       })

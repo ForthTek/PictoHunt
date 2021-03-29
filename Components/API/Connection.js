@@ -2,7 +2,7 @@ import Filter from "./Filter.js";
 import Firebase from "./Firebase.js";
 import Server from "./Server.js";
 
-const VALID_TEXT = /[a-zA-Z0-9!"£$%^&*()-_+=,.<>?/#@\[\]{}'~;:]+/;
+const VALID_TEXT = /[a-zA-Z0-9.,!£$%&+-*\/@#]+/;
 
 export default class Connection {
   #firebase;
@@ -280,6 +280,10 @@ export default class Connection {
    * @returns
    */
   createPost = async (title, channelName, latitude, longitude, photos) => {
+    // if (!VALID_TEXT.test(title)) {
+    //   throw new Error(`Title is not valid`);
+    // }
+
     // Filter any swears from the title
     const newTitle = await this.#server.filterSwears(title);
 
