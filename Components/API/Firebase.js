@@ -884,6 +884,26 @@ export default class Firebase {
     return true;
   }
 
+  reportPost = async (postID, reason) => {
+    const postRef = this.database.doc(`Posts/${postID}`);
+    const postData = await postRef.get();
+    if (!postData.exists) {
+      throw new Error(`Post ${postID} does not exist`);
+    }
+
+    const ref = this.database.collection(`Reports`).doc();
+
+    const report = {
+      UID: this.auth.currentUser.uid,
+      timestamp: firebase.firestore.Timestamp.now(),
+      post: postRef,
+      reason: reason,
+    };
+
+    await ref.set(report);
+    return true;
+  };
+
   /*
    * ADMIN FUNCTIONS
      The current user must be an admin for these to work
@@ -922,13 +942,11 @@ export default class Firebase {
    * @returns
    */
   deletePost = async (postID) => {
-    try {
-      // Try to delete the photos
-      // An admin won't have permission to do this so it could fail
-      const data = await this.database.doc(`Posts/${postID}`).get();
-      const photos = data.data().photos.length;
-      await this.upload.deleteImagesForPost(postID, photos);
-    } catch (error) {}
+    // Try to delete the photos
+    // An admin won't have permission to do this so it could fail
+    const data = await this.database.doc(`Posts/${postID}`).get();
+    const photos = data.data().photos.length;
+    await this.upload.deleteImagesForPost(postID, photos);
 
     // Delete the post
     await this.database.doc(`Posts/${postID}`).delete();
@@ -998,5 +1016,34 @@ export default class Firebase {
       await ref.set(data);
       return true;
     }
+  };
+
+  getAllReportedPosts = async (filter = new Filter()) => {
+    return await this.database
+      .collection("Reports")
+      .orderBy(filter.orderBy, filter.direction)
+      .get()
+      .then(async (snapshot) => {
+        let posts = [];
+        let all = {};
+        // Each report
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const ID = data.post.id;
+          // Ensure that we don't have this post yet
+          if (!all[ID]) {
+            all[ID] = true;
+            // Add the post to list
+            posts.push(
+              data.post.get().then((postDoc) => this.getPostFromDoc(postDoc))
+            );
+          }
+          // Add the report value instead
+          else {
+          }
+        });
+
+        return await Promise.all(posts);
+      });
   };
 }
