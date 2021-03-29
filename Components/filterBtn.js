@@ -132,7 +132,7 @@ export default class FilterBtn extends Component {
                             {this.state.isAdmin && (
                                 <View style={styles.container1}>
                                     <CheckBox
-                                        title='See reported and hidden posts'
+                                        title='See reported posts'
                                         iconType='material'
                                         checkedIcon='clear'
                                         uncheckedIcon='add'
