@@ -70,11 +70,9 @@ export default class Login extends Component {
                 <SafeAreaView style={styles.container}>
                     <View style={styles.container0}>
                         <Image
-                            source={require("../../assets/ForthTek.png")}
-                            width={160}
-                            style={{ width: 160, height: 160 }}
+                            source={require("../../assets/AppIconMenu.png")}
+                            width={250}
                         />
-                        <Text style={{ fontSize: 35 }}>Pictohunt</Text>
                         <Text style={{ fontSize: 18 }}>By ForthTek</Text>
                     </View>
 
@@ -153,18 +151,18 @@ export default class Login extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#8cfffb",
         justifyContent: "space-between",
     },
     container0: {
         flex: 1,
-        backgroundColor: "#fff",
-        paddingTop: "12%",
+        backgroundColor: "#8cfffb",
+        paddingTop: "6%",
         alignItems: "center",
     },
     container1: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#8cfffb",
     },
     container2: {
         flexDirection: "row",
@@ -188,5 +186,6 @@ const styles = StyleSheet.create({
         width: "70%",
         fontSize: 20,
         color: "gray",
+        backgroundColor: "white"
     },
 });
