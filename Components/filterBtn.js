@@ -14,6 +14,7 @@ export default class FilterBtn extends Component {
         anyChanged: false,
         search: "",
         isAdmin: this.props.isAdmin,
+        reportedPosts: false,
         hiddenPosts: false,
     };
 
@@ -49,7 +50,8 @@ export default class FilterBtn extends Component {
                                         this.state.onlyFollowedUsersCheck,
                                         this.state.onlyFollowedChannelsCheck,
                                         this.state.anyChanged,
-                                        this.state.reportedPosts
+                                        this.state.reportedPosts,
+                                        this.state.hiddenPosts
                                     );
                                 }}
                             >
@@ -140,10 +142,36 @@ export default class FilterBtn extends Component {
                                             this.setState({
                                                 reportedPosts: !this.state
                                                     .reportedPosts,
+                                                hiddenPosts: false,
                                                 anyChanged: true,
                                             })
                                         }
-                                        checked={this.state.reportedPosts}
+                                        checked={
+                                            this.state.reportedPosts &&
+                                            !this.state.hiddenPosts
+                                        }
+                                    />
+                                </View>
+                            )}
+                            {this.state.isAdmin && (
+                                <View style={styles.container1}>
+                                    <CheckBox
+                                        title='See hidden posts'
+                                        iconType='material'
+                                        checkedIcon='clear'
+                                        uncheckedIcon='add'
+                                        onPress={() =>
+                                            this.setState({
+                                                hiddenPosts: !this.state
+                                                    .hiddenPosts,
+                                                reportedPosts: false,
+                                                anyChanged: true,
+                                            })
+                                        }
+                                        checked={
+                                            this.state.hiddenPosts &&
+                                            !this.state.reportedPosts
+                                        }
                                     />
                                 </View>
                             )}

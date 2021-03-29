@@ -42,7 +42,8 @@ export default class Home extends Component {
 
         newChannel: false,
         isAdmin: false,
-        isHidden: false,
+        reportedPosts: false,
+        hiddenPosts: false,
     };
 
     componentDidMount() {
@@ -90,7 +91,7 @@ export default class Home extends Component {
 
     onRefresh = () => {
         this.setState({ refresh: true, DATA: "" });
-        if (!this.state.reportedPosts) {
+        if (!this.state.reportedPosts && !this.state.hiddenPosts) {
             this.connection.getBrowse(this.state.filter).then(
                 (res) => {
                     this.setState({ DATA: res });
@@ -104,8 +105,12 @@ export default class Home extends Component {
                     this.setState({ refresh: false });
                 }
             );
-        } else {
+        }
+        if (this.state.reportedPosts && !this.state.hiddenPosts) {
             this.getReportedPosts();
+        }
+        if (!this.state.reportedPosts && this.state.hiddenPosts) {
+            this.getHiddenPosts();
         }
     };
 
@@ -174,9 +179,11 @@ export default class Home extends Component {
         usersFollowed,
         channelsFollowed,
         anyChanged,
-        reportedPosts
+        reportedPosts,
+        hiddenPosts
     ) => {
         //console.log(byTime, byScore, usersFollowed, channelsFollowed);
+        this.state.hiddenPosts = hiddenPosts;
         this.state.reportedPosts = reportedPosts;
         this.state.filter.followedChannels = channelsFollowed;
         this.state.filter.followedUsers = usersFollowed;
@@ -194,6 +201,18 @@ export default class Home extends Component {
 
     getReportedPosts = () => {
         this.connection.getAllReportedPosts(this.state.filter).then(
+            (res) => {
+                this.setState({ DATA: res });
+                this.setState({ refresh: false });
+            },
+            (error) => {
+                Alert.alert(error.message);
+                this.setState({ refresh: false });
+            }
+        );
+    };
+    getHiddenPosts = () => {
+        this.connection.getAllHiddenPosts(this.state.filter).then(
             (res) => {
                 this.setState({ DATA: res });
                 this.setState({ refresh: false });
@@ -244,12 +263,42 @@ export default class Home extends Component {
                     },
                 },
                 {
-                    text: "Hide Post",
+                    text: "Show Post",
                     onPress: () => {
                         this.connection
                             .setPostPublic(id, false)
                             .then((res) => {
-                                Alert.alert("Post hidden");
+                                Alert.alert("Post Hidden");
+                            })
+                            .catch((error) => {
+                                Alert.alert(error.message);
+                            });
+                    },
+                },
+            ]
+        );
+    };
+
+    onShow = (id) => {
+        //this.connection.isAdmin().then((x) => console.log(x));
+
+        Alert.alert(
+            "Admin Make Public",
+            "This will make this post visible to all users again. Would you like to continue?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => {
+                        return;
+                    },
+                },
+                {
+                    text: "Hide Post",
+                    onPress: () => {
+                        this.connection
+                            .setPostPublic(id, true)
+                            .then((res) => {
+                                Alert.alert("Post Public");
                             })
                             .catch((error) => {
                                 Alert.alert(error.message);
@@ -345,12 +394,26 @@ export default class Home extends Component {
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
                                 />
-                                {this.state.isAdmin && this.state.isHidden && (
+                                {this.state.isAdmin &&
+                                    this.state.reportedPosts && (
+                                        <Pressable
+                                            onPress={() => this.onHide(item.ID)}
+                                        >
+                                            <FeatherIcon
+                                                name='eye-off'
+                                                style={{
+                                                    fontSize: 26,
+                                                    paddingRight: "1%",
+                                                }}
+                                            />
+                                        </Pressable>
+                                    )}
+                                {this.state.isAdmin && this.state.hiddenPosts && (
                                     <Pressable
-                                        onPress={() => this.onHide(item.ID)}
+                                        onPress={() => this.onShow(item.ID)}
                                     >
                                         <FeatherIcon
-                                            name='trash-2'
+                                            name='eye'
                                             style={{
                                                 fontSize: 26,
                                                 paddingRight: "1%",
