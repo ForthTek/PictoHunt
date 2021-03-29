@@ -2,7 +2,7 @@ import Filter from "./Filter.js";
 import Firebase from "./Firebase.js";
 import Server from "./Server.js";
 
-const VALID_TEXT = /[a-zA-Z0-9.,!£$%&+-*\/@#]+/;
+//const VALID_TEXT = /[a-zA-Z0-9.,!£$%&+\\-*\\/@#]+/;
 
 export default class Connection {
   #firebase;
