@@ -9,13 +9,17 @@ import {
     Alert,
     Modal,
     Pressable,
+    FlatList,
 } from "react-native";
 import MapView from "react-native-maps";
 import * as Location from "expo-location";
-
+import FeatherIcon from "react-native-vector-icons/Feather";
 import Ionicon from "react-native-vector-icons/Ionicons";
 import { PROVIDER_GOOGLE } from "react-native-maps";
 import SinglePost from "../singlePost";
+import { CheckBox } from "react-native-elements";
+import { SearchBar } from "react-native-elements";
+import SearchItem from "../searchItem";
 
 // NOTE: internal commentary dosn't have spell check, sorry
 
@@ -38,18 +42,40 @@ export default class Map extends Component {
             singlePostOpen: false,
             currentSinglePost: [],
             refresh: false,
+
+            filterOpen: false,
+            filteringScore: false,
+            filterPositive: false,
+            filter5: false,
+            filter10: false,
+            filter20: false,
+            filterNo: -1,
+
+            search: "",
+            searching: false,
+            userDATA:[],
+            filteringUser: false,
+            filteredUser: "",
         };
 
         this.connection = props.connection;
     }
 
     opensinglepost = (id) => {
-        //let post = connection.getPost(id);
         this.setState({ singlePostOpen: true, currentSinglePost: id });
     };
 
     closesinglepost = () => {
         this.setState({ singlePostOpen: false, currentSinglePost: [] });
+        this.onRefresh();
+    };
+
+    openFilterModal = () => {
+        this.setState({ filterOpen: true });
+    };
+
+    closeFilterModal = () => {
+        this.setState({ filterOpen: false });
         this.onRefresh();
     };
 
@@ -161,6 +187,20 @@ export default class Map extends Component {
             });
     };
 
+    onChangeSearch = (search) => {
+        this.setState({
+            search: search,
+            searching: true,
+        });
+        if (search == "") {
+            this.setState({ searching: false });
+        }
+
+        this.setState({
+            userDATA: this.connection.searchUsers(search),
+        });
+    };
+
     render() {
         // Unexplained thing, possibly due to the async being used above the app would ignore the componentDidMount() at first,
         // it would be run later but this would result in the map being generated with defualt values, this stops it by not allowing the map to be
@@ -170,12 +210,17 @@ export default class Map extends Component {
         if (this.state.locationset == true) {
             return (
                 <SafeAreaView style={styles.container}>
-                    <View style={{ zIndex: 1000, alignSelf: "flex-end" }}>
-                        <Pressable onPress={() => this.onRefresh()}>
-                            <Ionicon
-                                name='refresh-circle-outline'
-                                style={{ fontSize: 32 }}
-                            />
+                  <View style={{ zIndex: 1000, alignSelf: "flex-end" }}>
+                      <Pressable onPress={() => this.onRefresh()}>
+                          <Ionicon
+                              name='refresh-circle-outline'
+                              style={{ fontSize: 32 }}
+                          />
+                      </Pressable>
+                  </View>
+                    <View style={{ zIndex: 1000, alignSelf: "flex-start" }}>
+                        <Pressable onPress={this.openFilterModal}>
+                            <FeatherIcon name='sliders' style={{ fontSize: 30 }} />
                         </Pressable>
                     </View>
 
@@ -195,16 +240,165 @@ export default class Map extends Component {
                             </View>
                         </View>
                     </Modal>
-                    <Pressable
-                        onPress={() => {
-                            this.props.back();
-                        }}
+
+                    <Modal
+                        visible={this.state.filterOpen}
+                        animationType='slide'
+                        transparent={true}
                     >
-                        <Ionicon
-                            name='arrow-back-circle-outline'
-                            style={styles.icon}
-                        />
-                    </Pressable>
+                        <View style={styles.center}>
+                            <View style={styles.modalView}>
+                                <Pressable
+                                    onPress={this.closeFilterModal}
+                                >
+                                    <FeatherIcon
+                                        name='x-circle'
+                                        style={styles.icon1}
+                                    />
+                                </Pressable>
+                                <View style={styles.container1}>
+                                    <CheckBox
+                                        title='Show only Postitve Score Posts'
+                                        iconType='material'
+                                        checkedIcon='clear'
+                                        uncheckedIcon='add'
+                                        onPress={() =>
+                                            {if(this.state.filterPositive == false){
+                                              this.setState({
+                                                  filterPositive: true,
+                                                  filter5: false,
+                                                  filter10: false,
+                                                  filter20: false,
+                                                  filterNo: 0,
+                                                  filteringScore: true,
+                                              })
+                                            } else if (this.state.filterPositive == true) {
+                                              this.setState({
+                                                  filterPositive: false,
+                                                  filterNo: -1,
+                                                  filteringScore: false,
+                                              })
+                                            }
+                                        }
+                                      }
+                                      checked={this.state.filterPositive}
+                                    />
+                                </View>
+                                <View style={styles.container1}>
+                                    <CheckBox
+                                        title='Show only Posts with Score > 5'
+                                        iconType='material'
+                                        checkedIcon='clear'
+                                        uncheckedIcon='add'
+                                        onPress={() =>
+                                            {if(this.state.filter5 == false){
+                                              this.setState({
+                                                  filterPositive: false,
+                                                  filter5: true,
+                                                  filter10: false,
+                                                  filter20: false,
+                                                  filterNo: 5,
+                                                  filteringScore: true,
+                                              })
+                                            } else {
+                                              this.setState({
+                                                  filter5: false,
+                                                  filterNo: -1,
+                                                  filteringScore: false,
+                                              })
+                                            }
+                                        }
+                                      }
+                                      checked={this.state.filter5}
+                                    />
+                                </View>
+                                <View style={styles.container1}>
+                                    <CheckBox
+                                        title='Show only Posts with Score > 10'
+                                        iconType='material'
+                                        checkedIcon='clear'
+                                        uncheckedIcon='add'
+                                        onPress={() =>
+                                            {if(this.state.filter10 == false){
+                                              this.setState({
+                                                  filterPositive: false,
+                                                  filter5: false,
+                                                  filter10: true,
+                                                  filter20: false,
+                                                  filterNo: 10,
+                                                  filteringScore: true,
+                                              })
+                                            } else {
+                                              this.setState({
+                                                  filter10: false,
+                                                  filterNo: -1,
+                                                  filteringScore: false,
+                                              })
+                                            }
+                                        }
+                                      }
+                                      checked={this.state.filter10}
+                                    />
+                                </View>
+                                <View style={styles.container1}>
+                                    <CheckBox
+                                        title='Show only Posts with Score > 20'
+                                        iconType='material'
+                                        checkedIcon='clear'
+                                        uncheckedIcon='add'
+                                        onPress={() =>
+                                            {if(this.state.filter20 == false){
+                                              this.setState({
+                                                  filterPositive: false,
+                                                  filter5: false,
+                                                  filter10: false,
+                                                  filter20: true,
+                                                  filterNo: 20,
+                                                  filteringScore: true,
+                                              })
+                                            } else {
+                                              this.setState({
+                                                  filter20: false,
+                                                  filterNo: -1,
+                                                  filteringScore: false,
+                                              })
+                                            }
+                                        }
+                                      }
+                                      checked={this.state.filter20}
+                                    />
+                                </View>
+                                <Text>Only showing posts by: {this.state.filteredUser}</Text>
+                                <Pressable onPress={() => {this.setState({filteredUser: "", filteringUser: false})}}>
+                                  <Text>Clear User Filter</Text>
+                                </Pressable>
+                                <SearchBar
+                                    containerStyle={styles.searchCon}
+                                    inputContainerStyle={styles.inputContainerStyle}
+                                    value={this.state.search}
+                                    onChangeText={(text) => this.onChangeSearch(text)}
+                                    placeholder='Search...'
+                                    round
+                                />
+                                {this.state.searching && this.state.search != "" && (
+                                    <View style={styles.dropDown}>
+                                      <Text style={styles.ddText}> ------Users------ </Text>
+                                        <FlatList
+                                            data={this.state.userDATA}
+                                            renderItem={({ item }) => (
+                                                <Pressable onPress={() => {this.setState({filteredUser: item, filteringUser: true})}}>
+                                                  <Text style={styles.ddText}>
+                                                    { item }
+                                                  </Text>
+                                                </Pressable>
+                                            )}
+                                            keyExtractor={(item) => item}
+                                        />
+                                    </View>
+                                )}
+                            </View>
+                        </View>
+                    </Modal>
 
                     <MapView
                         style={StyleSheet.absoluteFillObject}
@@ -219,49 +413,56 @@ export default class Map extends Component {
                     >
                         {this.state.MarkerArray.map((m) => {
                             //console.log(m); // for testing, prints all posts
-                            return (
-                                <MapView.Marker
-                                    coordinate={{
-                                        latitude: m.GPS.latitude,
-                                        longitude: m.GPS.longitude,
-                                    }}
-                                    key={m.ID}
-                                    onPress={() => this.opensinglepost(m)}
-                                >
-                                    <View
-                                        style={{
-                                            flexDirection: "column",
-                                            flex: 1,
-                                            alignItems: "center",
-                                            justifyContent: "center",
+                            if(this.state.filteringScore == false || m.score > this.state.filterNo){
+                              if(this.state.filteringUser == false || m.user == this.state.filteredUser){
+
+                                return (
+                                    <MapView.Marker
+                                        coordinate={{
+                                            latitude: m.GPS.latitude,
+                                            longitude: m.GPS.longitude,
                                         }}
+                                        key={m.ID}
+                                        onPress={() => this.opensinglepost(m)}
                                     >
-                                        <Image
-                                            source={{ uri: m.photos[0] }}
-                                            style={{ width: 80, height: 80 }}
-                                        />
-                                        <Text
+                                        <View
                                             style={{
-                                                backgroundColor: "#fff",
-                                                fontSize: 11,
+                                                flexDirection: "column",
+                                                flex: 1,
+                                                alignItems: "center",
+                                                justifyContent: "center",
                                             }}
                                         >
-                                            {" "}
-                                            {m.title}{" "}
-                                        </Text>
-                                        <Text
-                                            style={{
-                                                backgroundColor: "#fff",
-                                                fontSize: 8,
-                                            }}
-                                        >
-                                            {" "}
-                                            {m.photos.length} post(s){" "}
-                                        </Text>
-                                    </View>
-                                </MapView.Marker>
-                            );
-                        })}
+                                            <Image
+                                                source={{ uri: m.photos[0] }}
+                                                style={{ width: 80, height: 80 }}
+                                            />
+                                            <Text
+                                                style={{
+                                                    backgroundColor: "#fff",
+                                                    fontSize: 11,
+                                                }}
+                                            >
+                                                {" "}
+                                                {m.title}{" "}
+                                            </Text>
+                                            <Text
+                                                style={{
+                                                    backgroundColor: "#fff",
+                                                    fontSize: 8,
+                                                }}
+                                            >
+                                                {" "}
+                                                {m.photos.length} post(s){" "}
+                                            </Text>
+                                        </View>
+                                    </MapView.Marker>
+                                );
+                            }
+                          }
+                      }
+                    )
+                  }
                     </MapView>
                 </SafeAreaView>
             );
@@ -307,5 +508,24 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
+    },
+    searchCon: {
+        width: "85%",
+        backgroundColor: "white",
+        borderTopWidth: 0,
+        borderBottomWidth: 0,
+    },
+    inputContainerStyle: {
+        height: "5%",
+        paddingBottom: "1%",
+    },
+    dropDown: {
+        backgroundColor: "#383d42",
+        paddingBottom: "2%",
+    },
+    ddText: {
+        fontSize: 20,
+        paddingLeft: "2%",
+        color: "white",
     },
 });
