@@ -578,29 +578,6 @@ export default class Firebase {
     return newKey;
   };
 
-  createChannel = async (name, description) => {
-    const username = this.currentUser().username;
-    const ref = this.database.doc(`Channels/${name}`);
-    const channel = await ref.get();
-    const userRef = this.database.doc(`Users/${username}`);
-
-    if (channel.exists) {
-      throw new Error(`Channel ${name} already exists`);
-    } else {
-      const data = {
-        description: description,
-        timestamp: firebase.firestore.Timestamp.now(),
-        createdBy: userRef,
-        // Add the name just as a string - for use in search queries
-        search: name.toUpperCase(),
-      };
-
-      await ref.set(data);
-
-      return true;
-    }
-  };
-
   getChannel = async (name, filter = new Filter()) => {
     const ref = this.database.doc(`Channels/${name}`);
     const channel = await ref.get();
@@ -720,6 +697,7 @@ export default class Firebase {
    * @returns
    */
   searchWithPrefix = async (collection, search, field = "search") => {
+    // No longer used as its too slow RIP :(
     const query = search.toUpperCase();
     const LIMIT = 5;
 
@@ -1021,6 +999,7 @@ export default class Firebase {
   getAllReportedPosts = async (filter = new Filter()) => {
     return await this.database
       .collection("Reports")
+      .where("public", "==", true)
       .orderBy(filter.orderBy, filter.direction)
       .get()
       .then(async (snapshot) => {

@@ -192,7 +192,7 @@ export default class Home extends Component {
     };
 
     getHiddenPosts = () => {
-        this.connection.getAllReportedPosts().then(
+        this.connection.getAllReportedPosts(this.state.filter).then(
             (res) => {
                 this.setState({ DATA: res });
                 this.setState({ refresh: false });
