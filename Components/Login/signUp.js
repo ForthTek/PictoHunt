@@ -71,7 +71,7 @@ export default class SignUp extends Component {
         return (
             <SafeAreaView style={styles.container}>
                 <View style={styles.container0}>
-                    <Text style={{ fontSize: 35 }}>Pictohunt</Text>
+                    <Text style={{ fontSize: 35 }}>PictoHunt</Text>
                     <Text style={{ fontSize: 18 }}>By ForthTek</Text>
                 </View>
                 <View style={styles.container1}>

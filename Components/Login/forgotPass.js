@@ -38,7 +38,7 @@ export default class ForgotPass extends Component {
         return (
             <SafeAreaView style={styles.container}>
               <View style={{paddingTop: "12%"}}>
-                  <Text style={{ fontSize: 35, textAlign: "center" }}>Pictohunt</Text>
+                  <Text style={{ fontSize: 35, textAlign: "center" }}>PictoHunt</Text>
                   <Text style={{ fontSize: 18, textAlign: "center"  }}>By ForthTek</Text>
                 <Text style={{ fontSize: 30, textAlign: "center", paddingTop: "6%" }}>Forgot Password</Text>
               </View>

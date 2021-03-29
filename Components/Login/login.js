@@ -74,7 +74,7 @@ export default class Login extends Component {
                             width={160}
                             style={{ width: 160, height: 160 }}
                         />
-                        <Text style={{ fontSize: 35 }}>Pictohunt</Text>
+                        <Text style={{ fontSize: 35 }}>PictoHunt</Text>
                         <Text style={{ fontSize: 18 }}>By ForthTek</Text>
                     </View>
 

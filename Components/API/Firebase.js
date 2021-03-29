@@ -1003,7 +1003,6 @@ export default class Firebase {
   getAllReportedPosts = async (filter = new Filter()) => {
     return await this.database
       .collection("Reports")
-      .orderBy(filter.orderBy, filter.direction)
       .get()
       .then(async (snapshot) => {
         let posts = [];

@@ -8,6 +8,10 @@
     "eject": "expo eject",
     "test": "jest"
   },
+  "expo": {
+    "name": "PictoHunt",
+    "description": "PictoHunt is an online image sharing application being developed by ForthTek, a group of 3rd year students from Heriot-Watt in Edinburgh."
+  },
   "dependencies": {
     "@react-native-community/datetimepicker": "3.0.4",
     "@react-native-firebase/app": "^10.8.1",
@@ -41,5 +45,18 @@
     "@babel/core": "^7.13.10",
     "jest": "^26.6.3"
   },
-  "private": true
+  "private": true,
+  "name": "pictohunt",
+  "description": "PictoHunt is an online image sharing application being developed by ForthTek, a group of 3rd year students from Heriot-Watt in Edinburgh.",
+  "version": "1.0.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ForthTek/PictoHunt.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ForthTek/PictoHunt/issues"
+  },
+  "homepage": "https://asmithie.github.io/forthtek-site/"
 }
