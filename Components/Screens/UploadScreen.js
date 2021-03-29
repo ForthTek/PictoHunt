@@ -42,6 +42,7 @@ export default class UploadScreen extends Component {
         imageSelector: false,
         activeIndex: 0,
         uris: [],
+        PRESSED: false,
     };
 
     onChangeTitle = (value) => {
@@ -71,8 +72,6 @@ export default class UploadScreen extends Component {
         this.setState({
             channelDATA: this.connection.searchChannels(search),
         });
-
-
     };
 
     addChannel = (name) => {
@@ -390,12 +389,15 @@ export default class UploadScreen extends Component {
                     </Modal>
 
                     <View style={styles.button}>
-                        <Button
-                            title='SUBMIT'
-                            onPress={() => {
-                                this.callConnection();
-                            }}
-                        />
+                        {!this.state.PRESSED && (
+                            <Button
+                                title='SUBMIT'
+                                onPress={() => {
+                                    this.setState({ PRESSED: true });
+                                    this.callConnection();
+                                }}
+                            />
+                        )}
                     </View>
                 </KeyboardAvoidingView>
             );
