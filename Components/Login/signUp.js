@@ -176,8 +176,9 @@ const styles = StyleSheet.create({
     },
     button: {
         maxWidth: "90%",
-        paddingLeft: "5%",
+        paddingLeft: "10%",
         paddingTop: "5%",
+        paddingBottom: "5%",
     },
     button0: {
         maxWidth: "90%",
