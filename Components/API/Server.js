@@ -50,10 +50,10 @@ export default class Server {
       `${ADDRESS}/api/inviteToChallenge/${challenge}/${username}`
     ).then(async (res) => {
       if (res.status >= SERVER_ERROR) {
-        const status = await res.text();
+        const status = await res.json();
         console.log("Server error:");
         console.log(status);
-        throw new Error(`Server failed to invite user to challenge`);
+        throw new Error(status.error);
       } else {
         return res;
       }
@@ -74,10 +74,10 @@ export default class Server {
       body: data,
     }).then(async (res) => {
       if (res.status >= SERVER_ERROR) {
-        const status = await res.text();
+        const status = await res.json();
         console.log("Server error:");
         console.log(status);
-        throw new Error(`Server failed to create challenge`);
+        throw new Error(status.error);
       } else {
         return res.text();
       }

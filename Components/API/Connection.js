@@ -482,4 +482,18 @@ export default class Connection {
   getAllReportedPosts = async (filter = new Filter()) => {
     return await this.#firebase.getAllReportedPosts(filter);
   };
+
+  /**
+   *
+   * @param {Filter} filter
+   * @returns
+   */
+  getAllHiddenPosts = async (filter = new Filter()) => {
+    return await this.#firebase.getPosts(
+      this.#firebase.database
+        .collection("Posts")
+        .where("public", "==", false)
+        .orderBy(filter.orderBy, filter.direction)
+    );
+  };
 }

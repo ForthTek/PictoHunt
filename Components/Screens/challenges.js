@@ -120,6 +120,7 @@ export default class challenges extends Component {
     };
 
     addUsers = (newUsers) => {
+        //let all = this.state.users.concat(newUsers);
         this.setState({ users: newUsers, userDD: false });
         console.log(this.state.users.toString());
     };

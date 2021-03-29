@@ -178,8 +178,12 @@ describe("2.0 signed in tests", () => {
   });
 
   describe("5.0 admin tests", () => {
-    test.only("getReportedPosts", async () => {
-      let x = await connection.getAllReportedPosts();
+    // test.only("getReportedPosts", async () => {
+    //   let x = await connection.getAllReportedPosts();
+    //   console.log(x);
+    // });
+    test.only("getAllHiddenPosts", async () => {
+      let x = await connection.getAllHiddenPosts();
       console.log(x);
     });
     // test.only("isAdmin", async () => {
