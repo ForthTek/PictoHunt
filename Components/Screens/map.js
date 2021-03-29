@@ -226,7 +226,7 @@ export default class Map extends Component {
                           />
                       </Pressable>
                   </View>
-                    <View style={{ zIndex: 1000, alignSelf: "flex-start" }}>
+                    <View style={{ zIndex: 1000, alignSelf: "flex-end" }}>
                         <Pressable onPress={this.openFilterModal}>
                             <FeatherIcon name='sliders' style={{ fontSize: 30 }} />
                         </Pressable>
