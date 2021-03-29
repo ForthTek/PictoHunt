@@ -3,6 +3,9 @@ const ORDER_BY_SCORE = "score";
 const DIRECTION_ASC = "asc";
 const DIRECTION_DESC = "desc";
 
+/**
+ * Class used for storing the current filter to use for a query.
+ */
 export default class Filter {
   constructor() {
     this.orderBy = ORDER_BY_TIME;

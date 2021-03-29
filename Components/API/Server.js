@@ -61,6 +61,7 @@ export default class Server {
   }
 
   async createChallenge(username, description, deadline, tasks) {
+    // Convert data to string first
     const data = JSON.stringify({
       username: username,
       description: description,
@@ -69,7 +70,9 @@ export default class Server {
     });
 
     return await fetch(`${ADDRESS}/api/createChallenge`, {
+      // Must use post to send data
       method: "POST",
+      // Also make sure to include content type json
       headers: { "Content-Type": "application/json" },
       body: data,
     }).then(async (res) => {
@@ -87,6 +90,7 @@ export default class Server {
   async containsSwears(sentence) {
     return await fetch(`${ADDRESS}/api/isValidString/${sentence}`).then(
       async (res) => {
+        // Only a tad janky
         return (await res.text()).toLowerCase() === "false";
       },
       (error) => {
