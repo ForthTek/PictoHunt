@@ -17,6 +17,7 @@ import SearchItem from "../searchItem";
 import { Pressable } from "react-native";
 import IonIcon from "react-native-vector-icons/Ionicons";
 import NewChannel from "../newChannel";
+import FeatherIcon from "react-native-vector-icons/Feather";
 
 export default class Home extends Component {
     constructor(props) {
@@ -104,7 +105,7 @@ export default class Home extends Component {
                 }
             );
         } else {
-            this.getHiddenPosts();
+            this.getReportedPosts();
         }
     };
 
@@ -191,7 +192,7 @@ export default class Home extends Component {
         }
     };
 
-    getHiddenPosts = () => {
+    getReportedPosts = () => {
         this.connection.getAllReportedPosts(this.state.filter).then(
             (res) => {
                 this.setState({ DATA: res });
@@ -229,35 +230,35 @@ export default class Home extends Component {
         this.setState({ newChannel: false });
     };
 
-    // onDelete = (id) => {
-    //     //this.connection.isAdmin().then((x) => console.log(x));
+    onHide = (id) => {
+        //this.connection.isAdmin().then((x) => console.log(x));
 
-    //     Alert.alert(
-    //         "Admin Delete",
-    //         "This will delete this post forever. Are you sure you want to continue?",
-    //         [
-    //             {
-    //                 text: "Cancel",
-    //                 onPress: () => {
-    //                     return;
-    //                 },
-    //             },
-    //             {
-    //                 text: "Delete Post",
-    //                 onPress: () => {
-    //                     this.connection
-    //                         .deletePost(id)
-    //                         .then((res) => {
-    //                             Alert.alert(res);
-    //                         })
-    //                         .catch((error) => {
-    //                             Alert.alert(error.message);
-    //                         });
-    //                 },
-    //             },
-    //         ]
-    //     );
-    // };
+        Alert.alert(
+            "Admin Hide",
+            "This will hide the post from non-admin users. Would you like to continue?",
+            [
+                {
+                    text: "Cancel",
+                    onPress: () => {
+                        return;
+                    },
+                },
+                {
+                    text: "Hide Post",
+                    onPress: () => {
+                        this.connection
+                            .setPostPublic(id, false)
+                            .then((res) => {
+                                Alert.alert("Post hidden");
+                            })
+                            .catch((error) => {
+                                Alert.alert(error.message);
+                            });
+                    },
+                },
+            ]
+        );
+    };
 
     render() {
         if (this.state.isLoading) {
@@ -344,9 +345,9 @@ export default class Home extends Component {
                                     connection={this.connection}
                                     onLikeBtnPress={this.onLikeBtnPress}
                                 />
-                                {/* {this.state.isAdmin && (
+                                {this.state.isAdmin && this.state.isHidden && (
                                     <Pressable
-                                        onPress={() => this.onDelete(item.ID)}
+                                        onPress={() => this.onHide(item.ID)}
                                     >
                                         <FeatherIcon
                                             name='trash-2'
@@ -356,7 +357,7 @@ export default class Home extends Component {
                                             }}
                                         />
                                     </Pressable>
-                                )} */}
+                                )}
                             </View>
                         )}
                         keyExtractor={(item) => item.ID.toString()}

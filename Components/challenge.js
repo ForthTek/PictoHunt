@@ -60,7 +60,7 @@ export default class Challenge extends Component {
                                         connection={this.connection}
                                     />
                                 )}
-                                keyExtractor={(item) => item.description}
+                                keyExtractor={(item) => item.key}
                             />
                         </View>
                     )}

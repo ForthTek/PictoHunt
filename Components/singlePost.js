@@ -63,21 +63,10 @@ export default class SinglePost extends Component {
     };
 
     handleReport = () => {
-        if (this.props.isHidden) {
-            this.connection.setPostPublic(this.state.postID).then(
-                () => {
-                    Alert.alert("Post made public");
-                },
-                (error) => {
-                    Alert.alert(error.message);
-                }
-            );
-        } else {
-            this.connection.reportPost(this.state.postID).then(
-                () => Alert.alert("Post Reported"),
-                (error) => Alert.alert(error.message)
-            );
-        }
+        this.connection.reportPost(this.state.postID).then(
+            () => Alert.alert("Post Reported"),
+            (error) => Alert.alert(error.message)
+        );
     };
 
     render() {
