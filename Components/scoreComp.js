@@ -6,9 +6,15 @@ const ScoreComp = (props) => {
   let word;
 
   if(props.numberdiff > 0){
-    word = 'ahead';
+    word = 'ahead of';
   } else {
     word = 'behind';
+  }
+
+  let nodiff = props.numberdiff;
+
+  if (nodiff < 0) {
+    nodiff = nodiff * -1
   }
 
     return (
@@ -18,7 +24,7 @@ const ScoreComp = (props) => {
           {props.label1}   {props.othernumber}
         </Text>
         <Text style={{fontSize: 18,}}>
-          {props.numberdiff} {props.label2} {word} of you ({props.usernumber})
+          {nodiff} {props.label2} {word} you ({props.usernumber})
         </Text>
       </View>
 

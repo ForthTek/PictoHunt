@@ -73,14 +73,14 @@ export default class ForgotPass extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#8cfffb",
         paddingTop: "10%",
         justifyContent: "space-between",
         alignContent: "space-around",
     },
     container0: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#8cfffb",
         paddingLeft: "10%",
         justifyContent: "center",
         maxWidth: "90%",
@@ -101,5 +101,6 @@ const styles = StyleSheet.create({
         borderWidth: 1,
         fontSize: 20,
         color: "gray",
+        backgroundColor: "white"
     },
 });

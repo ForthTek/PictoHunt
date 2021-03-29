@@ -152,18 +152,18 @@ export default class SignUp extends Component {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#8cfffb",
         paddingTop: "10%",
     },
     container0: {
         flex: 0.2,
-        backgroundColor: "#fff",
+        backgroundColor: "#8cfffb",
         paddingTop: "12%",
         alignItems: "center",
     },
     container1: {
         flex: 1,
-        backgroundColor: "#fff",
+        backgroundColor: "#8cfffb",
     },
 
     loginCon: {
@@ -176,8 +176,9 @@ const styles = StyleSheet.create({
     },
     button: {
         maxWidth: "90%",
-        paddingLeft: "5%",
+        paddingLeft: "10%",
         paddingTop: "5%",
+        paddingBottom: "5%",
     },
     button0: {
         maxWidth: "90%",
@@ -192,5 +193,6 @@ const styles = StyleSheet.create({
         width: "70%",
         fontSize: 20,
         color: "gray",
+        backgroundColor: "white"
     },
 });
