@@ -461,7 +461,7 @@ export default class Map extends Component {
                                                 }}
                                             >
                                                 {" "}
-                                                {m.photos.length} post(s){" "}
+                                                {m.photos.length} pic(s){" "}
                                             </Text>
                                         </View>
                                     </MapView.Marker>
