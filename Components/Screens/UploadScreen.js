@@ -103,9 +103,20 @@ export default class UploadScreen extends Component {
                     // Maybe go to single post view now?
                     //console.log(key);
                     this.setState({
+                        title: "",
+                        channel: "",
+                        image: [],
+                        res: null,
+                        modalVisible: false,
                         lat: null,
                         long: null,
+                        search: "",
+                        searching: false,
+                        channelDATA: [],
                         imageSelector: false,
+                        activeIndex: 0,
+                        uris: [],
+                        PRESSED: false,
                     });
                     this.handleBack();
                     Alert.alert("Post Submitted: ", key.message);
@@ -113,6 +124,7 @@ export default class UploadScreen extends Component {
                 (error) => {
                     console.log(error);
                     Alert.alert(error.message);
+                    this.setState({ PRESSED: false });
                 }
             );
     };
