@@ -153,51 +153,32 @@ class Account extends Component {
         } else {
             return (
                 <SafeAreaView style={styles.container}>
-                    <View style={{ flexDirection: "row", paddingLeft: "5%" }}>
-                        <Image
-                            source={require("../../assets/pfp-placeholder.png")}
-                            width={160}
-                        />
-                        <View
-                            style={{
-                                flexDirection: "column",
-                                paddingLeft: "3%",
-                            }}
-                        >
-                            <Text style={styles.username}>
-                                {this.state.user.username}
-                            </Text>
-                            <Text style={styles.info}>Joined:</Text>
-                            <Text style={styles.info}>
-                                {this.state.user.timestamp
-                                    .toString()
-                                    .substring(4, 15)}
-                            </Text>
-
-                            {this.state.isAdmin && (
-                                <SettingBtn
-                                    label='App Stats'
-                                    icon='stats-chart-outline'
-                                    onPress={() => {
-                                        this.openStats();
-                                    }}
-                                />
-                            )}
-                            <SettingBtn
-                                label='Log Out'
-                                icon='log-out-outline'
-                                onPress={() => {
-                                    this.onSignOutPress();
-                                }}
-                            />
-                        </View>
-                        {this.state.stats && (
-                            <Stats
-                                back={this.closeStats}
-                                connection={this.connection}
-                            />
-                        )}
-                    </View>
+                            <Text style={styles.username}>{this.state.user.username}</Text>
+                            <Text style={styles.info}>Joined: {this.state.user.timestamp.toString().substring(4, 15)}</Text>
+                            <View style={{paddingLeft: "5%", flexDirection: "row", flex: 0.4}}>
+                              {this.state.isAdmin && (
+                                  <SettingBtn
+                                      label='App Stats'
+                                      icon='stats-chart-outline'
+                                      onPress={() => {
+                                          this.openStats();
+                                      }}
+                                  />
+                              )}
+                              <SettingBtn
+                                  label='Log Out'
+                                  icon='log-out-outline'
+                                  onPress={() => {
+                                      this.onSignOutPress();
+                                  }}
+                              />
+                          {this.state.stats && (
+                              <Stats
+                                  back={this.closeStats}
+                                  connection={this.connection}
+                              />
+                          )}
+                      </View>
 
                     <View
                         style={{
@@ -261,12 +242,15 @@ const styles = StyleSheet.create({
         padding: "1%",
     },
     username: {
-        fontSize: 22,
+        fontSize: 34,
         maxWidth: 200,
+        paddingLeft: "5%",
+        paddingBottom: "2%",
     },
     info: {
         fontSize: 18,
-        paddingBottom: "2%",
+        paddingLeft: "5%",
+        paddingBottom: "4%",
     },
     loadCon: {
         flex: 1,
