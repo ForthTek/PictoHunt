@@ -71,11 +71,6 @@ export default class SignUp extends Component {
         return (
             <SafeAreaView style={styles.container}>
                 <View style={styles.container0}>
-                    <Image
-                        source={require("../../assets/ForthTek.png")}
-                        width={160}
-                        style={{ width: 160, height: 160 }}
-                    />
                     <Text style={{ fontSize: 35 }}>Pictohunt</Text>
                     <Text style={{ fontSize: 18 }}>By ForthTek</Text>
                 </View>
@@ -159,11 +154,9 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: "#fff",
         paddingTop: "10%",
-        justifyContent: "space-between",
-        alignContent: "space-around",
     },
     container0: {
-        flex: 1,
+        flex: 0.2,
         backgroundColor: "#fff",
         paddingTop: "12%",
         alignItems: "center",
