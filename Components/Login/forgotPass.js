@@ -37,8 +37,11 @@ export default class ForgotPass extends Component {
     render() {
         return (
             <SafeAreaView style={styles.container}>
-                <Text style={{ fontSize: 30 }}>Forgot Password</Text>
-
+              <View style={{paddingTop: "12%"}}>
+                  <Text style={{ fontSize: 35, textAlign: "center" }}>Pictohunt</Text>
+                  <Text style={{ fontSize: 18, textAlign: "center"  }}>By ForthTek</Text>
+                <Text style={{ fontSize: 30, textAlign: "center", paddingTop: "6%" }}>Forgot Password</Text>
+              </View>
                 <View style={styles.container0}>
                     <Text style={{ fontSize: 20 }}>Email:</Text>
 
