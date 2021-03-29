@@ -773,6 +773,7 @@ export default class Firebase {
               longitude: long,
               radius: task.radius,
               completed: all[i].completed[j],
+              ID: `${all[i].ID}:${j}`,
             });
           }
 

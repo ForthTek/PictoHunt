@@ -2,7 +2,7 @@ import Filter from "./Filter.js";
 import Firebase from "./Firebase.js";
 import Server from "./Server.js";
 
-//const VALID_TEXT = /[a-zA-Z0-9.,!£$%&+\\-*\\/@#]+/;
+const VALID_TEXT = /^[a-zA-Z0-9.,!£$%&+*@#\/-]+$/;
 
 export default class Connection {
   #firebase;
@@ -83,6 +83,10 @@ export default class Connection {
    * @returns true if succesful
    */
   createProfile = async (email, username, password) => {
+    if (!VALID_TEXT.test(username)) {
+      throw new Error(`Username is not valid`);
+    }
+
     if (await this.#server.containsSwears(username)) {
       throw new Error(`Username ${username} contains a swear`);
     }
@@ -280,9 +284,9 @@ export default class Connection {
    * @returns
    */
   createPost = async (title, channelName, latitude, longitude, photos) => {
-    // if (!VALID_TEXT.test(title)) {
-    //   throw new Error(`Title is not valid`);
-    // }
+    if (!VALID_TEXT.test(title)) {
+      throw new Error(`Title is not valid`);
+    }
 
     // Filter any swears from the title
     const newTitle = await this.#server.filterSwears(title);
@@ -390,6 +394,10 @@ export default class Connection {
    * @returns
    */
   createChallenge = async (description, deadline, tasksPerPost) => {
+    if (!VALID_TEXT.test(description)) {
+      throw new Error(`Description is not valid`);
+    }
+
     // Don't need to censor description as server will do that there
     const username = this.#firebase.currentUser().username;
 
@@ -484,6 +492,14 @@ export default class Connection {
    * @returns
    */
   createChannel = async (name, description) => {
+    if (!VALID_TEXT.test(name)) {
+      throw new Error(`Name is not valid`);
+    }
+
+    if (!VALID_TEXT.test(description)) {
+      throw new Error(`Description is not valid`);
+    }
+
     // Ensure that the channel name and description is clean
     if (await this.#server.containsSwears(name)) {
       throw new Error(`Channel name ${name} contains a swear`);
