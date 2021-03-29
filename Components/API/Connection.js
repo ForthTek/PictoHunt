@@ -2,6 +2,8 @@ import Filter from "./Filter.js";
 import Firebase from "./Firebase.js";
 import Server from "./Server.js";
 
+const VALID_TEXT = /[a-zA-Z0-9!"£$%^&*()-_+=,.<>?/#@\[\]{}'~;:]+/;
+
 export default class Connection {
   #firebase;
   #server;
@@ -495,6 +497,8 @@ export default class Connection {
    * @returns
    */
   getAllReportedPosts = async (filter = new Filter()) => {
+    //filter.orderBy = Filter.ORDER_BY_SCORE;
+
     return await this.#firebase.getAllReportedPosts(filter);
   };
 
@@ -504,6 +508,8 @@ export default class Connection {
    * @returns
    */
   getAllHiddenPosts = async (filter = new Filter()) => {
+    //filter.orderBy = Filter.ORDER_BY_SCORE;
+
     return await this.#firebase.getPosts(
       this.#firebase.database
         .collection("Posts")

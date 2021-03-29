@@ -180,12 +180,13 @@ describe("2.0 signed in tests", () => {
   describe("5.0 admin tests", () => {
     // test.only("getReportedPosts", async () => {
     //   let x = await connection.getAllReportedPosts();
-    //   console.log(x);
+    //   console.log(`reported: ${x.length}`);
+    //   //console.log(x);
     // });
-    test.only("getAllHiddenPosts", async () => {
-      let x = await connection.getAllHiddenPosts();
-      console.log(x);
-    });
+    // test.only("getAllHiddenPosts", async () => {
+    //   let x = await connection.getAllHiddenPosts();
+    //   console.log(`hidden: ${x.length}`);
+    // });
     // test.only("isAdmin", async () => {
     //   expect(await connection.isAdmin()).toBe(true);
     // });

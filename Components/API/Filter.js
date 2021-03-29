@@ -31,7 +31,7 @@ export default class Filter {
     return DIRECTION_DESC;
   }
 
-  static get DIRECTION_ASC() {
-    return DIRECTION_ASC;
-  }
+  // static get DIRECTION_ASC() {
+  //   return DIRECTION_ASC;
+  // }
 }

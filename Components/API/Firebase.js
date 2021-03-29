@@ -283,6 +283,7 @@ export default class Firebase {
         time: data.timestamp.toDate(),
         liked: liked,
         disliked: disliked,
+        public: data.public,
         ID: doc.id,
       };
 
@@ -462,7 +463,7 @@ export default class Firebase {
       })
       .catch((error) => {
         console.log(error);
-        throw new Error(`Failed to load posts (${error.message})`);
+        throw new Error(error);
       });
   }
 
@@ -999,12 +1000,14 @@ export default class Firebase {
   getAllReportedPosts = async (filter = new Filter()) => {
     return await this.database
       .collection("Reports")
-      .where("public", "==", true)
       .orderBy(filter.orderBy, filter.direction)
       .get()
       .then(async (snapshot) => {
         let posts = [];
         let all = {};
+
+        console.log(snapshot.docs.length);
+
         // Each report
         snapshot.forEach((doc) => {
           const data = doc.data();
@@ -1017,12 +1020,22 @@ export default class Firebase {
               data.post.get().then((postDoc) => this.getPostFromDoc(postDoc))
             );
           }
-          // Add the report value instead
-          else {
-          }
         });
 
-        return await Promise.all(posts);
+        let loaded = await Promise.all(posts);
+
+        // Remove all public posts
+        for(let i = 0; i < loaded.length; i++) {
+          if(!loaded[i].public) {
+            loaded.splice(i, 1);
+          }
+        }
+
+        return loaded;
+      })
+      .catch((error) => {
+        console.log(error);
+        throw new Error(error);
       });
   };
 }
