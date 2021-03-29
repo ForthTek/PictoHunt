@@ -43,27 +43,26 @@ export default class Stats extends Component {
                             </Pressable>
 
                             <Text style={styles.text}>
-                                Current number of Users: {this.state.DATA.users}
+                                Number of Users: {this.state.DATA.users}
                             </Text>
                             <Text style={styles.text}>
-                                Current number of channels:{" "}
-                                {this.state.DATA.channels}
+                                Number of channels: {this.state.DATA.channels}
                             </Text>
                             <Text style={styles.text}>
-                                Current number of posts:{" "}
+                                Number of posts:{" "}
                                 {this.state.DATA.publicPosts +
                                     this.state.DATA.privatePosts}
                             </Text>
                             <Text style={styles.text}>
-                                Current number of posts hidden:{" "}
+                                Number of posts hidden:{" "}
                                 {this.state.DATA.privatePosts}
                             </Text>
                             <Text style={styles.text}>
-                                Current number of public posts:{" "}
+                                Number of public posts:{" "}
                                 {this.state.DATA.publicPosts}
                             </Text>
                             <Text style={styles.text}>
-                                Current number of challenges:{" "}
+                                Number of challenges:{" "}
                                 {this.state.DATA.challenges}
                             </Text>
                         </View>
