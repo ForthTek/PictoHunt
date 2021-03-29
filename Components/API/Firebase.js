@@ -566,6 +566,8 @@ export default class Firebase {
       GPSHash: GPSHash,
       channel: channelRef,
       photos: URLs,
+      likes: 0,
+      dislikes: 0,
       score: 0,
       createdBy: userRef,
       timestamp: firebase.firestore.Timestamp.now(),
