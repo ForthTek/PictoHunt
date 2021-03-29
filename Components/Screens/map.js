@@ -173,6 +173,14 @@ export default class Map extends Component {
     }
 
     onRefresh = () => {
+        // Please use a Filter object here as a parameter
+        // use these as the options:
+        // .postsByMe 
+        // .postsByUser + .username
+        // .positiveScore
+        // could also use .followedUsers and .followedChannels but you'll need to tell
+        // me so I can implement that
+
         this.connection
             .getMap()
             .then((response) => {

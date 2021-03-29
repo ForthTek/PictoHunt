@@ -9,7 +9,12 @@ export default class Filter {
     this.direction = DIRECTION_DESC;
     this.followedUsers = true;
     this.followedChannels = true;
+
+    this.postsByUser = false;
     this.postsByMe = false;
+    this.positiveScore = false;
+
+    this.username = "";
     this.useLimit = false;
     this.limit = 10;
   }

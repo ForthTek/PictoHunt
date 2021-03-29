@@ -208,10 +208,15 @@ export default class Connection {
   getMap = async (filter = new Filter()) => {
     //const limit = filter.useLimit ? filter.limit : 100;
     const limit = 20;
+    const username = this.#firebase.currentUser().username;
 
-    // Posts by the user
     if (filter.postsByMe) {
-      const username = this.currentUser().username;
+      filter.username = username;
+    }
+
+    // Posts by a specific user
+    if (filter.postsByUser) {
+      const username = filter.username;
       const user = this.#firebase.database.doc(`Users/${username}`);
 
       return await this.#firebase.getPosts(
@@ -225,13 +230,23 @@ export default class Connection {
     }
     // All posts
     else {
-      return await this.#firebase.getPosts(
+      let posts = await this.#firebase.getPosts(
         this.#firebase.database
           .collection("Posts")
           .where("public", "==", true)
           .where("GPS", "!=", null)
           .limit(limit)
       );
+
+      // Filter by positive posts
+      if (filter.positiveScore) {
+        for (let i = 0; i < posts.length; i++) {
+          if (posts[i].score < 0) {
+            posts.splice(i, 1);
+          }
+        }
+      }
+      return posts;
     }
   };
 
