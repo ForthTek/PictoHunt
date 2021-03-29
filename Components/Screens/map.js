@@ -175,7 +175,7 @@ export default class Map extends Component {
     onRefresh = () => {
         // Please use a Filter object here as a parameter
         // use these as the options:
-        // .postsByMe 
+        // .postsByMe
         // .postsByUser + .username
         // .positiveScore
         // could also use .followedUsers and .followedChannels but you'll need to tell
@@ -411,63 +411,158 @@ export default class Map extends Component {
                     <MapView
                         style={StyleSheet.absoluteFillObject}
                         provider={PROVIDER_GOOGLE}
+                        mapType='standard'
                         initialRegion={{
                             latitude: this.state.latitude,
                             longitude: this.state.longitude,
                             latitudeDelta: this.state.latitudeDelta,
                             longitudeDelta: this.state.longitudeDelta,
                         }}
-                        mapType='standard'
+                        onRegionChangeComplete={(region) => {this.setState({latitudeDelta: region.latitudeDelta})}}
                     >
                         {this.state.MarkerArray.map((m) => {
                             //console.log(m); // for testing, prints all posts
-                            if(this.state.filteringScore == false || m.score > this.state.filterNo){
-                              if(this.state.filteringUser == false || m.user == this.state.filteredUser){
+                            //console.log(this.state.latitudeDelta);
+                            if(this.state.latitudeDelta < 1){
+                              if(this.state.filteringScore == false || m.score > this.state.filterNo){
+                                if(this.state.filteringUser == false || m.user == this.state.filteredUser){
 
-                                return (
-                                    <MapView.Marker
-                                        coordinate={{
-                                            latitude: m.GPS.latitude,
-                                            longitude: m.GPS.longitude,
-                                        }}
-                                        key={m.ID}
-                                        onPress={() => this.opensinglepost(m)}
-                                    >
-                                        <View
-                                            style={{
-                                                flexDirection: "column",
-                                                flex: 1,
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                            }}
-                                        >
-                                            <Image
-                                                source={{ uri: m.photos[0] }}
-                                                style={{ width: 80, height: 80 }}
-                                            />
-                                            <Text
-                                                style={{
-                                                    backgroundColor: "#fff",
-                                                    fontSize: 11,
-                                                }}
-                                            >
-                                                {" "}
-                                                {m.title}{" "}
-                                            </Text>
-                                            <Text
-                                                style={{
-                                                    backgroundColor: "#fff",
-                                                    fontSize: 8,
-                                                }}
-                                            >
-                                                {" "}
-                                                {m.photos.length} pic(s){" "}
-                                            </Text>
-                                        </View>
-                                    </MapView.Marker>
-                                );
+                                  return (
+                                      <MapView.Marker
+                                          coordinate={{
+                                              latitude: m.GPS.latitude,
+                                              longitude: m.GPS.longitude,
+                                          }}
+                                          key={m.ID}
+                                          onPress={() => this.opensinglepost(m)}
+                                      >
+                                          <View
+                                              style={{
+                                                  flexDirection: "column",
+                                                  flex: 1,
+                                                  alignItems: "center",
+                                                  justifyContent: "center",
+                                              }}
+                                          >
+                                              <Image
+                                                  source={{ uri: m.photos[0] }}
+                                                  style={{ width: 80, height: 80 }}
+                                              />
+                                              <Text
+                                                  style={{
+                                                      backgroundColor: "#fff",
+                                                      fontSize: 11,
+                                                  }}
+                                              >
+                                                  {" "}
+                                                  {m.title}{" "}
+                                              </Text>
+                                              <Text
+                                                  style={{
+                                                      backgroundColor: "#fff",
+                                                      fontSize: 8,
+                                                  }}
+                                              >
+                                                  {" "}
+                                                  {m.photos.length} pic(s){" "}
+                                              </Text>
+                                          </View>
+                                      </MapView.Marker>
+                                  );
+                              }
                             }
+                        } else if (this.state.latitudeDelta >= 1 && this.state.latitudeDelta < 6) {
+                          if(this.state.filteringScore == false || m.score > this.state.filterNo){
+                            if(this.state.filteringUser == false || m.user == this.state.filteredUser){
+
+                              return (
+                                  <MapView.Marker
+                                      coordinate={{
+                                          latitude: m.GPS.latitude,
+                                          longitude: m.GPS.longitude,
+                                      }}
+                                      key={m.ID}
+                                      onPress={() => this.opensinglepost(m)}
+                                  >
+                                      <View
+                                          style={{
+                                              flexDirection: "column",
+                                              flex: 1,
+                                              alignItems: "center",
+                                              justifyContent: "center",
+                                          }}
+                                      >
+                                          <Image
+                                              source={{ uri: m.photos[0] }}
+                                              style={{ width: 40, height: 40 }}
+                                          />
+                                      </View>
+                                  </MapView.Marker>
+                              );
                           }
+                        }
+                      } else if (this.state.latitudeDelta >= 6 && this.state.latitudeDelta < 60) {
+                        if(this.state.filteringScore == false || m.score > this.state.filterNo){
+                          if(this.state.filteringUser == false || m.user == this.state.filteredUser){
+
+                            return (
+                                <MapView.Marker
+                                    coordinate={{
+                                        latitude: m.GPS.latitude,
+                                        longitude: m.GPS.longitude,
+                                    }}
+                                    key={m.ID}
+                                    onPress={() => this.opensinglepost(m)}
+                                >
+                                    <View
+                                        style={{
+                                            flexDirection: "column",
+                                            flex: 1,
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <Image
+                                            source={{ uri: m.photos[0] }}
+                                            style={{ width: (80 / 3.5), height: (80 / 3.5) }}
+                                        />
+                                    </View>
+                                </MapView.Marker>
+                            );
+                        }
+                      }
+                      } else {
+                        if(this.state.filteringScore == false || m.score > this.state.filterNo){
+                          if(this.state.filteringUser == false || m.user == this.state.filteredUser){
+
+                            return (
+                                <MapView.Marker
+                                    coordinate={{
+                                        latitude: m.GPS.latitude,
+                                        longitude: m.GPS.longitude,
+                                    }}
+                                    key={m.ID}
+                                    onPress={() => this.opensinglepost(m)}
+                                >
+                                    <View
+                                        style={{
+                                            flexDirection: "column",
+                                            flex: 1,
+                                            alignItems: "center",
+                                            justifyContent: "center",
+                                        }}
+                                    >
+                                        <Image
+                                            source={{ uri: m.photos[0] }}
+                                            style={{ width: 10, height: 10 }}
+                                        />
+                                    </View>
+                                </MapView.Marker>
+                            );
+                        }
+                      }
+                      }
+
                       }
                     )
                   }
@@ -528,12 +623,12 @@ const styles = StyleSheet.create({
         paddingBottom: "1%",
     },
     dropDown: {
-        backgroundColor: "#383d42",
+        backgroundColor: "#fff",
         paddingBottom: "2%",
     },
     ddText: {
         fontSize: 20,
         paddingLeft: "2%",
-        color: "white",
+        color: "black",
     },
 });
