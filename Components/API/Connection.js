@@ -4,7 +4,16 @@ import Server from "./Server.js";
 
 const VALID_TEXT = /^[ a-zA-Z0-9.,!£$%&+*@#\/-]+$/;
 
+/**
+ * This is the main class used for interacting with the back-end of PictoHunt. In
+ * this class we create a persistent connection to Firebase and use its auth, database
+ * and cloud storage services.  We also interact with the lightweight node server used to
+ * clean up parts of the database.  The server is hosted on Heroku.
+ */
 export default class Connection {
+  // Declare some private variables
+  // Connection is essentially a wrapper over Firebase, Upload and Server classes and
+  // we use private instances of those classes to allow us to make their functions private.
   #firebase;
   #server;
   #cachedChannels;
@@ -26,7 +35,7 @@ export default class Connection {
   };
 
   /**
-   * Invokes the function with no parameters, whenever the login state of the user changes
+   * Invokes the function supplied with no parameters, whenever the login state of the user changes
    *
    * @param {function} callback
    */
@@ -209,6 +218,7 @@ export default class Connection {
 
   /**
    *
+   * @param {Filter} filter
    * @returns
    */
   getMap = async (filter = new Filter()) => {
@@ -364,6 +374,9 @@ export default class Connection {
     return results;
   };
 
+  /**
+   * Loads all channels from the database and stores them locally. Used for offline search
+   */
   loadChannelsSearch = async () => {
     await this.#firebase.database
       .collection("Channels")
@@ -375,6 +388,9 @@ export default class Connection {
       });
   };
 
+  /**
+   * Loads all users from the database and stores them locally. Used for offline search
+   */
   loadUsersSearch = async () => {
     await this.#firebase.database
       .collection("Users")
@@ -390,7 +406,8 @@ export default class Connection {
    *
    * @param {string} description
    * @param {Date} deadline
-   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel name), .latitude and .longitude (required location)
+   * @param {object[]} tasksPerPost Array of JSON objects containing .channel (channel
+   * name), .latitude and .longitude (required location)
    * @returns
    */
   createChallenge = async (description, deadline, tasksPerPost) => {
@@ -409,6 +426,11 @@ export default class Connection {
     );
   };
 
+  /**
+   *
+   * @param {string} challenge
+   * @param {string[]} users
+   */
   inviteUsersToChallenge = async (challenge, users) => {
     let promises = [];
     for (let i = 0; i < users.length; i++) {
@@ -438,6 +460,7 @@ export default class Connection {
   /**
    *
    * @param {string} postID
+   * @param {string} reason
    * @returns
    */
   reportPost = async (postID, reason = "not specified") => {
@@ -517,8 +540,6 @@ export default class Connection {
    * @returns
    */
   getAllReportedPosts = async (filter = new Filter()) => {
-    //filter.orderBy = Filter.ORDER_BY_SCORE;
-
     return await this.#firebase.getAllReportedPosts(filter);
   };
 
@@ -528,8 +549,6 @@ export default class Connection {
    * @returns
    */
   getAllHiddenPosts = async (filter = new Filter()) => {
-    //filter.orderBy = Filter.ORDER_BY_SCORE;
-
     return await this.#firebase.getPosts(
       this.#firebase.database
         .collection("Posts")
