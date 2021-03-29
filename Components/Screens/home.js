@@ -90,7 +90,7 @@ export default class Home extends Component {
 
     onRefresh = () => {
         this.setState({ refresh: true, DATA: "" });
-        if (!this.state.isHidden) {
+        if (!this.state.reportedPosts) {
             this.connection.getBrowse(this.state.filter).then(
                 (res) => {
                     this.setState({ DATA: res });
@@ -174,10 +174,10 @@ export default class Home extends Component {
         usersFollowed,
         channelsFollowed,
         anyChanged,
-        hiddenPosts
+        reportedPosts
     ) => {
         //console.log(byTime, byScore, usersFollowed, channelsFollowed);
-        this.state.isHidden = hiddenPosts;
+        this.state.reportedPosts = reportedPosts;
         this.state.filter.followedChannels = channelsFollowed;
         this.state.filter.followedUsers = usersFollowed;
         if (byTime) {

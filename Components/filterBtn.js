@@ -49,7 +49,7 @@ export default class FilterBtn extends Component {
                                         this.state.onlyFollowedUsersCheck,
                                         this.state.onlyFollowedChannelsCheck,
                                         this.state.anyChanged,
-                                        this.state.hiddenPosts
+                                        this.state.reportedPosts
                                     );
                                 }}
                             >
@@ -138,12 +138,12 @@ export default class FilterBtn extends Component {
                                         uncheckedIcon='add'
                                         onPress={() =>
                                             this.setState({
-                                                hiddenPosts: !this.state
-                                                    .hiddenPosts,
+                                                reportedPosts: !this.state
+                                                    .reportedPosts,
                                                 anyChanged: true,
                                             })
                                         }
-                                        checked={this.state.hiddenPosts}
+                                        checked={this.state.reportedPosts}
                                     />
                                 </View>
                             )}
