@@ -24,8 +24,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/ForthTek.png",
-        "backgroundColor": "#00a8f3"
+        "foregroundImage": "./assets/AppIcon.png",
+        "backgroundColor": "#000000"
       },
       "package": "app.pictohunt",
       "config": {

@@ -501,7 +501,7 @@ export default class Map extends Component {
                               );
                           }
                         }
-                      } else if (this.state.latitudeDelta >= 6 && this.state.latitudeDelta < 60) {
+                      } else if (this.state.latitudeDelta >= 6 && this.state.latitudeDelta < 55) {
                         if(this.state.filteringScore == false || m.score > this.state.filterNo){
                           if(this.state.filteringUser == false || m.user == this.state.filteredUser){
 

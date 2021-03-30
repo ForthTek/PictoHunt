@@ -263,7 +263,7 @@ export default class Home extends Component {
                     },
                 },
                 {
-                    text: "Show Post",
+                    text: "Hide Post",
                     onPress: () => {
                         this.connection
                             .setPostPublic(id, false)
@@ -293,7 +293,7 @@ export default class Home extends Component {
                     },
                 },
                 {
-                    text: "Hide Post",
+                    text: "Show Post",
                     onPress: () => {
                         this.connection
                             .setPostPublic(id, true)
