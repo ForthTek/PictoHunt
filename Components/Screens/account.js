@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
     },
     username: {
         fontSize: 34,
-        maxWidth: 200,
+        maxWidth: 400,
         paddingLeft: "5%",
         paddingBottom: "2%",
     },
