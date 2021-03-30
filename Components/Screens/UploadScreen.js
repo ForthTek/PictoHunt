@@ -265,7 +265,7 @@ export default class UploadScreen extends Component {
                             sliderWidth={300}
                             itemWidth={300}
                             renderItem={this._renderItem}
-                            firstItem={this.state.uris.length - 1}
+                            firstItem={0}
                             onSnapToItem={(index) =>
                                 this.setState({ activeIndex: index })
                             }
