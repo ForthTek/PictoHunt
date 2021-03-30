@@ -1,6 +1,7 @@
 {
   "expo": {
-    "name": "forthtek-app",
+    "name": "PictoHunt",
+    "description": "PictoHunt is an online image sharing application being developed by ForthTek, a group of 3rd year students from Heriot-Watt in Edinburgh.",
     "slug": "forthtek-app",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -13,9 +14,7 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "app.pictohunt",

@@ -25,41 +25,6 @@ afterAll(() => {
   connection.close();
 });
 
-// Tests when the user is a guest
-// describe("1.0 guest tests", () => {
-//   beforeAll(async () => {
-//     await connection.logout();
-//   });
-
-//   test("1.1 guest isLoggedIn", async () => {
-//     let x = connection.isLoggedIn();
-//     expect(x).toBe(false);
-//   });
-
-//   test("1.2 guest getAllPosts", async () => {
-//     let x = await connection.getAllPosts(new Filter());
-//     expect(x.length).toBeGreaterThan(0);
-//   });
-
-//   // test("guest getAllPosts", async () => {
-//   //   let x = await connection.getAllPosts();
-//   //   expect(x.length).toBeGreaterThan(0);
-//   // });
-
-//   // test("guest getAllPosts", async () => {
-//   //   let x = await connection.getAllPosts();
-//   //   expect(x.length).toBeGreaterThan(0);
-//   // });
-
-//   test("1.3 guest getBrowse", async () => {
-//     // A guest user viewing browse should see all posts
-//     const numberOfAllPosts = (await connection.getAllPosts(new Filter()))
-//       .length;
-//     const numberOfBrowse = (await connection.getBrowse(new Filter())).length;
-//     expect(numberOfBrowse).toBe(numberOfAllPosts);
-//   });
-// });
-
 describe("2.0 signed in tests", () => {
   beforeAll(async () => {
     try {
@@ -69,10 +34,6 @@ describe("2.0 signed in tests", () => {
         TEST_PASSWORD,
         false
       );
-    } catch (error) {}
-
-    try {
-      await connection.createChannel(TEST_CHANNEL, "just a test channel");
     } catch (error) {}
 
     await connection.login(TEST_EMAIL, TEST_PASSWORD);
@@ -113,7 +74,13 @@ describe("2.0 signed in tests", () => {
   });
 
   describe("3.0 channel tests", () => {
-    test("getChannel", async () => {
+    beforeAll(async () => {
+      await connection.createChannel(TEST_CHANNEL, "just a test channel");
+
+      await connection.login(TEST_EMAIL, TEST_PASSWORD);
+    });
+
+    test.only("getChannel", async () => {
       let channel = await connection.getChannel(TEST_CHANNEL);
       //console.log(channel);
     });
