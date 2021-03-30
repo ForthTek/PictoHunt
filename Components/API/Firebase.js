@@ -1027,7 +1027,7 @@ export default class Firebase {
         // Remove all public posts
         for (let i = 0; i < loaded.length; i++) {
           if (!loaded[i].public) {
-            loaded.splice(i, 1);
+            loaded.splice(i);
           }
         }
 
