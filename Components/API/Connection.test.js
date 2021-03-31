@@ -1,258 +1,155 @@
 import Connection from "./Connection.js";
-import Filter from "./Filter.js";
-import Server from "./Server.js";
 
+// This is a basic account login
 const TEST_EMAIL = "forthtek1@gmail.com";
-const TEST_USERNAME = "Test";
 const TEST_PASSWORD = "password";
+const TEST_USERNAME = "Test";
 const TEST_CHANNEL = "Test";
 
+// Put in admin login details here when running the tests
+const ADMIN_EMAIL = "";
+const ADMIN_PASSWORD = "";
+
 /*
-
 Tests Index
-1.0: Guest Tests
-2.0: User Tests
-3.0: Channel Tests
-4.0: Challenge Tests
-5.0: Unit Tests
-
+1.0: Auth tests
+2.0: Profile tests
+3.0: Admin tests
+4.0: Channel tests
+5.0: Browse tests
+6.0: Map tests
+7.0: Challenge tests
 */
 
-// Create the connection at the start
-const connection = new Connection();
+describe("Connection.js tests", () => {
+  var connection;
 
-afterAll(() => {
-  connection.close();
-});
-
-describe("2.0 signed in tests", () => {
+  // Global test setup
   beforeAll(async () => {
-    try {
-      await connection.createProfile(
-        TEST_EMAIL,
-        TEST_USERNAME,
-        TEST_PASSWORD,
-        false
-      );
-    } catch (error) {}
+    connection = new Connection();
+
+    await connection
+      .createProfile(TEST_EMAIL, TEST_USERNAME, TEST_PASSWORD, false)
+      .catch((error) => {});
 
     await connection.login(TEST_EMAIL, TEST_PASSWORD);
   });
 
-  describe("2.1 account tests", () => {
-    test("currentUser", async () => {
-      let x = connection.currentUser();
-      expect(x.email).toBe(TEST_EMAIL);
-      expect(x.username).toBe(TEST_USERNAME);
-    });
+  // Global test teardown
+  afterAll(() => {
+    connection.close();
+  });
 
-    test("2.2 login", async () => {
+  describe("1.0 auth tests", () => {
+    test("1.1 login", async () => {
       await connection.logout();
       await connection.login(TEST_EMAIL, TEST_PASSWORD);
       // If this test fails, the test account could be locked/suspended
     });
+
+    describe("1.2 account tests", () => {
+      test("currentUser", async () => {
+        let x = connection.currentUser();
+        expect(x.email).toBe(TEST_EMAIL);
+        expect(x.username).toBe(TEST_USERNAME);
+      });
+
+      test("1.3 isLoggedIn", async () => {
+        expect(connection.isLoggedIn()).toBe(true);
+      });
+    });
   });
 
-  describe("2.3 profile tests", () => {
-    test("getProfile", async () => {
+  describe("2.0 profile tests", () => {
+    test("2.1 getProfile", async () => {
       let user = await connection.getProfile(TEST_USERNAME);
       //console.log(user);
     });
 
-    // test("likePost", async () => {
-    //   let x = await connection.likePost(TEST_POST);
-    //   // Like, dislike and remove interaction
-    // });
-
-    test("2.4 followUser", async () => {
+    test("2.2 followUser", async () => {
       await connection.followUser(TEST_USERNAME, true);
     });
 
-    test("2.5 followChannel", async () => {
+    test("2.3 followChannel", async () => {
       await connection.followChannel(TEST_CHANNEL, true);
     });
   });
 
-  describe("3.0 channel tests", () => {
+  describe("3.0 admin tests", () => {
     beforeAll(async () => {
-      await connection.createChannel(TEST_CHANNEL, "just a test channel");
+      if (!ADMIN_EMAIL || !ADMIN_PASSWORD) {
+        throw new Error(`Must define admin login details`);
+      }
 
-      await connection.login(TEST_EMAIL, TEST_PASSWORD);
+      await connection.login(ADMIN_EMAIL, ADMIN_PASSWORD);
+
+      await connection
+        .createChannel(TEST_CHANNEL, "description here")
+        .catch((error) => {});
     });
 
-    test.only("getChannel", async () => {
-      let channel = await connection.getChannel(TEST_CHANNEL);
-      //console.log(channel);
+    test("3.1 isAdmin", async () => {
+      expect(await connection.isAdmin()).toBe(true);
+    });
+
+    test("3.2 getReportedPosts", async () => {
+      let x = await connection.getAllReportedPosts();
+      // console.log(`reported posts: ${x.length}`);
+    });
+
+    test("3.3 getAllHiddenPosts", async () => {
+      let x = await connection.getAllHiddenPosts();
+      // console.log(`hidden posts: ${x.length}`);
+    });
+
+    test("3.4 getSummaryReport", async () => {
+      let x = await connection.getSummaryReport();
+      // console.log(x);
     });
   });
 
-  describe("3.1 browse tests", () => {
-    beforeEach(async () => {
+  describe("4.0 channel tests", () => {
+    beforeAll(async () => {
       await connection.login(TEST_EMAIL, TEST_PASSWORD);
     });
 
-    test("3.2 getGetAllPosts", async () => {
+    test("4.1 getChannel", async () => {
+      let x = await connection.getChannel(TEST_CHANNEL);
+    });
+  });
+
+  describe("5.1 browse tests", () => {
+    beforeAll(async () => {
+      await connection.login(TEST_EMAIL, TEST_PASSWORD);
+    });
+
+    test("5.2 getGetAllPosts", async () => {
       let x = await connection.getAllPosts();
-      //console.log(x.length);
     });
 
-    test("3.3 getBrowse", async () => {
+    test("5.3 getBrowse", async () => {
       let x = await connection.getBrowse();
-      //console.log(x.length);
     });
   });
 
-  describe("3.4 map tests", () => {
-    test("getMap", async () => {
+  describe("6.0 map tests", () => {
+    test("6.1 getMap", async () => {
       let x = await connection.getMap();
       //console.log(x.length);
     });
   });
 
-  describe("4.0 challenge tests", () => {
-    // beforeAll(async () => {
-    //   await connection.login(TEST_EMAIL, TEST_PASSWORD);
-    // });
+  describe("7.0 challenge tests", () => {
+    beforeAll(async () => {
+      await connection.login(TEST_EMAIL, TEST_PASSWORD);
+    });
 
-    // test.only("createChallenge", async () => {
-    //   let x = await connection.createChallenge(
-    //     "a description",
-    //     new Date("2021-04-17T03:24:00"),
-    //     [
-    //       { channel: "Test", latitude: null, longitude: null, radius: 100 },
-    //       { channel: "Test", latitude: 1, longitude: 2, radius: 100 },
-    //     ]
-    //   );
-    //   console.log(x);
-    // });
-
-    const c = "UXlZhJc8sQGub94WGpiR";
-    // test.only("inviteUsersToChallenge", async () => {
-    //   let x = await connection.inviteUsersToChallenge(c, ["Test"]);
-    // });
-
-    // test.only("deleteChallengeRequest", async () => {
-    //   let x = await connection.deleteChallenge(c);
-    // });
-
-    test("getChallenges", async () => {
+    test("7.1 getChallenges", async () => {
       let x = await connection.getChallenges(false);
-      //console.log(x);
-      // for (let i = 0; i < x[0].tasks.length; i++) {
-      //   console.log(x[0].tasks[i]);
-      // }
+    });
+
+    test("7.2 getChallenges", async () => {
+      let x = await connection.getChallenges(true);
     });
   });
-
-  describe("5.0 admin tests", () => {
-    // test.only("getReportedPosts", async () => {
-    //   let x = await connection.getAllReportedPosts();
-    //   console.log(`reported: ${x.length}`);
-    //   //console.log(x);
-    // });
-    // test.only("getAllHiddenPosts", async () => {
-    //   let x = await connection.getAllHiddenPosts();
-    //   console.log(`hidden: ${x.length}`);
-    // });
-    // test.only("isAdmin", async () => {
-    //   expect(await connection.isAdmin()).toBe(true);
-    // });
-    // test.only("getSummaryReport", async () => {
-    //   console.log(await connection.getSummeryReport());
-    // });
-    // test.only("createChannel", async () => {
-    //   console.log(await connection.createChannel(TEST_CHANNEL, "description here"));
-    // });
-  });
 });
-
-// let server = new Server();
-// describe("5.0 signed in tests", () => {
-//   describe("5.1 filter tests", () => {
-//     test("SwearString", async () => {
-//       var swear = "shit";
-//       let x = await server.containsSwears(swear);
-//       expect(x).toBe(true);
-//     });
-
-//     test("NoSwearString", async () => {
-//       var noSwear = "test string";
-//       let x = await server.containsSwears(noSwear);
-//       expect(x).toBe(false);
-//     });
-//   });
-// });
-
-// test.only("create sample data", async () => {
-
-//   await connection.login(TEST_EMAIL, TEST_PASSWORD);
-//   try {
-//     await connection.createProfile(
-//       TEST_EMAIL,
-//       TEST_USERNAME,
-//       TEST_PASSWORD,
-//       false
-//     );
-//   } catch (error) {}
-
-//   await connection.login(TEST_EMAIL, TEST_PASSWORD);
-
-//   try {
-//     await connection.createChannel(
-//       "Animals",
-//       "Pictures of cute animals. Anything goes!"
-//     );
-//   } catch (error) {}
-
-//   try {
-//     await connection.createChannel("doggos", "cute doggos only!");
-//   } catch (error) {}
-
-//   try {
-//     await connection.createChannel(
-//       "Holiday pictures",
-//       "Dedicated to pictures taken on holiday"
-//     );
-//   } catch (error) {}
-
-//   try {
-//     await connection.createChannel("Cities", "Cities from around the world");
-//   } catch (error) {}
-
-//   try {
-//     await connection.createChallenge(
-//       "Weekly challenge",
-//       new Date("2021-04-01T00:00:00"),
-//       100,
-//       [
-//         new ChallengeTask("Photograph any animal", "Animals"),
-//         new ChallengeTask("Take a picture of a dog", "doggos"),
-//       ]
-//     );
-//   } catch (error) {}
-
-//   try {
-//     await connection.createChallenge(
-//       "Daily challenge",
-//       new Date("2021-03-27T00:00:00"),
-//       75,
-//       [new ChallengeTask("Take a picture in the city", "Cities")]
-//     );
-//   } catch (error) {}
-
-//   try {
-//     await connection.createChallenge(
-//       "Interesting buildings",
-//       new Date("2021-03-27T00:00:00"),
-//       150,
-//       [
-//         new ChallengeTask("Photograph a tall building", "Cities"),
-//         new ChallengeTask("Take a pic of an interesting building", "Cities"),
-//         new ChallengeTask(
-//           "Take a snap of a damaged building",
-//           "Holiday pictures"
-//         ),
-//       ]
-//     );
-//   } catch (error) {}
-// });
